@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<EntityRelationships xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <EntityRelationship Name="business_unit_xgate_xgatesmschannelinstance" />
+  <EntityRelationship Name="business_unit_xgate_xgatesmschannelinstanceaccount" />
+  <EntityRelationship Name="lk_xgate_xgatesmschannelinstance_createdby" />
+  <EntityRelationship Name="lk_xgate_xgatesmschannelinstance_modifiedby" />
+  <EntityRelationship Name="lk_xgate_xgatesmschannelinstanceaccount_createdby" />
+  <EntityRelationship Name="lk_xgate_xgatesmschannelinstanceaccount_modifiedby" />
+  <EntityRelationship Name="owner_xgate_xgatesmschannelinstance" />
+  <EntityRelationship Name="owner_xgate_xgatesmschannelinstanceaccount" />
+  <EntityRelationship Name="team_xgate_xgatesmschannelinstance" />
+  <EntityRelationship Name="team_xgate_xgatesmschannelinstanceaccount" />
+  <EntityRelationship Name="user_xgate_xgatesmschannelinstance" />
+  <EntityRelationship Name="user_xgate_xgatesmschannelinstanceaccount" />
+  <EntityRelationship Name="msdyn_ChannelInstance_extendedentityid_xgate_xgatesmschannelinstance" />
+  <EntityRelationship Name="msdyn_ChannelInstanceAccount_extendedentityid_xgate_xgatesmschannelinstanceaccount" />
+</EntityRelationships>

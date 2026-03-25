@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>XgateSmsChannel.Plugins</id>
+    <version>1.0.0</version>
+    <authors>XgateSmsChannel.Plugins</authors>
+    <description>Package Description</description>
+    <repository type="git" />
+    <dependencies>
+      <group targetFramework=".NETFramework4.7.1">
+        <dependency id="Microsoft.CrmSdk.CoreAssemblies" version="9.0.2.46" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="Microsoft.CSharp" targetFramework=".NETFramework4.7.1" />
+      <frameworkAssembly assemblyName="System.ComponentModel.DataAnnotations" targetFramework=".NETFramework4.7.1" />
+      <frameworkAssembly assemblyName="System.Core" targetFramework=".NETFramework4.7.1" />
+      <frameworkAssembly assemblyName="System.Data.DataSetExtensions" targetFramework=".NETFramework4.7.1" />
+      <frameworkAssembly assemblyName="System.Data" targetFramework=".NETFramework4.7.1" />
+      <frameworkAssembly assemblyName="System" targetFramework=".NETFramework4.7.1" />
+      <frameworkAssembly assemblyName="System.Net.Http" targetFramework=".NETFramework4.7.1" />
+      <frameworkAssembly assemblyName="System.ServiceModel" targetFramework=".NETFramework4.7.1" />
+      <frameworkAssembly assemblyName="System.Xml" targetFramework=".NETFramework4.7.1" />
+      <frameworkAssembly assemblyName="System.Xml.Linq" targetFramework=".NETFramework4.7.1" />
+    </frameworkAssemblies>
+  </metadata>
+  <files>
+    <file src="D:\work\XgateSmsChannel\XgateSmsChannel.Plugins\bin\Release\net471\XgateSmsChannel.Plugins.dll" target="lib\net471\XgateSmsChannel.Plugins.dll" />
+  </files>
+</package>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<customapi uniquename="xgate_OutboundSmsCustomApi">
+  <allowedcustomprocessingsteptype>0</allowedcustomprocessingsteptype>
+  <bindingtype>0</bindingtype>
+  <boundentitylogicalname></boundentitylogicalname>
+  <description default="Outbound Sms custom api">
+    <label description="Outbound Sms custom api" languagecode="1033" />
+  </description>
+  <displayname default="OutboundSmsCustomApi">
+    <label description="OutboundSmsCustomApi" languagecode="1033" />
+  </displayname>
+  <executeprivilegename></executeprivilegename>
+  <iscustomizable>0</iscustomizable>
+  <isfunction>0</isfunction>
+  <isprivate>0</isprivate>
+  <name>OutboundSmsCustomApi</name>
+  <plugintypeid>
+    <plugintypeid>17ff135f-d55f-488e-a792-7422ddbdd435</plugintypeid>
+  </plugintypeid>
+  <workflowsdkstepenabled>0</workflowsdkstepenabled>
+  <statecode>1</statecode>
+  <statuscode>2</statuscode>
+</customapi>

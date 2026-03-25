@@ -1,0 +1,18 @@
+<customapi uniquename="xgate_DeliveryReportCustomApi">
+  <allowedcustomprocessingsteptype>0</allowedcustomprocessingsteptype>
+  <bindingtype>0</bindingtype>
+  <description default="Delivery report custom api">
+    <label description="Delivery report custom api" languagecode="1033" />
+  </description>
+  <displayname default="DeliveryReportCustomApi">
+    <label description="DeliveryReportCustomApi" languagecode="1033" />
+  </displayname>
+  <iscustomizable>0</iscustomizable>
+  <isfunction>0</isfunction>
+  <isprivate>0</isprivate>
+  <name>DeliveryReportCustomApi</name>
+  <plugintypeid>
+    <plugintypeid>26d2ca7e-2ba1-4049-9083-5a06372ce3f9</plugintypeid>
+  </plugintypeid>
+  <workflowsdkstepenabled>0</workflowsdkstepenabled>
+</customapi>

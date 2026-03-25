@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<customapi uniquename="xgate_SmsDeliveryReportCustomApi">
+  <allowedcustomprocessingsteptype>0</allowedcustomprocessingsteptype>
+  <bindingtype>0</bindingtype>
+  <boundentitylogicalname></boundentitylogicalname>
+  <description default="SmsDelivery report custom api">
+    <label description="SmsDelivery report custom api" languagecode="1033" />
+  </description>
+  <displayname default="SmsDeliveryReportCustomApi">
+    <label description="SmsDeliveryReportCustomApi" languagecode="1033" />
+  </displayname>
+  <executeprivilegename></executeprivilegename>
+  <iscustomizable>0</iscustomizable>
+  <isfunction>0</isfunction>
+  <isprivate>0</isprivate>
+  <name>SmsDeliveryReportCustomApi</name>
+  <plugintypeid>
+    <plugintypeid>b7763b99-7976-4b0a-8787-407d9ae29051</plugintypeid>
+  </plugintypeid>
+  <workflowsdkstepenabled>0</workflowsdkstepenabled>
+  <statecode>1</statecode>
+  <statuscode>2</statuscode>
+</customapi>

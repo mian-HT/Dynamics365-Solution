@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ImportExportXml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Entities />
+  <Roles />
+  <Workflows />
+  <FieldSecurityProfiles />
+  <Templates />
+  <EntityMaps />
+  <EntityRelationships />
+  <OrganizationSettings />
+  <optionsets />
+  <CustomControls />
+  <SolutionPluginAssemblies />
+  <EntityDataProviders />
+  <msdyn_channeldefinitions>
+    <msdyn_channeldefinition msdyn_channeldefinitionid="d78c79f8-d725-41ff-b0de-87988baf2643">
+      <msdyn_channeldefinitionaccountexternalentity>xgate_xgatesmschannelinstanceaccount</msdyn_channeldefinitionaccountexternalentity>
+      <msdyn_channeldefinitionaccountexternalformid>13964edc-3cdb-49a2-bf48-247e09ef586c</msdyn_channeldefinitionaccountexternalformid>
+      <msdyn_channeldefinitionexternalentity>xgate_xgatesmschannelinstance</msdyn_channeldefinitionexternalentity>
+      <msdyn_channeldefinitionexternalformid>d6edc918-d062-4a28-b80e-604706e18edc</msdyn_channeldefinitionexternalformid>
+      <msdyn_channeltype>SMS</msdyn_channeltype>
+      <msdyn_description>Metadata definition for Xgate SMS channel</msdyn_description>
+      <msdyn_displayname>Xgate SMS channel</msdyn_displayname>
+      <msdyn_hasdeliveryreceipt>1</msdyn_hasdeliveryreceipt>
+      <msdyn_hasinbound>1</msdyn_hasinbound>
+      <msdyn_outboundendpointurltemplate>/xgate_OutboundSmsCustomApi</msdyn_outboundendpointurltemplate>
+      <msdyn_specialconsentrequired>0</msdyn_specialconsentrequired>
+      <msdyn_supportsaccount>1</msdyn_supportsaccount>
+      <msdyn_supportsattachment>0</msdyn_supportsattachment>
+      <msdyn_supportsbinary>0</msdyn_supportsbinary>
+    </msdyn_channeldefinition>
+  </msdyn_channeldefinitions>
+  <msdyn_channelmessageparts>
+    <msdyn_channelmessagepart msdyn_channelmessagepartid="de4e1a4b-086a-4090-b995-8c11c427c090">
+      <msdyn_channeldefinitionid>
+        <msdyn_channeldefinitionid>d78c79f8-d725-41ff-b0de-87988baf2643</msdyn_channeldefinitionid>
+      </msdyn_channeldefinitionid>
+      <msdyn_description>Text part of SMS</msdyn_description>
+      <msdyn_displayname>Text</msdyn_displayname>
+      <msdyn_isrequired>1</msdyn_isrequired>
+      <msdyn_maxlength>1000</msdyn_maxlength>
+      <msdyn_name>text</msdyn_name>
+      <msdyn_type>192350000</msdyn_type>
+    </msdyn_channelmessagepart>
+  </msdyn_channelmessageparts>
+  <Languages>
+    <Language>1033</Language>
+  </Languages>
+</ImportExportXml>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<customapirequestparameter uniquename="payload">
+  <description default="JSON serialized outbound contract">
+    <label description="JSON serialized outbound contract" languagecode="1033" />
+  </description>
+  <displayname default="Payload">
+    <label description="Payload" languagecode="1033" />
+  </displayname>
+  <iscustomizable>0</iscustomizable>
+  <isoptional>0</isoptional>
+  <logicalentityname></logicalentityname>
+  <name>Payload</name>
+  <type>10</type>
+  <statecode>1</statecode>
+  <statuscode>2</statuscode>
+</customapirequestparameter>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<customapiresponseproperty uniquename="response">
+  <description default="JSON serialized delivery notification contract">
+    <label description="JSON serialized delivery notification contract" languagecode="1033" />
+  </description>
+  <displayname default="response">
+    <label description="response" languagecode="1033" />
+  </displayname>
+  <iscustomizable>0</iscustomizable>
+  <isoptional>0</isoptional>
+  <logicalentityname></logicalentityname>
+  <name>response</name>
+  <type>10</type>
+  <statecode>1</statecode>
+  <statuscode>2</statuscode>
+</customapiresponseproperty>

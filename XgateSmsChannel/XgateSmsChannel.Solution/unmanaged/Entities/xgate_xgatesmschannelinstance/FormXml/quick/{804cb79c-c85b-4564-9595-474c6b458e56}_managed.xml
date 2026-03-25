@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<forms xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <systemform>
+    <formid>{804cb79c-c85b-4564-9595-474c6b458e56}</formid>
+    <IntroducedVersion>1.0.0.0</IntroducedVersion>
+    <FormPresentation>1</FormPresentation>
+    <FormActivationState>1</FormActivationState>
+    <form>
+      <tabs>
+        <tab verticallayout="true" id="{5c64a7b8-4ca8-4abd-8f36-7ee7e213c438}" IsUserDefined="1">
+          <labels>
+            <label description="" languagecode="1033" />
+          </labels>
+          <columns>
+            <column width="100%">
+              <sections>
+                <section showlabel="false" showbar="false" IsUserDefined="0" id="{4648d80f-005b-4fb1-adf9-f898052ee848}">
+                  <labels>
+                    <label description="GENERAL" languagecode="1033" />
+                  </labels>
+                  <rows>
+                    <row>
+                      <cell id="{b79f3cd5-6d8f-4e0b-83fe-16e37e359662}">
+                        <labels />
+                        <control id="xgate_name" classid="{4273EDBD-AC1D-40d3-9FB2-095C621B552D}" datafieldname="xgate_name" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{b48a3f4d-6aa4-4cc5-a2ae-bbfc420f1ce9}">
+                        <labels />
+                        <control id="ownerid" classid="{270BD3DB-D9AF-4782-9025-509E298DEC0A}" datafieldname="ownerid" />
+                      </cell>
+                    </row>
+                  </rows>
+                </section>
+              </sections>
+            </column>
+          </columns>
+        </tab>
+      </tabs>
+    </form>
+    <IsCustomizable>0</IsCustomizable>
+    <CanBeDeleted>0</CanBeDeleted>
+    <LocalizedNames>
+      <LocalizedName description="Information" languagecode="1033" />
+    </LocalizedNames>
+  </systemform>
+</forms>

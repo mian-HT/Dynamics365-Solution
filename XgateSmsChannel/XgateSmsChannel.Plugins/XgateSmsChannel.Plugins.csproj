@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net471</TargetFramework>
+    <AssemblyName>XgateSmsChannel.Plugins</AssemblyName>
+    <RootNamespace>XgateSmsChannel.Plugins</RootNamespace>
+    <AssemblyOriginatorKeyFile>XgateKey.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly>True</SignAssembly>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CrmSdk.CoreAssemblies" Version="9.0.2.46" />
+  </ItemGroup>
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+        <Copy SourceFiles="$(OutDir)$(TargetName).dll" DestinationFiles="$(MSBuildProjectDirectory)\..\XgateSmsChannel.Solution\unmanaged\PluginAssemblies\XgateSmsChannelPlugins-BD9E885E-B45B-4452-A448-C7E6B93F231F\XgateSmsChannelPlugins.dll" />
+  </Target>
+</Project>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PluginAssembly FullName="XgateWhatsAppChannel.Plugins, Version=1.0.0.0, Culture=neutral, PublicKeyToken=ce2803c0831125f1" PluginAssemblyId="710374e4-90c6-4a25-8215-d9f790ae55bb" CustomizationLevel="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <IsolationMode>2</IsolationMode>
+  <SourceType>0</SourceType>
+  <IntroducedVersion>1.0</IntroducedVersion>
+  <FileName>/PluginAssemblies/XgateWhatsAppChannelPlugins-710374E4-90C6-4A25-8215-D9F790AE55BB/XgateWhatsAppChannelPlugins.dll</FileName>
+  <PluginTypes>
+    <PluginType AssemblyQualifiedName="XgateWhatsAppChannel.Plugins.DeliveryReportPlugin, XgateWhatsAppChannel.Plugins, Version=1.0.0.0, Culture=neutral, PublicKeyToken=ce2803c0831125f1" PluginTypeId="26d2ca7e-2ba1-4049-9083-5a06372ce3f9" Name="XgateWhatsAppChannel.Plugins.DeliveryReportPlugin">
+      <FriendlyName>26d2ca7e-2ba1-4049-9083-5a06372ce3f91.0.0.0</FriendlyName>
+    </PluginType>
+    <PluginType AssemblyQualifiedName="XgateWhatsAppChannel.Plugins.OutboundPlugin, XgateWhatsAppChannel.Plugins, Version=1.0.0.0, Culture=neutral, PublicKeyToken=ce2803c0831125f1" PluginTypeId="8c075f0a-20dd-4524-a5ee-254cff3d8759" Name="XgateWhatsAppChannel.Plugins.OutboundPlugin">
+      <FriendlyName>8c075f0a-20dd-4524-a5ee-254cff3d87591.0.0.0</FriendlyName>
+    </PluginType>
+  </PluginTypes>
+</PluginAssembly>
