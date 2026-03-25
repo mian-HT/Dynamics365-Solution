@@ -1,0 +1,25 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/d365_proxy?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: root
+    password: 321321
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  cache:
+    type: caffeine
+
+mybatis-plus:
+  configuration:
+    # 驼峰命名映射 (tenant_id -> tenantId)
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+  global-config:
+    db-config:
+      id-type: auto
+
+logging:
+  level:
+    com.xgate.d365proxy: debug
