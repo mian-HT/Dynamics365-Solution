@@ -38,12 +38,12 @@
       </Descriptions>
     </RelationshipDescription>
   </EntityRelationship>
-  <EntityRelationship Name="lk_xgate_samplechannelinstance_createdby">
+  <EntityRelationship Name="lk_xgate_whatsappchannelinstance_createdby">
     <EntityRelationshipType>OneToMany</EntityRelationshipType>
     <IsCustomizable>0</IsCustomizable>
     <IntroducedVersion>1.0.0.0</IntroducedVersion>
     <IsHierarchical>0</IsHierarchical>
-    <ReferencingEntityName>xgate_samplechannelinstance</ReferencingEntityName>
+    <ReferencingEntityName>xgate_whatsappchannelinstance</ReferencingEntityName>
     <ReferencedEntityName>SystemUser</ReferencedEntityName>
     <CascadeAssign>NoCascade</CascadeAssign>
     <CascadeDelete>NoCascade</CascadeDelete>
@@ -57,12 +57,12 @@
       </Descriptions>
     </RelationshipDescription>
   </EntityRelationship>
-  <EntityRelationship Name="lk_xgate_samplechannelinstance_modifiedby">
+  <EntityRelationship Name="lk_xgate_whatsappchannelinstance_modifiedby">
     <EntityRelationshipType>OneToMany</EntityRelationshipType>
     <IsCustomizable>0</IsCustomizable>
     <IntroducedVersion>1.0.0.0</IntroducedVersion>
     <IsHierarchical>0</IsHierarchical>
-    <ReferencingEntityName>xgate_samplechannelinstance</ReferencingEntityName>
+    <ReferencingEntityName>xgate_whatsappchannelinstance</ReferencingEntityName>
     <ReferencedEntityName>SystemUser</ReferencedEntityName>
     <CascadeAssign>NoCascade</CascadeAssign>
     <CascadeDelete>NoCascade</CascadeDelete>
@@ -76,12 +76,12 @@
       </Descriptions>
     </RelationshipDescription>
   </EntityRelationship>
-  <EntityRelationship Name="lk_xgate_samplemessagepartsview_createdby">
+  <EntityRelationship Name="lk_xgate_whatsappmessagepartsview_createdby">
     <EntityRelationshipType>OneToMany</EntityRelationshipType>
     <IsCustomizable>0</IsCustomizable>
     <IntroducedVersion>1.0.0.0</IntroducedVersion>
     <IsHierarchical>0</IsHierarchical>
-    <ReferencingEntityName>xgate_samplemessagepartsview</ReferencingEntityName>
+    <ReferencingEntityName>xgate_whatsappmessagepartsview</ReferencingEntityName>
     <ReferencedEntityName>SystemUser</ReferencedEntityName>
     <CascadeAssign>NoCascade</CascadeAssign>
     <CascadeDelete>NoCascade</CascadeDelete>
@@ -95,12 +95,12 @@
       </Descriptions>
     </RelationshipDescription>
   </EntityRelationship>
-  <EntityRelationship Name="lk_xgate_samplemessagepartsview_modifiedby">
+  <EntityRelationship Name="lk_xgate_whatsappmessagepartsview_modifiedby">
     <EntityRelationshipType>OneToMany</EntityRelationshipType>
     <IsCustomizable>0</IsCustomizable>
     <IntroducedVersion>1.0.0.0</IntroducedVersion>
     <IsHierarchical>0</IsHierarchical>
-    <ReferencingEntityName>xgate_samplemessagepartsview</ReferencingEntityName>
+    <ReferencingEntityName>xgate_whatsappmessagepartsview</ReferencingEntityName>
     <ReferencedEntityName>SystemUser</ReferencedEntityName>
     <CascadeAssign>NoCascade</CascadeAssign>
     <CascadeDelete>NoCascade</CascadeDelete>
@@ -133,12 +133,12 @@
       </Descriptions>
     </RelationshipDescription>
   </EntityRelationship>
-  <EntityRelationship Name="user_xgate_samplechannelinstance">
+  <EntityRelationship Name="user_xgate_whatsappchannelinstance">
     <EntityRelationshipType>OneToMany</EntityRelationshipType>
     <IsCustomizable>0</IsCustomizable>
     <IntroducedVersion>1.0.0.0</IntroducedVersion>
     <IsHierarchical>0</IsHierarchical>
-    <ReferencingEntityName>xgate_samplechannelinstance</ReferencingEntityName>
+    <ReferencingEntityName>xgate_whatsappchannelinstance</ReferencingEntityName>
     <ReferencedEntityName>SystemUser</ReferencedEntityName>
     <CascadeAssign>NoCascade</CascadeAssign>
     <CascadeDelete>NoCascade</CascadeDelete>
@@ -152,12 +152,12 @@
       </Descriptions>
     </RelationshipDescription>
   </EntityRelationship>
-  <EntityRelationship Name="user_xgate_samplemessagepartsview">
+  <EntityRelationship Name="user_xgate_whatsappmessagepartsview">
     <EntityRelationshipType>OneToMany</EntityRelationshipType>
     <IsCustomizable>0</IsCustomizable>
     <IntroducedVersion>1.0.0.0</IntroducedVersion>
     <IsHierarchical>0</IsHierarchical>
-    <ReferencingEntityName>xgate_samplemessagepartsview</ReferencingEntityName>
+    <ReferencingEntityName>xgate_whatsappmessagepartsview</ReferencingEntityName>
     <ReferencedEntityName>SystemUser</ReferencedEntityName>
     <CascadeAssign>NoCascade</CascadeAssign>
     <CascadeDelete>NoCascade</CascadeDelete>

@@ -73,9 +73,9 @@
             // Only one channel instance can exist for give definition id and contact point
             var extendedChannelInstance = channelInstances.Entities[0].GetAttributeValue<EntityReference>("msdyn_extendedentityid");
 
-            var sampleChannelInstance = organizationService.Retrieve(extendedChannelInstance.LogicalName, extendedChannelInstance.Id, new ColumnSet("xgate_accountid", "xgate_authtoken"));
-            var xgateAccountId = sampleChannelInstance.GetAttributeValue<string>("xgate_accountid");
-            var xgateAuthtoken = sampleChannelInstance.GetAttributeValue<string>("xgate_authtoken");
+            var whatsappChannelInstance = organizationService.Retrieve(extendedChannelInstance.LogicalName, extendedChannelInstance.Id, new ColumnSet("xgate_accountid", "xgate_authtoken"));
+            var xgateAccountId = whatsappChannelInstance.GetAttributeValue<string>("xgate_accountid");
+            var xgateAuthtoken = whatsappChannelInstance.GetAttributeValue<string>("xgate_authtoken");
 
             return new Credentials
             {

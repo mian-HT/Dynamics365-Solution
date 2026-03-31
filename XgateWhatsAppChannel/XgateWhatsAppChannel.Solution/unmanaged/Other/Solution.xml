@@ -80,8 +80,8 @@
     <RootComponents>
       <RootComponent type="1" schemaName="msdyn_channelinstance" behavior="1" />
       <RootComponent type="1" schemaName="xgate_requestmessagemapping" behavior="0" />
-      <RootComponent type="1" schemaName="xgate_samplechannelinstance" behavior="0" />
-      <RootComponent type="1" schemaName="xgate_samplemessagepartsview" behavior="0" />
+      <RootComponent type="1" schemaName="xgate_whatsappchannelinstance" behavior="0" />
+      <RootComponent type="1" schemaName="xgate_whatsappmessagepartsview" behavior="0" />
       <RootComponent type="91" id="710374E4-90C6-4A25-8215-D9F790AE55BB" schemaName="XgateWhatsAppChannel.Plugins, Version=1.0.0.0, Culture=neutral, PublicKeyToken=ce2803c0831125f1" behavior="0" />
     </RootComponents>
     <MissingDependencies>

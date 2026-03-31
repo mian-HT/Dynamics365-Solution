@@ -14,10 +14,10 @@
   <EntityDataProviders />
   <msdyn_channeldefinitions>
     <msdyn_channeldefinition msdyn_channeldefinitionid="702c7021-cf32-4fcd-be63-b3373f27906b">
-      <msdyn_channeldefinitionaccountexternalentity>xgate_samplechannelinstanceaccount</msdyn_channeldefinitionaccountexternalentity>
+      <msdyn_channeldefinitionaccountexternalentity>xgate_whatsappchannelinstanceaccount</msdyn_channeldefinitionaccountexternalentity>
       <msdyn_channeldefinitionaccountexternalformid>89c7b8cd-0d5f-4d0c-b92e-40ffc1ce2fc1</msdyn_channeldefinitionaccountexternalformid>
-      <msdyn_channeldefinitionexternalentity>xgate_samplechannelinstance</msdyn_channeldefinitionexternalentity>
-      <msdyn_channeldefinitionexternalformid>34d42fa2-ff18-4b88-9a54-bf6cd3b746f6</msdyn_channeldefinitionexternalformid>
+      <msdyn_channeldefinitionexternalentity>xgate_whatsappchannelinstance</msdyn_channeldefinitionexternalentity>
+      <msdyn_channeldefinitionexternalformid>48f25d02-adcb-433c-8d50-c58233ddddde</msdyn_channeldefinitionexternalformid>
       <msdyn_channeltype>Custom</msdyn_channeltype>
       <msdyn_description>Metadata definition for xgate whatsapp channel</msdyn_description>
       <msdyn_displayname>Xgate whatsapp channel</msdyn_displayname>

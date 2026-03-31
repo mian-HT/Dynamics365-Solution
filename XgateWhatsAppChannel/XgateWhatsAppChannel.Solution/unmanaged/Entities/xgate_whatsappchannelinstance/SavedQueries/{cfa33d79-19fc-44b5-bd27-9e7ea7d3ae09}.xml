@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<savedqueries xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <savedquery>
+    <IsCustomizable>0</IsCustomizable>
+    <CanBeDeleted>0</CanBeDeleted>
+    <isquickfindquery>1</isquickfindquery>
+    <isprivate>0</isprivate>
+    <isdefault>1</isdefault>
+    <savedqueryid>{cfa33d79-19fc-44b5-bd27-9e7ea7d3ae09}</savedqueryid>
+    <layoutxml>
+      <grid name="resultset" jump="xgate_name" select="1" icon="1" preview="1">
+        <row name="result" id="xgate_whatsappchannelinstanceid">
+          <cell name="xgate_name" width="300" />
+          <cell name="createdon" width="125" />
+        </row>
+      </grid>
+    </layoutxml>
+    <querytype>4</querytype>
+    <fetchxml>
+      <fetch version="1.0" mapping="logical">
+        <entity name="xgate_whatsappchannelinstance">
+          <attribute name="xgate_whatsappchannelinstanceid" />
+          <attribute name="xgate_name" />
+          <attribute name="createdon" />
+          <order attribute="xgate_name" descending="false" />
+          <filter type="and">
+            <condition attribute="statecode" operator="eq" value="0" />
+          </filter>
+          <filter type="or" isquickfindfields="1">
+            <condition attribute="xgate_name" operator="like" value="{0}" />
+          </filter>
+        </entity>
+      </fetch>
+    </fetchxml>
+    <IntroducedVersion>1.0.0.0</IntroducedVersion>
+    <LocalizedNames>
+      <LocalizedName description="Quick Find Active WhatsApp channel instances" languagecode="1033" />
+    </LocalizedNames>
+  </savedquery>
+</savedqueries>

@@ -19,12 +19,12 @@
       </Descriptions>
     </RelationshipDescription>
   </EntityRelationship>
-  <EntityRelationship Name="owner_xgate_samplechannelinstance">
+  <EntityRelationship Name="owner_xgate_whatsappchannelinstance">
     <EntityRelationshipType>OneToMany</EntityRelationshipType>
     <IsCustomizable>0</IsCustomizable>
     <IntroducedVersion>1.0.0.0</IntroducedVersion>
     <IsHierarchical>0</IsHierarchical>
-    <ReferencingEntityName>xgate_samplechannelinstance</ReferencingEntityName>
+    <ReferencingEntityName>xgate_whatsappchannelinstance</ReferencingEntityName>
     <ReferencedEntityName>Owner</ReferencedEntityName>
     <CascadeAssign>NoCascade</CascadeAssign>
     <CascadeDelete>NoCascade</CascadeDelete>
@@ -38,12 +38,12 @@
       </Descriptions>
     </RelationshipDescription>
   </EntityRelationship>
-  <EntityRelationship Name="owner_xgate_samplemessagepartsview">
+  <EntityRelationship Name="owner_xgate_whatsappmessagepartsview">
     <EntityRelationshipType>OneToMany</EntityRelationshipType>
     <IsCustomizable>0</IsCustomizable>
     <IntroducedVersion>1.0.0.0</IntroducedVersion>
     <IsHierarchical>0</IsHierarchical>
-    <ReferencingEntityName>xgate_samplemessagepartsview</ReferencingEntityName>
+    <ReferencingEntityName>xgate_whatsappmessagepartsview</ReferencingEntityName>
     <ReferencedEntityName>Owner</ReferencedEntityName>
     <CascadeAssign>NoCascade</CascadeAssign>
     <CascadeDelete>NoCascade</CascadeDelete>
