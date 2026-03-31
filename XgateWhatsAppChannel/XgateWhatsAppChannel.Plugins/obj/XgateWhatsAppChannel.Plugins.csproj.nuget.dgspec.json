@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\work\\XgateWhatsAppChannel\\XgateWhatsAppChannel.Plugins\\XgateWhatsAppChannel.Plugins.csproj": {}
+    "D:\\work\\Dynamics365-Solution\\XgateWhatsAppChannel\\XgateWhatsAppChannel.Plugins\\XgateWhatsAppChannel.Plugins.csproj": {}
   },
   "projects": {
-    "D:\\work\\XgateWhatsAppChannel\\XgateWhatsAppChannel.Plugins\\XgateWhatsAppChannel.Plugins.csproj": {
+    "D:\\work\\Dynamics365-Solution\\XgateWhatsAppChannel\\XgateWhatsAppChannel.Plugins\\XgateWhatsAppChannel.Plugins.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\work\\XgateWhatsAppChannel\\XgateWhatsAppChannel.Plugins\\XgateWhatsAppChannel.Plugins.csproj",
+        "projectUniqueName": "D:\\work\\Dynamics365-Solution\\XgateWhatsAppChannel\\XgateWhatsAppChannel.Plugins\\XgateWhatsAppChannel.Plugins.csproj",
         "projectName": "XgateWhatsAppChannel.Plugins",
-        "projectPath": "D:\\work\\XgateWhatsAppChannel\\XgateWhatsAppChannel.Plugins\\XgateWhatsAppChannel.Plugins.csproj",
+        "projectPath": "D:\\work\\Dynamics365-Solution\\XgateWhatsAppChannel\\XgateWhatsAppChannel.Plugins\\XgateWhatsAppChannel.Plugins.csproj",
         "packagesPath": "C:\\Users\\Administrator\\.nuget\\packages\\",
-        "outputPath": "D:\\work\\XgateWhatsAppChannel\\XgateWhatsAppChannel.Plugins\\obj\\",
+        "outputPath": "D:\\work\\Dynamics365-Solution\\XgateWhatsAppChannel\\XgateWhatsAppChannel.Plugins\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

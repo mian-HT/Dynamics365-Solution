@@ -9,13 +9,13 @@
     using System.Text;
     using System.Web;
 
-    // Sample plugin that sends a WhatsApp message using Twilio
+    // WhatsApp plugin that sends a WhatsApp message using Twilio
     public class OutboundPlugin : IPlugin
     {
         public void Execute(IServiceProvider serviceProvider)
         {
             var tracingService = serviceProvider.Get<ITracingService>();
-            tracingService.Trace("Executing outbound sample channel plugin");
+            tracingService.Trace("Executing outbound WhatsApp channel plugin");
             var pluginExecutionContext = serviceProvider.Get<IPluginExecutionContext>();
 
             // "payload" attribute is required by contract
@@ -74,24 +74,24 @@
             var extendedChannelInstance = channelInstances.Entities[0].GetAttributeValue<EntityReference>("msdyn_extendedentityid");
 
             var sampleChannelInstance = organizationService.Retrieve(extendedChannelInstance.LogicalName, extendedChannelInstance.Id, new ColumnSet("xgate_accountid", "xgate_authtoken"));
-            var twilioSid = sampleChannelInstance.GetAttributeValue<string>("xgate_accountid");
-            var twilioToken = sampleChannelInstance.GetAttributeValue<string>("xgate_authtoken");
+            var xgateAccountId = sampleChannelInstance.GetAttributeValue<string>("xgate_accountid");
+            var xgateAuthtoken = sampleChannelInstance.GetAttributeValue<string>("xgate_authtoken");
 
             return new Credentials
             {
-                AccountId = twilioSid,
-                Token = twilioToken,
+                AccountId = xgateAccountId,
+                Token = xgateAuthtoken,
             };
         }
 
-        private static string SendTwilioRequest(string twilioSid, string twilioToken, Payload payloadObject, ITracingService tracingService)
+        private static string SendTwilioRequest(string AccountId, string token, Payload payloadObject, ITracingService tracingService)
         {
-            var request = WebRequest.CreateHttp($"https://api.twilio.com/2010-04-01/Accounts/{twilioSid}/Messages.json");
+            var request = WebRequest.CreateHttp($"https://api.twilio.com/2010-04-01/Accounts/{AccountId}/Messages.json");
 
             request.Method = "POST";
             request.ContentType = "application/x-www-form-urlencoded";
 
-            var basicAuth = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{twilioSid}:{twilioToken}"));
+            var basicAuth = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{AccountId}:{token}"));
             request.Headers.Add(HttpRequestHeader.Authorization, $"Basic {basicAuth}");
 
             var queryString = HttpUtility.ParseQueryString(string.Empty);

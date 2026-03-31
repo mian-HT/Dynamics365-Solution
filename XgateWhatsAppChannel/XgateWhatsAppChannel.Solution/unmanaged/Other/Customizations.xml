@@ -32,79 +32,40 @@
     </msdyn_channeldefinition>
   </msdyn_channeldefinitions>
   <msdyn_channelmessageparts>
-    <msdyn_channelmessagepart msdyn_channelmessagepartid="5dbb4356-ab09-4e4b-aedb-3fd7333eb833">
+    <msdyn_channelmessagepart msdyn_channelmessagepartid="8ed9addf-a578-42df-b7e0-aba0745c2523">
       <msdyn_channeldefinitionid>
         <msdyn_channeldefinitionid>702c7021-cf32-4fcd-be63-b3373f27906b</msdyn_channeldefinitionid>
       </msdyn_channeldefinitionid>
-      <msdyn_description>Text</msdyn_description>
-      <msdyn_displayname>Text</msdyn_displayname>
+      <msdyn_description>Template ID</msdyn_description>
+      <msdyn_displayname>Template ID</msdyn_displayname>
       <msdyn_isrequired>1</msdyn_isrequired>
-      <msdyn_maxlength>1000</msdyn_maxlength>
-      <msdyn_name>text</msdyn_name>
+      <msdyn_maxlength>100</msdyn_maxlength>
+      <msdyn_name>xgate_templateid</msdyn_name> 
       <msdyn_type>192350000</msdyn_type>
     </msdyn_channelmessagepart>
-    <msdyn_channelmessagepart msdyn_channelmessagepartid="308447ab-b555-4c44-80ca-0c975bfa33b0">
+
+    <msdyn_channelmessagepart msdyn_channelmessagepartid="bd991618-98a7-4170-ba36-de93de1a2c44">
       <msdyn_channeldefinitionid>
         <msdyn_channeldefinitionid>702c7021-cf32-4fcd-be63-b3373f27906b</msdyn_channeldefinitionid>
       </msdyn_channeldefinitionid>
-      <msdyn_description>Image</msdyn_description>
-      <msdyn_displayname>Image</msdyn_displayname>
+      <msdyn_description>Header Variables (Key:Value)</msdyn_description>
+      <msdyn_displayname>Header Variables</msdyn_displayname>
       <msdyn_isrequired>0</msdyn_isrequired>
-      <msdyn_name>image</msdyn_name>
-      <msdyn_type>192350004</msdyn_type>
+      <msdyn_maxlength>2000</msdyn_maxlength>
+      <msdyn_name>xgate_headervariables</msdyn_name>
+      <msdyn_type>192350000</msdyn_type>
     </msdyn_channelmessagepart>
-    <msdyn_channelmessagepart msdyn_channelmessagepartid="1444f64e-f4d6-41dd-9f9d-79c4c1a8877d">
+
+    <msdyn_channelmessagepart msdyn_channelmessagepartid="5b21d09d-d1bb-43c7-b885-df0c69bc490f">
       <msdyn_channeldefinitionid>
         <msdyn_channeldefinitionid>702c7021-cf32-4fcd-be63-b3373f27906b</msdyn_channeldefinitionid>
       </msdyn_channeldefinitionid>
-      <msdyn_description>File</msdyn_description>
-      <msdyn_displayname>File</msdyn_displayname>
+      <msdyn_description>Body Variables (Key:Value)</msdyn_description>
+      <msdyn_displayname>Body Variables</msdyn_displayname>
       <msdyn_isrequired>0</msdyn_isrequired>
-      <msdyn_name>file</msdyn_name>
-      <msdyn_type>192350003</msdyn_type>
-    </msdyn_channelmessagepart>
-    <msdyn_channelmessagepart msdyn_channelmessagepartid="e838d90e-bd44-481d-be55-00de8b773837">
-      <msdyn_channeldefinitionid>
-        <msdyn_channeldefinitionid>702c7021-cf32-4fcd-be63-b3373f27906b</msdyn_channeldefinitionid>
-      </msdyn_channeldefinitionid>
-      <msdyn_description>Contact</msdyn_description>
-      <msdyn_displayname>Contact</msdyn_displayname>
-      <msdyn_isrequired>0</msdyn_isrequired>
-      <msdyn_name>contact</msdyn_name>
-      <msdyn_type>192350005</msdyn_type>
-      <msdyn_entityname>contact</msdyn_entityname>
-      <msdyn_entityviewid>00000000-0000-0000-00aa-000010001003</msdyn_entityviewid>
-    </msdyn_channelmessagepart>
-    <msdyn_channelmessagepart msdyn_channelmessagepartid="b39b2212-7880-4aae-b7b4-a95e7cb71511">
-      <msdyn_channeldefinitionid>
-        <msdyn_channeldefinitionid>702c7021-cf32-4fcd-be63-b3373f27906b</msdyn_channeldefinitionid>
-      </msdyn_channeldefinitionid>
-      <msdyn_description>Number</msdyn_description>
-      <msdyn_displayname>Number</msdyn_displayname>
-      <msdyn_isrequired>0</msdyn_isrequired>
-      <msdyn_name>number</msdyn_name>
-      <msdyn_type>192350006</msdyn_type>
-    </msdyn_channelmessagepart>
-    <msdyn_channelmessagepart msdyn_channelmessagepartid="8f0d8f26-201a-41a9-b6a8-25d55abdf02a">
-      <msdyn_channeldefinitionid>
-        <msdyn_channeldefinitionid>702c7021-cf32-4fcd-be63-b3373f27906b</msdyn_channeldefinitionid>
-      </msdyn_channeldefinitionid>
-      <msdyn_description>Boolean</msdyn_description>
-      <msdyn_displayname>Boolean</msdyn_displayname>
-      <msdyn_isrequired>0</msdyn_isrequired>
-      <msdyn_name>boolean</msdyn_name>
-      <msdyn_type>192350007</msdyn_type>
-    </msdyn_channelmessagepart>
-    <msdyn_channelmessagepart msdyn_channelmessagepartid="19bf21b6-a328-4539-a4da-a1d48f9cae96">
-      <msdyn_channeldefinitionid>
-        <msdyn_channeldefinitionid>702c7021-cf32-4fcd-be63-b3373f27906b</msdyn_channeldefinitionid>
-      </msdyn_channeldefinitionid>
-      <msdyn_description>Option List</msdyn_description>
-      <msdyn_displayname>Option List</msdyn_displayname>
-      <msdyn_isrequired>0</msdyn_isrequired>
-      <msdyn_name>options</msdyn_name>
-      <msdyn_type>192350008</msdyn_type>
-      <msdyn_options>[{ "label": "Option 1", "value": 1 }, { "label": "Option 2", "value": 2 }, {"label": "Option 3", "value": 3}]</msdyn_options>
+      <msdyn_maxlength>4000</msdyn_maxlength>
+      <msdyn_name>xgate_bodyvariables</msdyn_name>
+      <msdyn_type>192350000</msdyn_type>
     </msdyn_channelmessagepart>
   </msdyn_channelmessageparts>
   <Languages>

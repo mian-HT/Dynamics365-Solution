@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "R/DFwaBysHY=",
+  "dgSpecHash": "HWQdlkCs8tA=",
   "success": true,
-  "projectFilePath": "D:\\work\\XgateWhatsAppChannel\\XgateWhatsAppChannel.Plugins\\XgateWhatsAppChannel.Plugins.csproj",
+  "projectFilePath": "D:\\work\\Dynamics365-Solution\\XgateWhatsAppChannel\\XgateWhatsAppChannel.Plugins\\XgateWhatsAppChannel.Plugins.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Administrator\\.nuget\\packages\\microsoft.bcl.asyncinterfaces\\6.0.0\\microsoft.bcl.asyncinterfaces.6.0.0.nupkg.sha512",
     "C:\\Users\\Administrator\\.nuget\\packages\\microsoft.crmsdk.coreassemblies\\9.0.2.46\\microsoft.crmsdk.coreassemblies.9.0.2.46.nupkg.sha512",
