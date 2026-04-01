@@ -4,7 +4,7 @@
     using Microsoft.Xrm.Sdk.Extensions;
     using Microsoft.Xrm.Sdk.Query;
 
-    using XgateWhatsAppChannel.Plugins.TwilioContracts;
+    using XgateWhatsAppChannel.Plugins.XgateContracts;
 
     using System;
     using System.Collections.Generic;
@@ -23,10 +23,10 @@
             tracingService.Trace(payload);
             var organizationService = serviceProvider.Get<IOrganizationServiceFactory>().CreateOrganizationService(null);
 
-            var twilioDeliverReport = JsonUtils.Deserialize<TwilioDeliveryReport>(payload);
+            var xgateDeliverReport = JsonUtils.Deserialize<XgateDeliveryReport>(payload);
 
             // Only processing "delivered" status for demo purpose
-            if (twilioDeliverReport.MessageStatus == "delivered")
+            if (xgateDeliverReport.MessageStatus == "delivered")
             {
                 // Find request id by message id
                 var requestId = organizationService.RetrieveMultiple(new QueryExpression("xgate_requestmessagemapping")
@@ -34,16 +34,16 @@
                     ColumnSet = new ColumnSet("xgate_requestid"),
                     Criteria = new FilterExpression()
                     {
-                        Conditions = { new ConditionExpression("xgate_messageid", ConditionOperator.Equal, twilioDeliverReport.MessageSid) }
+                        Conditions = { new ConditionExpression("xgate_messageid", ConditionOperator.Equal, xgateDeliverReport.MessageSid) }
                     }
                 }).Entities[0].GetAttributeValue<string>("xgate_requestid");
 
                 var deliveryReport = new DeliveryReport()
                 {
                     ChannelDefinitionId = Guid.Parse("702c7021-cf32-4fcd-be63-b3373f27906b"),
-                    // Twilio specific prefix
-                    From = twilioDeliverReport.From.Replace("whatsapp:", ""),
-                    MessageId = twilioDeliverReport.MessageSid,
+                    // Xgate specific prefix
+                    From = xgateDeliverReport.From.Replace("whatsapp:", ""),
+                    MessageId = xgateDeliverReport.MessageSid,
                     RequestId = requestId,
                     Status = "Delivered",
                     OrganizationId = pluginExecutionContext.OrganizationId.ToString(),

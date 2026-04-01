@@ -1,4 +1,4 @@
-﻿namespace XgateWhatsAppChannel.Plugins.TwilioContracts
+﻿namespace XgateWhatsAppChannel.Plugins.XgateContracts
 {
     using System;
     using System.Collections.Generic;
@@ -8,7 +8,7 @@
     using System.Threading.Tasks;
 
     [DataContract]
-    public class TwilioDeliveryReport
+    public class XgateDeliveryReport
     {
         [DataMember]
         public string SmsSid { get; set; }

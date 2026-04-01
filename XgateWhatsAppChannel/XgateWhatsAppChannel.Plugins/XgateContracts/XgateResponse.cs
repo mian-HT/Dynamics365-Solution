@@ -3,7 +3,7 @@
     using System.Runtime.Serialization;
 
     [DataContract]
-    public class TwilioResponse
+    public class XgateResponse
     {
         [DataMember(Name = "sid")]
         public string Sid { get; set; }
