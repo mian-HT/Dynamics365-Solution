@@ -1,0 +1,158 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<forms xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <systemform>
+    <formid>{90ffd52e-b52e-4379-8ad5-80681f6bf3b7}</formid>
+    <IntroducedVersion>1.0</IntroducedVersion>
+    <FormPresentation>1</FormPresentation>
+    <FormActivationState>1</FormActivationState>
+    <form headerdensity="HighWithControls">
+      <tabs>
+        <tab verticallayout="true" id="{f9106b6e-2039-41a2-a854-29e5fbc28999}" IsUserDefined="1" name="WhatsApp Message">
+          <labels>
+            <label description="General" languagecode="1033" />
+            <label description="全般" languagecode="1041" />
+            <label description="常规" languagecode="2052" />
+          </labels>
+          <columns>
+            <column width="100%">
+              <sections>
+                <section showlabel="false" showbar="false" IsUserDefined="0" id="{88bf72db-0637-40d1-9dd1-56593fcec0e7}">
+                  <labels>
+                    <label description="General" languagecode="1033" />
+                    <label description="全般" languagecode="1041" />
+                    <label description="常规" languagecode="2052" />
+                  </labels>
+                  <rows>
+                    <row>
+                      <cell id="{db7afcb6-8fe7-413e-9615-dade90340c6d}">
+                        <labels>
+                          <label description="Name" languagecode="1041" />
+                          <label description="Name" languagecode="1033" />
+                        </labels>
+                        <control id="xgate_name" classid="{4273EDBD-AC1D-40d3-9FB2-095C621B552D}" datafieldname="xgate_name" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{ea227e5b-74b9-4d5c-96b8-d1e17e09f0c7}">
+                        <labels>
+                          <label description="所有者" languagecode="1041" />
+                        </labels>
+                        <control id="ownerid" classid="{270BD3DB-D9AF-4782-9025-509E298DEC0A}" datafieldname="ownerid" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{e3e442d3-8439-41cf-8de3-e7ff76eb3207}" locklevel="0" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="Template ID" languagecode="1041" />
+                          <label description="Template ID" languagecode="1033" />
+                        </labels>
+                        <control id="xgate_templateid" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" datafieldname="xgate_templateid" disabled="false" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{2e0ce92a-7dcc-4442-ad3d-ab9574c415ab}" locklevel="0" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="Header Variables" languagecode="1041" />
+                          <label description="Header Variables" languagecode="1033" />
+                        </labels>
+                        <control id="xgate_headervariables" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" datafieldname="xgate_headervariables" disabled="false" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{ca87ff25-0ac7-4704-b0e8-f5f9ae5534e6}" locklevel="0" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="Body Variables" languagecode="1041" />
+                          <label description="Body Variables" languagecode="1033" />
+                        </labels>
+                        <control id="xgate_bodyvariables" classid="{F9A8A302-114E-466A-B582-6771B2AE0D92}" datafieldname="xgate_bodyvariables" disabled="false" uniqueid="{4d0ef6c6-dcbd-4f58-9b7c-53a80c659126}" />
+                      </cell>
+                    </row>
+                  </rows>
+                </section>
+              </sections>
+            </column>
+          </columns>
+        </tab>
+      </tabs>
+      <header id="{0f44c116-cc13-4855-a34c-898cf6fcf6de}" celllabelposition="Top" columns="111" labelwidth="115" celllabelalignment="Left">
+        <rows>
+          <row>
+            <cell id="{2572ec15-2cdb-4d91-852a-26be6419b1b1}" showlabel="false">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+            <cell id="{9d7208fd-28dc-452f-9fcb-f40f236630df}" showlabel="false">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+            <cell id="{766290be-6cc2-41c0-a7a9-81fb086a9b4a}" showlabel="false">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+          </row>
+        </rows>
+      </header>
+      <footer id="{085c2c85-589e-4d1c-aa75-1f87feaa1bbc}" celllabelposition="Top" columns="111" labelwidth="115" celllabelalignment="Left">
+        <rows>
+          <row>
+            <cell id="{d341fc01-9ab0-4d2c-a212-30601c5281cf}" showlabel="false">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+            <cell id="{c51c0087-f83e-45ed-b50a-4468efa28342}" showlabel="false">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+            <cell id="{bf863cc1-2f33-4213-9826-8f19b40ed409}" showlabel="false">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+          </row>
+        </rows>
+      </footer>
+      <DisplayConditions Order="0" FallbackForm="true">
+        <Everyone />
+      </DisplayConditions>
+      <controlDescriptions>
+        <controlDescription forControl="{4d0ef6c6-dcbd-4f58-9b7c-53a80c659126}">
+          <customControl id="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}">
+            <parameters>
+              <datafieldname>xgate_bodyvariables</datafieldname>
+            </parameters>
+          </customControl>
+          <customControl formFactor="0" name="xgate_XgateUI.WhatsAppTemplateEditor">
+            <parameters>
+              <sampleProperty type="SingleLine.Text">xgate_bodyvariables</sampleProperty>
+            </parameters>
+          </customControl>
+          <customControl formFactor="2" name="xgate_XgateUI.WhatsAppTemplateEditor">
+            <parameters>
+              <sampleProperty type="SingleLine.Text">xgate_bodyvariables</sampleProperty>
+            </parameters>
+          </customControl>
+          <customControl formFactor="1" name="xgate_XgateUI.WhatsAppTemplateEditor">
+            <parameters>
+              <sampleProperty type="SingleLine.Text">xgate_bodyvariables</sampleProperty>
+            </parameters>
+          </customControl>
+        </controlDescription>
+      </controlDescriptions>
+    </form>
+    <IsCustomizable>1</IsCustomizable>
+    <CanBeDeleted>1</CanBeDeleted>
+    <LocalizedNames>
+      <LocalizedName description="情報" languagecode="1033" />
+      <LocalizedName description="情報" languagecode="1041" />
+    </LocalizedNames>
+    <Descriptions>
+      <Description description="このエンティティ用のフォームです。" languagecode="1033" />
+      <Description description="このエンティティ用のフォームです。" languagecode="1041" />
+    </Descriptions>
+  </systemform>
+</forms>

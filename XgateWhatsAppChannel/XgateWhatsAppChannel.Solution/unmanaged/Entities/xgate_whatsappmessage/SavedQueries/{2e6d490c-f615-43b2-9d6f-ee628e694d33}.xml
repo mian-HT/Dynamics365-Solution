@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<savedqueries xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <savedquery>
+    <IsCustomizable>1</IsCustomizable>
+    <CanBeDeleted>0</CanBeDeleted>
+    <isquickfindquery>0</isquickfindquery>
+    <isprivate>0</isprivate>
+    <isdefault>1</isdefault>
+    <savedqueryid>{2e6d490c-f615-43b2-9d6f-ee628e694d33}</savedqueryid>
+    <layoutxml>
+      <grid name="resultset" jump="xgate_name" select="1" icon="1" preview="1">
+        <row name="result" id="xgate_whatsappmessageid">
+          <cell name="xgate_name" width="300" />
+          <cell name="createdon" width="125" />
+        </row>
+      </grid>
+    </layoutxml>
+    <querytype>0</querytype>
+    <fetchxml>
+      <fetch version="1.0" mapping="logical">
+        <entity name="xgate_whatsappmessage">
+          <attribute name="xgate_whatsappmessageid" />
+          <attribute name="xgate_name" />
+          <attribute name="createdon" />
+          <order attribute="xgate_name" descending="false" />
+          <filter type="and">
+            <condition attribute="statecode" operator="eq" value="0" />
+          </filter>
+        </entity>
+      </fetch>
+    </fetchxml>
+    <IntroducedVersion>1.0</IntroducedVersion>
+    <LocalizedNames>
+      <LocalizedName description="アクティブなWhatsApp Messages" languagecode="1033" />
+      <LocalizedName description="アクティブなWhatsApp Messages" languagecode="1041" />
+    </LocalizedNames>
+  </savedquery>
+</savedqueries>

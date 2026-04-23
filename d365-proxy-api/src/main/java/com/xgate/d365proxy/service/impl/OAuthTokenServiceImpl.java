@@ -1,20 +1,30 @@
 package com.xgate.d365proxy.service.impl;
 
-import cn.hutool.http.HttpRequest;
-import cn.hutool.json.JSONObject;
-import cn.hutool.json.JSONUtil;
 import com.xgate.d365proxy.service.OAuthTokenService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.Map;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class OAuthTokenServiceImpl implements OAuthTokenService {
 
     private static final String TOKEN_URL_TEMPLATE =
             "https://login.microsoftonline.com/%s/oauth2/v2.0/token";
+
+    private final RestTemplate restTemplate;
 
     @Override
     @Cacheable(value = "oauthToken", key = "#tenantId")
@@ -23,25 +33,27 @@ public class OAuthTokenServiceImpl implements OAuthTokenService {
         String tokenUrl = String.format(TOKEN_URL_TEMPLATE, tenantId);
         String scope = d365InstanceUrl + "/.default";
 
-        String formBody = "client_id=" + clientId
-                + "&client_secret=" + clientSecret
-                + "&grant_type=client_credentials"
-                + "&scope=" + scope;
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+        formData.add("client_id", clientId);
+        formData.add("client_secret", clientSecret);
+        formData.add("grant_type", "client_credentials");
+        formData.add("scope", scope);
 
         log.info("Requesting OAuth token for tenant: {}", tenantId);
 
-        String responseBody = HttpRequest.post(tokenUrl)
-                .header("Content-Type", "application/x-www-form-urlencoded")
-                .body(formBody)
-                .timeout(10000)
-                .execute()
-                .body();
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(formData, headers);
+        @SuppressWarnings("unchecked")
+        ResponseEntity<Map<String, Object>> response = restTemplate.postForEntity(
+                tokenUrl, request, (Class<Map<String, Object>>) (Class<?>) Map.class);
 
-        JSONObject json = JSONUtil.parseObj(responseBody);
-        String accessToken = json.getStr("access_token");
+        Map<String, Object> body = response.getBody();
+        String accessToken = body != null ? (String) body.get("access_token") : null;
 
         if (accessToken == null || accessToken.isEmpty()) {
-            log.error("Failed to obtain OAuth token for tenant: {}, response: {}", tenantId, responseBody);
+            log.error("Failed to obtain OAuth token for tenant: {}, response: {}", tenantId, body);
             throw new RuntimeException("Failed to obtain OAuth token for tenant: " + tenantId);
         }
 

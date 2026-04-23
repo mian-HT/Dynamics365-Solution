@@ -23,7 +23,7 @@
       <msdyn_displayname>Xgate whatsapp channel</msdyn_displayname>
       <msdyn_hasdeliveryreceipt>0</msdyn_hasdeliveryreceipt>
       <msdyn_hasinbound>0</msdyn_hasinbound>
-      <msdyn_messageformid></msdyn_messageformid>
+      <msdyn_messageformid>90ffd52e-b52e-4379-8ad5-80681f6bf3b7</msdyn_messageformid>
       <msdyn_outboundendpointurltemplate>/xgate_OutboundCustomApi</msdyn_outboundendpointurltemplate>
       <msdyn_specialconsentrequired>0</msdyn_specialconsentrequired>
       <msdyn_supportsaccount>1</msdyn_supportsaccount>

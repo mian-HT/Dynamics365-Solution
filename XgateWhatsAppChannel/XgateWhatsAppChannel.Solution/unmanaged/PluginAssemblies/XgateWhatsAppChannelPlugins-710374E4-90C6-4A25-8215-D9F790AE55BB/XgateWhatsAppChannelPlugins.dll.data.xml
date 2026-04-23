@@ -11,5 +11,8 @@
     <PluginType AssemblyQualifiedName="XgateWhatsAppChannel.Plugins.OutboundPlugin, XgateWhatsAppChannel.Plugins, Version=1.0.0.0, Culture=neutral, PublicKeyToken=ce2803c0831125f1" PluginTypeId="8c075f0a-20dd-4524-a5ee-254cff3d8759" Name="XgateWhatsAppChannel.Plugins.OutboundPlugin">
       <FriendlyName>8c075f0a-20dd-4524-a5ee-254cff3d87591.0.0.0</FriendlyName>
     </PluginType>
+    <PluginType AssemblyQualifiedName="XgateWhatsAppChannel.Plugins.GetTemplatePlugin, XgateWhatsAppChannel.Plugins, Version=1.0.0.0, Culture=neutral, PublicKeyToken=ce2803c0831125f1" PluginTypeId="b788e30f-2035-4cac-84ab-42a63ddae309" Name="XgateWhatsAppChannel.Plugins.GetTemplatePlugin">
+      <FriendlyName>b788e30f-2035-4cac-84ab-42a63ddae3091.0.0.0</FriendlyName>
+    </PluginType>
   </PluginTypes>
 </PluginAssembly>
