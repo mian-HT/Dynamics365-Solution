@@ -1,6 +1,6 @@
 is_global = true
 build_property.RootNamespace = XgateSmsChannel.Plugins
-build_property.ProjectDir = D:\work\XgateSmsChannel\XgateSmsChannel.Plugins\
+build_property.ProjectDir = D:\work\Dynamics365-Solution\XgateSmsChannel\XgateSmsChannel.Plugins\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.CsWinRTUseWindowsUIXamlProjections = false

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "6EyhxWg3AKI=",
+  "dgSpecHash": "SI8MpSHAzBE=",
   "success": true,
-  "projectFilePath": "D:\\work\\XgateSmsChannel\\XgateSmsChannel.Plugins\\XgateSmsChannel.Plugins.csproj",
+  "projectFilePath": "D:\\work\\Dynamics365-Solution\\XgateSmsChannel\\XgateSmsChannel.Plugins\\XgateSmsChannel.Plugins.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Administrator\\.nuget\\packages\\microsoft.bcl.asyncinterfaces\\6.0.0\\microsoft.bcl.asyncinterfaces.6.0.0.nupkg.sha512",
     "C:\\Users\\Administrator\\.nuget\\packages\\microsoft.crmsdk.coreassemblies\\9.0.2.46\\microsoft.crmsdk.coreassemblies.9.0.2.46.nupkg.sha512",

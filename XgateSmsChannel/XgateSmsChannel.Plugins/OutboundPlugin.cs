@@ -34,44 +34,50 @@ namespace XgateSmsChannel.Plugins
 
             try
             {
-                // --- Requirement 1: 动态获取账号配置 ---
+                // --- Requirement 1: 动态获取账号配置与 API 地址 ---
                 var serviceFactory = serviceProvider.Get<IOrganizationServiceFactory>();
                 var orgService = serviceFactory.CreateOrganizationService(null);
 
                 var accountQuery = new QueryExpression("xgate_xgatesmschannelinstanceaccount")
                 {
                     TopCount = 1,
-                    ColumnSet = new ColumnSet("xgate_accountid", "xgate_accountsecret")
+                    ColumnSet = new ColumnSet("xgate_accountid", "xgate_accountsecret", "xgate_apibaseurl") 
                 };
                 var accountResults = orgService.RetrieveMultiple(accountQuery);
 
                 if (accountResults.Entities.Count == 0)
                 {
-                    // 以前这里是 throw InvalidPluginExecutionException 会导致系统崩溃
-                    // 现在改为抛出普通异常，由底下的 catch 优雅拦截并返回给漏斗图
                     throw new Exception("配置异常: 未在系统中找到 Xgate 账号配置，请检查后台。");
                 }
 
                 var accountEntity = accountResults.Entities[0];
                 var appId = accountEntity.GetAttributeValue<string>("xgate_accountid");
                 var appSecret = accountEntity.GetAttributeValue<string>("xgate_accountsecret");
-                tracingService.Trace("Account config loaded.");
+
+                // 2：读取 URL。做个防呆设计，如果客户没填，给一个默认的生产环境地址
+                var baseUrl = accountEntity.GetAttributeValue<string>("xgate_apibaseurl");
+                if (string.IsNullOrWhiteSpace(baseUrl))
+                {
+                    baseUrl = "https://sms-api.xgate.com/sms/2.0"; // 默认生产地址
+                }
+                baseUrl = baseUrl.TrimEnd('/'); // 防呆：去掉客户手滑多打的斜杠
+
+                tracingService.Trace($"Account config loaded. BaseURL: {baseUrl}");
 
                 // --- Requirement 2: 极限瘦身版 ExternalId ---
                 var fromNumber = payloadObject.From ?? "10690000";
                 var msgB64 = Convert.ToBase64String(msgGuid.ToByteArray()).Replace("+", "-").Replace("/", "_").TrimEnd('=');
                 var superExternalId = $"{msgB64}.{fromNumber}";
-                
-                // Step 1: 获取 Token
+
+                // 3：动态拼接 Token 接口地址
                 var tokenRequestBody = JsonUtils.Serialize(new TokenRequest { AppId = appId, AppSecret = appSecret });
                 var tokenHttpResponse = httpClient.PostAsync(
-                    "https://sms-api-uat.xgate.com/sms/2.0/token",
+                    $"{baseUrl}/token", // 动态 URL！
                     new StringContent(tokenRequestBody, Encoding.UTF8, "application/json")
                 ).GetAwaiter().GetResult();
 
                 var tokenResponseBody = tokenHttpResponse.Content.ReadAsStringAsync().GetAwaiter().GetResult();
-                
-                // 【兜底 1】如果账号密码填错、或者 Xgate 宕机报 500，优雅拦截！
+
                 if (!tokenHttpResponse.IsSuccessStatusCode)
                 {
                     throw new Exception($"登录网关失败 (HTTP {tokenHttpResponse.StatusCode}): {tokenResponseBody}");
@@ -92,7 +98,8 @@ namespace XgateSmsChannel.Plugins
                     }
                 });
 
-                var smsHttpRequest = new HttpRequestMessage(HttpMethod.Post, "https://sms-api-uat.xgate.com/sms/2.0/send")
+                //4：动态拼接 Send 接口地址
+                var smsHttpRequest = new HttpRequestMessage(HttpMethod.Post, $"{baseUrl}/send") // 动态 URL！
                 {
                     Content = new StringContent(smsRequestBody, Encoding.UTF8, "application/json")
                 };

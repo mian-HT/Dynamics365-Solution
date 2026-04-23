@@ -35,6 +35,14 @@
                         <control id="xgate_accountsecret" classid="{4273EDBD-AC1D-40d3-9FB2-095C621B552D}" datafieldname="xgate_accountsecret" disabled="false" />
                       </cell>
                     </row>
+                    <row>
+                      <cell id="{25ab93e8-cc05-4c6c-ab3a-196d832310b7}" locklevel="0" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="API Base URL" languagecode="1033" />
+                        </labels>
+                        <control id="xgate_apibaseurl" classid="{71716B6C-711E-476C-8AB8-5D11542BFB47}" datafieldname="xgate_apibaseurl" disabled="false" />
+                      </cell>
+                    </row>
                   </rows>
                 </section>
               </sections>

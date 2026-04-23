@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\work\\XgateSmsChannel\\XgateSmsChannel.Plugins\\XgateSmsChannel.Plugins.csproj": {}
+    "D:\\work\\Dynamics365-Solution\\XgateSmsChannel\\XgateSmsChannel.Plugins\\XgateSmsChannel.Plugins.csproj": {}
   },
   "projects": {
-    "D:\\work\\XgateSmsChannel\\XgateSmsChannel.Plugins\\XgateSmsChannel.Plugins.csproj": {
+    "D:\\work\\Dynamics365-Solution\\XgateSmsChannel\\XgateSmsChannel.Plugins\\XgateSmsChannel.Plugins.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\work\\XgateSmsChannel\\XgateSmsChannel.Plugins\\XgateSmsChannel.Plugins.csproj",
+        "projectUniqueName": "D:\\work\\Dynamics365-Solution\\XgateSmsChannel\\XgateSmsChannel.Plugins\\XgateSmsChannel.Plugins.csproj",
         "projectName": "XgateSmsChannel.Plugins",
-        "projectPath": "D:\\work\\XgateSmsChannel\\XgateSmsChannel.Plugins\\XgateSmsChannel.Plugins.csproj",
+        "projectPath": "D:\\work\\Dynamics365-Solution\\XgateSmsChannel\\XgateSmsChannel.Plugins\\XgateSmsChannel.Plugins.csproj",
         "packagesPath": "C:\\Users\\Administrator\\.nuget\\packages\\",
-        "outputPath": "D:\\work\\XgateSmsChannel\\XgateSmsChannel.Plugins\\obj\\",
+        "outputPath": "D:\\work\\Dynamics365-Solution\\XgateSmsChannel\\XgateSmsChannel.Plugins\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -61,7 +61,7 @@
               "autoReferenced": true
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.200\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.202\\RuntimeIdentifierGraph.json"
         }
       }
     }
