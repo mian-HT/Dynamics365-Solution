@@ -64,7 +64,7 @@ namespace XgateSmsChannel.Plugins
 
                 if (parts.Length >= 2)
                 {
-                    fromNumber = parts[1]; // 完美拿到发件人号码
+                    fromNumber = Uri.UnescapeDataString(parts[1]); // 完美拿到发件人号码
                 }
             }
 

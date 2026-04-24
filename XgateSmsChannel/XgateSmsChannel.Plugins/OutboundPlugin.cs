@@ -34,40 +34,97 @@ namespace XgateSmsChannel.Plugins
 
             try
             {
-                // --- Requirement 1: 动态获取账号配置与 API 地址 ---
+                var rawFrom = payloadObject.From ?? "10690000";
+                tracingService.Trace($"用户选择的发件人: {rawFrom}, 所属账号ID: {payloadObject.ChannelInstanceId}");
+
                 var serviceFactory = serviceProvider.Get<IOrganizationServiceFactory>();
                 var orgService = serviceFactory.CreateOrganizationService(null);
 
-                var accountQuery = new QueryExpression("xgate_xgatesmschannelinstanceaccount")
-                {
-                    TopCount = 1,
-                    ColumnSet = new ColumnSet("xgate_accountid", "xgate_accountsecret", "xgate_apibaseurl") 
-                };
-                var accountResults = orgService.RetrieveMultiple(accountQuery);
+                Entity accountEntity = null;
 
-                if (accountResults.Entities.Count == 0)
+                // 按主键直查 ChannelInstanceId存在就用ChannelInstanceId查找
+                if (!string.IsNullOrEmpty(payloadObject.ChannelInstanceId) && 
+                    payloadObject.ChannelInstanceId != Guid.Empty.ToString() && 
+                    payloadObject.ChannelInstanceId.Replace("-", "") != "00000000000000000000000000000000")
                 {
-                    throw new Exception("配置异常: 未在系统中找到 Xgate 账号配置，请检查后台。");
+                    tracingService.Trace("检测到完整 InstanceId，进入主键直查...");
+                    try
+                    {
+                        accountEntity = orgService.Retrieve(
+                            "xgate_xgatesmschannelinstanceaccount", 
+                            Guid.Parse(payloadObject.ChannelInstanceId), 
+                            new ColumnSet("xgate_accountid", "xgate_accountsecret", "xgate_apibaseurl", "statecode")
+                        );
+                    }
+                    catch { /* 如果查不到，静默失败，交给下面的兜底通道处理 */ }
                 }
 
-                var accountEntity = accountResults.Entities[0];
+                // (关联查询)
+                if (accountEntity == null)
+                {
+                    tracingService.Trace($"通道 2：启动标准 CI-J 链路查询，From: {rawFrom}");
+
+                    // 1. 起点：您的自定义配置表 (获取 API Secret/URL)
+                    var fallbackQuery = new QueryExpression("xgate_xgatesmschannelinstanceaccount")
+                    {
+                        TopCount = 1,
+                        ColumnSet = new ColumnSet("xgate_accountid", "xgate_accountsecret", "xgate_apibaseurl", "statecode")
+                    };
+                    fallbackQuery.Criteria.AddCondition("statecode", ConditionOperator.Equal, 0);
+
+                    // 2. 第一级关联：自定义配置表 <-> 标准账户表 (msdyn_channelinstanceaccount)
+                    // 关键点：标准表通过 msdyn_extendedentityid 字段存储了您自定义记录的 GUID 字符串
+                    var accountLink = fallbackQuery.AddLink(
+                        "msdyn_channelinstanceaccount", 
+                        "xgate_xgatesmschannelinstanceaccountid", 
+                        "msdyn_extendedentityid", 
+                        JoinOperator.Inner
+                    );
+
+                    // 3. 第二级关联：标准账户表 <-> 标准实例表 (msdyn_channelinstance)
+                    var instanceLink = accountLink.AddLink(
+                        "msdyn_channelinstance", 
+                        "msdyn_channelinstanceaccountid", // 账户表主键
+                        "msdyn_channelinstanceaccountid", // 实例表外键
+                        JoinOperator.Inner
+                    );
+
+                    // 4. 终点：匹配发件人名称 msdyn_name = rawFrom
+                    instanceLink.LinkCriteria.AddCondition("msdyn_name", ConditionOperator.Equal, rawFrom);
+
+                    var fallbackResults = orgService.RetrieveMultiple(fallbackQuery);
+                    if (fallbackResults.Entities.Count > 0)
+                    {
+                        accountEntity = fallbackResults.Entities[0];
+                        tracingService.Trace($"三表联动查询成功！已找到对应环境配置。Id={accountEntity.Id}, AccountId={accountEntity.GetAttributeValue<string>("xgate_accountid")}, ApiBaseUrl={accountEntity.GetAttributeValue<string>("xgate_apibaseurl")}");
+                    }
+                }
+
+                // ==========================================
+                // 最终校验与赋值
+                // ==========================================
+                if (accountEntity == null)
+                {
+                    throw new Exception($"配置异常: 未在系统中找到发件人 [{rawFrom}] 对应的启用状态的账号配置 (测试发送或正式发送均匹配失败)。");
+                }
+
+                var stateCode = accountEntity.GetAttributeValue<OptionSetValue>("statecode");
+                if (stateCode != null && stateCode.Value != 0) 
+                {
+                    throw new Exception($"配置异常: 当前选择的发件人所属的账号已被停用。");
+                }
+
                 var appId = accountEntity.GetAttributeValue<string>("xgate_accountid");
                 var appSecret = accountEntity.GetAttributeValue<string>("xgate_accountsecret");
 
-                // 2：读取 URL。做个防呆设计，如果客户没填，给一个默认的生产环境地址
                 var baseUrl = accountEntity.GetAttributeValue<string>("xgate_apibaseurl");
-                if (string.IsNullOrWhiteSpace(baseUrl))
-                {
-                    baseUrl = "https://sms-api.xgate.com/sms/2.0"; // 默认生产地址
-                }
-                baseUrl = baseUrl.TrimEnd('/'); // 防呆：去掉客户手滑多打的斜杠
+                if (string.IsNullOrWhiteSpace(baseUrl)) baseUrl = "https://sms-api.xgate.com/sms/2.0";
+                baseUrl = baseUrl.TrimEnd('/'); 
 
-                tracingService.Trace($"Account config loaded. BaseURL: {baseUrl}");
-
-                // --- Requirement 2: 极限瘦身版 ExternalId ---
-                var fromNumber = payloadObject.From ?? "10690000";
-                var msgB64 = Convert.ToBase64String(msgGuid.ToByteArray()).Replace("+", "-").Replace("/", "_").TrimEnd('=');
-                var superExternalId = $"{msgB64}.{fromNumber}";
+                // xgate sms接口中的ExternalId有长度限制最大64个字符，所以这里压缩字符长度
+                var safeFromNumber = Uri.EscapeDataString(rawFrom); 
+                var msgB64 = Convert.ToBase64String(msgGuid.ToByteArray()).Replace("+", "-").Replace("/", "_").         TrimEnd('=');
+                var superExternalId = $"{msgB64}.{safeFromNumber}";
 
                 // 3：动态拼接 Token 接口地址
                 var tokenRequestBody = JsonUtils.Serialize(new TokenRequest { AppId = appId, AppSecret = appSecret });

@@ -14,6 +14,9 @@
         public Guid ChannelDefinitionId { get; set; }
 
         [DataMember]
+        public string ChannelInstanceId { get; set; }
+
+        [DataMember]
         public string RequestId { get; set; }
 
         [DataMember]
