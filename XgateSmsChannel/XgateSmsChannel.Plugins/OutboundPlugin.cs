@@ -90,7 +90,7 @@ namespace XgateSmsChannel.Plugins
                     );
 
                     // 4. 终点：匹配发件人名称 msdyn_name = rawFrom
-                    instanceLink.LinkCriteria.AddCondition("msdyn_name", ConditionOperator.Equal, rawFrom);
+                    instanceLink.LinkCriteria.AddCondition("msdyn_contactpoint", ConditionOperator.Equal, rawFrom);
 
                     var fallbackResults = orgService.RetrieveMultiple(fallbackQuery);
                     if (fallbackResults.Entities.Count > 0)
