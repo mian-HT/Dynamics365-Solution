@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "Z10rRIIABvI=",
+  "dgSpecHash": "X+EVXW9316o=",
   "success": true,
   "projectFilePath": "D:\\work\\Dynamics365-Solution\\XgateWhatsAppChannel\\XgateWhatsAppChannel.Plugins\\XgateWhatsAppChannel.Plugins.csproj",
   "expectedPackageFiles": [
@@ -8,6 +8,7 @@
     "C:\\Users\\Administrator\\.nuget\\packages\\microsoft.crmsdk.coreassemblies\\9.0.2.46\\microsoft.crmsdk.coreassemblies.9.0.2.46.nupkg.sha512",
     "C:\\Users\\Administrator\\.nuget\\packages\\microsoft.netframework.referenceassemblies\\1.0.3\\microsoft.netframework.referenceassemblies.1.0.3.nupkg.sha512",
     "C:\\Users\\Administrator\\.nuget\\packages\\microsoft.netframework.referenceassemblies.net471\\1.0.3\\microsoft.netframework.referenceassemblies.net471.1.0.3.nupkg.sha512",
+    "C:\\Users\\Administrator\\.nuget\\packages\\microsoft.powerapps.msbuild.plugin\\1.52.1\\microsoft.powerapps.msbuild.plugin.1.52.1.nupkg.sha512",
     "C:\\Users\\Administrator\\.nuget\\packages\\system.buffers\\4.5.1\\system.buffers.4.5.1.nupkg.sha512",
     "C:\\Users\\Administrator\\.nuget\\packages\\system.memory\\4.5.4\\system.memory.4.5.4.nupkg.sha512",
     "C:\\Users\\Administrator\\.nuget\\packages\\system.numerics.vectors\\4.5.0\\system.numerics.vectors.4.5.0.nupkg.sha512",

@@ -22,8 +22,14 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CrmSdk.CoreAssemblies" Version="9.0.2.46" />
+    <PackageReference Include="Microsoft.PowerApps.MSBuild.Plugin" Version="1.*" />
   </ItemGroup>
+  <Target Name="GetProjectOutputPath" Returns="$(TargetPath)">
+    <PropertyGroup>
+      <ProjectOutputPath>$(TargetPath)</ProjectOutputPath>
+    </PropertyGroup>
+  </Target>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Copy SourceFiles="$(OutDir)$(TargetName).dll" DestinationFiles="$(MSBuildProjectDirectory)\..\XgateWhatsAppChannel.Solution\unmanaged\PluginAssemblies\XgateWhatsAppChannelPlugins-710374E4-90C6-4A25-8215-D9F790AE55BB\XgateWhatsAppChannelPlugins.dll" />
+    <Copy SourceFiles="$(OutDir)$(TargetName).dll" DestinationFiles="$(MSBuildProjectDirectory)\..\src\PluginAssemblies\XgateWhatsAppChannelPlugins-710374E4-90C6-4A25-8215-D9F790AE55BB\XgateWhatsAppChannelPlugins.dll" />
   </Target>
 </Project>

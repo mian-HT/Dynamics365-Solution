@@ -1,0 +1,13 @@
+D:\work\Dynamics365-Solution\XgateWhatsAppChannel\XgateWhatsAppChannel.Plugins\bin\Debug\net471\publish\XgateWhatsAppChannel.Plugins.dll
+D:\work\Dynamics365-Solution\XgateWhatsAppChannel\XgateWhatsAppChannel.Plugins\bin\Debug\net471\publish\XgateWhatsAppChannel.Plugins.pdb
+D:\work\Dynamics365-Solution\XgateWhatsAppChannel\XgateWhatsAppChannel.Plugins\bin\Debug\net471\publish\Microsoft.Bcl.AsyncInterfaces.dll
+D:\work\Dynamics365-Solution\XgateWhatsAppChannel\XgateWhatsAppChannel.Plugins\bin\Debug\net471\publish\Microsoft.Crm.Sdk.Proxy.dll
+D:\work\Dynamics365-Solution\XgateWhatsAppChannel\XgateWhatsAppChannel.Plugins\bin\Debug\net471\publish\Microsoft.Xrm.Sdk.dll
+D:\work\Dynamics365-Solution\XgateWhatsAppChannel\XgateWhatsAppChannel.Plugins\bin\Debug\net471\publish\System.Buffers.dll
+D:\work\Dynamics365-Solution\XgateWhatsAppChannel\XgateWhatsAppChannel.Plugins\bin\Debug\net471\publish\System.Memory.dll
+D:\work\Dynamics365-Solution\XgateWhatsAppChannel\XgateWhatsAppChannel.Plugins\bin\Debug\net471\publish\System.Numerics.Vectors.dll
+D:\work\Dynamics365-Solution\XgateWhatsAppChannel\XgateWhatsAppChannel.Plugins\bin\Debug\net471\publish\System.Runtime.CompilerServices.Unsafe.dll
+D:\work\Dynamics365-Solution\XgateWhatsAppChannel\XgateWhatsAppChannel.Plugins\bin\Debug\net471\publish\System.Text.Encodings.Web.dll
+D:\work\Dynamics365-Solution\XgateWhatsAppChannel\XgateWhatsAppChannel.Plugins\bin\Debug\net471\publish\System.Text.Json.dll
+D:\work\Dynamics365-Solution\XgateWhatsAppChannel\XgateWhatsAppChannel.Plugins\bin\Debug\net471\publish\System.Threading.Tasks.Extensions.dll
+D:\work\Dynamics365-Solution\XgateWhatsAppChannel\XgateWhatsAppChannel.Plugins\bin\Debug\net471\publish\System.ValueTuple.dll

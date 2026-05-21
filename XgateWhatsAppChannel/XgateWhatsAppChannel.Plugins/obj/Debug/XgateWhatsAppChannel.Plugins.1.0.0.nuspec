@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>XgateWhatsAppChannel.Plugins</id>
+    <version>1.0.0</version>
+    <authors>XgateWhatsAppChannel.Plugins</authors>
+    <description>Package Description</description>
+    <repository type="git" commit="a38519649fc63f4e244eddc9bde28befc423debc" />
+    <dependencies>
+      <group targetFramework=".NETFramework4.7.1">
+        <dependency id="Microsoft.CrmSdk.CoreAssemblies" version="9.0.2.46" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.PowerApps.MSBuild.Plugin" version="1.52.1" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="Microsoft.CSharp" targetFramework=".NETFramework4.7.1" />
+      <frameworkAssembly assemblyName="System.ComponentModel.DataAnnotations" targetFramework=".NETFramework4.7.1" />
+      <frameworkAssembly assemblyName="System.Core" targetFramework=".NETFramework4.7.1" />
+      <frameworkAssembly assemblyName="System.Data.DataSetExtensions" targetFramework=".NETFramework4.7.1" />
+      <frameworkAssembly assemblyName="System.Data" targetFramework=".NETFramework4.7.1" />
+      <frameworkAssembly assemblyName="System" targetFramework=".NETFramework4.7.1" />
+      <frameworkAssembly assemblyName="System.Net.Http" targetFramework=".NETFramework4.7.1" />
+      <frameworkAssembly assemblyName="System.ServiceModel" targetFramework=".NETFramework4.7.1" />
+      <frameworkAssembly assemblyName="System.Xml" targetFramework=".NETFramework4.7.1" />
+      <frameworkAssembly assemblyName="System.Xml.Linq" targetFramework=".NETFramework4.7.1" />
+    </frameworkAssemblies>
+  </metadata>
+  <files>
+    <file src="bin\Debug\net471\publish\Microsoft.Bcl.AsyncInterfaces.dll" target="lib\net471\Microsoft.Bcl.AsyncInterfaces.dll" />
+    <file src="bin\Debug\net471\publish\Microsoft.Crm.Sdk.Proxy.dll" target="lib\net471\Microsoft.Crm.Sdk.Proxy.dll" />
+    <file src="bin\Debug\net471\publish\Microsoft.Xrm.Sdk.dll" target="lib\net471\Microsoft.Xrm.Sdk.dll" />
+    <file src="bin\Debug\net471\publish\System.Buffers.dll" target="lib\net471\System.Buffers.dll" />
+    <file src="bin\Debug\net471\publish\System.Memory.dll" target="lib\net471\System.Memory.dll" />
+    <file src="bin\Debug\net471\publish\System.Numerics.Vectors.dll" target="lib\net471\System.Numerics.Vectors.dll" />
+    <file src="bin\Debug\net471\publish\System.Runtime.CompilerServices.Unsafe.dll" target="lib\net471\System.Runtime.CompilerServices.Unsafe.dll" />
+    <file src="bin\Debug\net471\publish\System.Text.Encodings.Web.dll" target="lib\net471\System.Text.Encodings.Web.dll" />
+    <file src="bin\Debug\net471\publish\System.Text.Json.dll" target="lib\net471\System.Text.Json.dll" />
+    <file src="bin\Debug\net471\publish\System.Threading.Tasks.Extensions.dll" target="lib\net471\System.Threading.Tasks.Extensions.dll" />
+    <file src="bin\Debug\net471\publish\System.ValueTuple.dll" target="lib\net471\System.ValueTuple.dll" />
+    <file src="bin\Debug\net471\publish\XgateWhatsAppChannel.Plugins.dll" target="lib\net471\XgateWhatsAppChannel.Plugins.dll" />
+  </files>
+</package>

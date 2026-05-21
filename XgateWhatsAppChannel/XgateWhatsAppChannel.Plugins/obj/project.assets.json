@@ -65,6 +65,17 @@
           "build/Microsoft.NETFramework.ReferenceAssemblies.net471.targets": {}
         }
       },
+      "Microsoft.PowerApps.MSBuild.Plugin/1.52.1": {
+        "type": "package",
+        "build": {
+          "build/Microsoft.PowerApps.MSBuild.Plugin.props": {},
+          "build/Microsoft.PowerApps.MSBuild.Plugin.targets": {}
+        },
+        "buildMultiTargeting": {
+          "buildMultiTargeting/Microsoft.PowerApps.MSBuild.Plugin.props": {},
+          "buildMultiTargeting/Microsoft.PowerApps.MSBuild.Plugin.targets": {}
+        }
+      },
       "System.Buffers/4.5.1": {
         "type": "package",
         "frameworkAssemblies": [
@@ -647,6 +658,100 @@
         "microsoft.netframework.referenceassemblies.net471.nuspec"
       ]
     },
+    "Microsoft.PowerApps.MSBuild.Plugin/1.52.1": {
+      "sha512": "/a+52c5veTU7h+wl+K6FU0AAOKn8dMvQ5IeUy23LDTpMtZq22vThWm31xEC8RNMgADAgl9l6tzBOZmxm9g7g0w==",
+      "type": "package",
+      "path": "microsoft.powerapps.msbuild.plugin/1.52.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "3rdPartyNotice.txt",
+        "LICENSE.txt",
+        "build/Microsoft.PowerApps.MSBuild.Plugin.props",
+        "build/Microsoft.PowerApps.MSBuild.Plugin.targets",
+        "buildMultiTargeting/Microsoft.PowerApps.MSBuild.Plugin.props",
+        "buildMultiTargeting/Microsoft.PowerApps.MSBuild.Plugin.targets",
+        "microsoft.powerapps.msbuild.plugin.1.52.1.nupkg.sha512",
+        "microsoft.powerapps.msbuild.plugin.nuspec",
+        "tasks/Microsoft.PowerApps.MSBuild.Plugin.tasks",
+        "tasks/net472/Microsoft.PowerPlatform.MSBuild.Telemetry.Tasks.dll",
+        "tasks/net472/Microsoft.PowerPlatform.MSBuild.Telemetry.Tasks.pdb",
+        "tasks/net472/Microsoft.PowerPlatform.MSBuild.Telemetry.Tasks.tasks",
+        "tasks/net472/Newtonsoft.Json.dll",
+        "tasks/net472/System.Drawing.Common.dll",
+        "tasks/net472/ppbtTelemetryRecorder/Microsoft.ApplicationInsights.dll",
+        "tasks/net472/ppbtTelemetryRecorder/Microsoft.Bcl.AsyncInterfaces.dll",
+        "tasks/net472/ppbtTelemetryRecorder/Microsoft.Extensions.DependencyInjection.Abstractions.dll",
+        "tasks/net472/ppbtTelemetryRecorder/Microsoft.Extensions.DependencyInjection.dll",
+        "tasks/net472/ppbtTelemetryRecorder/Microsoft.Extensions.Logging.Abstractions.dll",
+        "tasks/net472/ppbtTelemetryRecorder/Microsoft.Extensions.Logging.dll",
+        "tasks/net472/ppbtTelemetryRecorder/Microsoft.Extensions.Options.dll",
+        "tasks/net472/ppbtTelemetryRecorder/Microsoft.Extensions.Primitives.dll",
+        "tasks/net472/ppbtTelemetryRecorder/Microsoft.PowerPlatform.Tooling.BatchedTelemetry.dll",
+        "tasks/net472/ppbtTelemetryRecorder/System.Buffers.dll",
+        "tasks/net472/ppbtTelemetryRecorder/System.Diagnostics.DiagnosticSource.dll",
+        "tasks/net472/ppbtTelemetryRecorder/System.IO.Pipelines.dll",
+        "tasks/net472/ppbtTelemetryRecorder/System.Memory.dll",
+        "tasks/net472/ppbtTelemetryRecorder/System.Numerics.Vectors.dll",
+        "tasks/net472/ppbtTelemetryRecorder/System.Runtime.CompilerServices.Unsafe.dll",
+        "tasks/net472/ppbtTelemetryRecorder/System.Text.Encodings.Web.dll",
+        "tasks/net472/ppbtTelemetryRecorder/System.Text.Json.dll",
+        "tasks/net472/ppbtTelemetryRecorder/System.Threading.Tasks.Extensions.dll",
+        "tasks/net472/ppbtTelemetryRecorder/System.ValueTuple.dll",
+        "tasks/net472/ppbtTelemetryRecorder/bt-uploader/Microsoft.ApplicationInsights.dll",
+        "tasks/net472/ppbtTelemetryRecorder/bt-uploader/Microsoft.Bcl.AsyncInterfaces.dll",
+        "tasks/net472/ppbtTelemetryRecorder/bt-uploader/Microsoft.PowerPlatform.Tooling.BatchedTelemetry.dll",
+        "tasks/net472/ppbtTelemetryRecorder/bt-uploader/Microsoft.PowerPlatform.Tooling.BatchedTelemetry.xml",
+        "tasks/net472/ppbtTelemetryRecorder/bt-uploader/System.Buffers.dll",
+        "tasks/net472/ppbtTelemetryRecorder/bt-uploader/System.Diagnostics.DiagnosticSource.dll",
+        "tasks/net472/ppbtTelemetryRecorder/bt-uploader/System.Memory.dll",
+        "tasks/net472/ppbtTelemetryRecorder/bt-uploader/System.Numerics.Vectors.dll",
+        "tasks/net472/ppbtTelemetryRecorder/bt-uploader/System.Runtime.CompilerServices.Unsafe.dll",
+        "tasks/net472/ppbtTelemetryRecorder/bt-uploader/System.Text.Encodings.Web.dll",
+        "tasks/net472/ppbtTelemetryRecorder/bt-uploader/System.Text.Json.dll",
+        "tasks/net472/ppbtTelemetryRecorder/bt-uploader/System.Threading.Tasks.Extensions.dll",
+        "tasks/net472/ppbtTelemetryRecorder/bt-uploader/System.ValueTuple.dll",
+        "tasks/net472/ppbtTelemetryRecorder/bt-uploader/pacTelemetryUpload.exe",
+        "tasks/net472/ppbtTelemetryRecorder/bt-uploader/pacTelemetryUpload.exe.config",
+        "tasks/net472/ppbtTelemetryRecorder/ppbtTelemetryRecorder.exe",
+        "tasks/net472/ppbtTelemetryRecorder/ppbtTelemetryRecorder.exe.config",
+        "tasks/net472/ppbtTelemetryRecorder/ppbtTelemetryRecorder.pdb",
+        "tasks/net6.0/Microsoft.PowerPlatform.MSBuild.Telemetry.Tasks.deps.json",
+        "tasks/net6.0/Microsoft.PowerPlatform.MSBuild.Telemetry.Tasks.dll",
+        "tasks/net6.0/Microsoft.PowerPlatform.MSBuild.Telemetry.Tasks.pdb",
+        "tasks/net6.0/Microsoft.PowerPlatform.MSBuild.Telemetry.Tasks.tasks",
+        "tasks/net6.0/Microsoft.Win32.SystemEvents.dll",
+        "tasks/net6.0/Newtonsoft.Json.dll",
+        "tasks/net6.0/System.Drawing.Common.dll",
+        "tasks/net6.0/ppbtTelemetryRecorder/Microsoft.ApplicationInsights.dll",
+        "tasks/net6.0/ppbtTelemetryRecorder/Microsoft.Bcl.AsyncInterfaces.dll",
+        "tasks/net6.0/ppbtTelemetryRecorder/Microsoft.Extensions.DependencyInjection.Abstractions.dll",
+        "tasks/net6.0/ppbtTelemetryRecorder/Microsoft.Extensions.DependencyInjection.dll",
+        "tasks/net6.0/ppbtTelemetryRecorder/Microsoft.Extensions.Logging.Abstractions.dll",
+        "tasks/net6.0/ppbtTelemetryRecorder/Microsoft.Extensions.Logging.dll",
+        "tasks/net6.0/ppbtTelemetryRecorder/Microsoft.Extensions.Options.dll",
+        "tasks/net6.0/ppbtTelemetryRecorder/Microsoft.Extensions.Primitives.dll",
+        "tasks/net6.0/ppbtTelemetryRecorder/Microsoft.PowerPlatform.Tooling.BatchedTelemetry.dll",
+        "tasks/net6.0/ppbtTelemetryRecorder/System.IO.Pipelines.dll",
+        "tasks/net6.0/ppbtTelemetryRecorder/System.Text.Encodings.Web.dll",
+        "tasks/net6.0/ppbtTelemetryRecorder/System.Text.Json.dll",
+        "tasks/net6.0/ppbtTelemetryRecorder/bt-uploader/Microsoft.ApplicationInsights.dll",
+        "tasks/net6.0/ppbtTelemetryRecorder/bt-uploader/Microsoft.PowerPlatform.Tooling.BatchedTelemetry.dll",
+        "tasks/net6.0/ppbtTelemetryRecorder/bt-uploader/Microsoft.PowerPlatform.Tooling.BatchedTelemetry.xml",
+        "tasks/net6.0/ppbtTelemetryRecorder/bt-uploader/System.Text.Encodings.Web.dll",
+        "tasks/net6.0/ppbtTelemetryRecorder/bt-uploader/System.Text.Json.dll",
+        "tasks/net6.0/ppbtTelemetryRecorder/bt-uploader/pacTelemetryUpload.deps.json",
+        "tasks/net6.0/ppbtTelemetryRecorder/bt-uploader/pacTelemetryUpload.dll",
+        "tasks/net6.0/ppbtTelemetryRecorder/bt-uploader/pacTelemetryUpload.dll.config",
+        "tasks/net6.0/ppbtTelemetryRecorder/bt-uploader/pacTelemetryUpload.runtimeconfig.json",
+        "tasks/net6.0/ppbtTelemetryRecorder/ppbtTelemetryRecorder.deps.json",
+        "tasks/net6.0/ppbtTelemetryRecorder/ppbtTelemetryRecorder.dll",
+        "tasks/net6.0/ppbtTelemetryRecorder/ppbtTelemetryRecorder.dll.config",
+        "tasks/net6.0/ppbtTelemetryRecorder/ppbtTelemetryRecorder.pdb",
+        "tasks/net6.0/ppbtTelemetryRecorder/ppbtTelemetryRecorder.runtimeconfig.json",
+        "tasks/net6.0/runtimes/win/lib/net6.0/Microsoft.Win32.SystemEvents.dll"
+      ]
+    },
     "System.Buffers/4.5.1": {
       "sha512": "Rw7ijyl1qqRS0YQD/WycNst8hUUMgrMH4FCn1nNm27M4VxchZ1js3fVjQaANHO5f3sN4isvP4a+Met9Y4YomAg==",
       "type": "package",
@@ -939,7 +1044,8 @@
   "projectFileDependencyGroups": {
     ".NETFramework,Version=v4.7.1": [
       "Microsoft.CrmSdk.CoreAssemblies >= 9.0.2.46",
-      "Microsoft.NETFramework.ReferenceAssemblies >= 1.0.3"
+      "Microsoft.NETFramework.ReferenceAssemblies >= 1.0.3",
+      "Microsoft.PowerApps.MSBuild.Plugin >= 1.*"
     ]
   },
   "packageFolders": {
@@ -1001,9 +1107,13 @@
             "target": "Package",
             "version": "[1.0.3, )",
             "autoReferenced": true
+          },
+          "Microsoft.PowerApps.MSBuild.Plugin": {
+            "target": "Package",
+            "version": "[1.*, )"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.202\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.204\\RuntimeIdentifierGraph.json"
       }
     }
   }
