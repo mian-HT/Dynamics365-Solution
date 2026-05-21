@@ -1,0 +1,25 @@
+{
+  "UniqueName": "XgateSmsChannel",
+  "Version": "1.0.0.1",
+  "DisplayName": {
+    "ByLcid": {
+      "1033": "XgateSmsChannel"
+    }
+  },
+  "Components": {
+    "ScfComponents": [
+      {
+        "ScfComponentTypeName": "customapi",
+        "Name": "SmsDeliveryReportCustomApi"
+      },
+      {
+        "ScfComponentTypeName": "customapi",
+        "Name": "InboundCustomApi"
+      },
+      {
+        "ScfComponentTypeName": "customapi",
+        "Name": "OutboundSmsCustomApi"
+      }
+    ]
+  }
+}

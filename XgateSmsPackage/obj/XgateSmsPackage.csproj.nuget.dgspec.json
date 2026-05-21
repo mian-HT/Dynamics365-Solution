@@ -1,0 +1,75 @@
+{
+  "format": 1,
+  "restore": {
+    "D:\\work\\Dynamics365-Solution\\XgateSmsPackage\\XgateSmsPackage.csproj": {}
+  },
+  "projects": {
+    "D:\\work\\Dynamics365-Solution\\XgateSmsPackage\\XgateSmsPackage.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "D:\\work\\Dynamics365-Solution\\XgateSmsPackage\\XgateSmsPackage.csproj",
+        "projectName": "XgateSmsPackage",
+        "projectPath": "D:\\work\\Dynamics365-Solution\\XgateSmsPackage\\XgateSmsPackage.csproj",
+        "packagesPath": "C:\\Users\\Administrator\\.nuget\\packages\\",
+        "outputPath": "D:\\work\\Dynamics365-Solution\\XgateSmsPackage\\obj\\",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\Administrator\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net472"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net472": {
+            "targetAlias": "net472",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "10.0.200"
+      },
+      "frameworks": {
+        "net472": {
+          "targetAlias": "net472",
+          "dependencies": {
+            "Microsoft.CrmSdk.XrmTooling.CoreAssembly": {
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[9.1.0.79, )"
+            },
+            "Microsoft.CrmSdk.XrmTooling.PackageDeployment": {
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[9.1.0.74, )"
+            },
+            "Microsoft.PowerApps.MSBuild.PDPackage": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[1.*, )"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.204\\RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

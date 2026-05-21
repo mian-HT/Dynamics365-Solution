@@ -1,0 +1,5 @@
+D:\work\Dynamics365-Solution\XgateSmsPackage\bin\Debug\net472\pdpublish\XgateSmsPackage.dll
+D:\work\Dynamics365-Solution\XgateSmsPackage\bin\Debug\net472\pdpublish\XgateSmsPackage.pdb
+D:\work\Dynamics365-Solution\XgateSmsPackage\bin\Debug\net472\pdpublish\PkgAssets\ImportConfig.xml
+D:\work\Dynamics365-Solution\XgateSmsPackage\bin\Debug\net472\pdpublish\PkgAssets\manifest.ppkg.json
+D:\work\Dynamics365-Solution\XgateSmsPackage\bin\Debug\net472\pdpublish\PkgAssets\XgateSmsChannel_managed.zip
