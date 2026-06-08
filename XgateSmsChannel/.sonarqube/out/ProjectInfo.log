@@ -1,0 +1,26 @@
+Product projects
+---------------------------------------
+D:\work\Dynamics365-Solution\XgateSmsChannel\XgateSmsChannel.Plugins\XgateSmsChannel.Plugins.csproj
+
+
+Test projects
+---------------------------------------
+D:\work\Dynamics365-Solution\XgateSmsChannel\XgateSmsChannel.Plugins.Tests\XgateSmsChannel.Plugins.Tests.csproj
+
+
+Invalid projects
+---------------------------------------
+{none}
+
+
+Skipped projects
+---------------------------------------
+D:\work\Dynamics365-Solution\XgateSmsChannel\XgateSmsChannel.Plugins\XgateSmsChannel.Plugins.csproj
+D:\work\Dynamics365-Solution\XgateSmsChannel\XgateSmsChannel.Plugins.Tests\XgateSmsChannel.Plugins.Tests.csproj
+
+
+Excluded projects
+---------------------------------------
+{none}
+
+

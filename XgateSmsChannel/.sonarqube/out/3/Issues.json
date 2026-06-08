@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json.schemastore.org/sarif-1.0.0",
+  "version": "1.0.0",
+  "runs": [
+    {
+      "tool": {
+        "name": "Microsoft(R) Visual C# 编译器",
+        "version": "5.3.0.0",
+        "fileVersion": "5.3.0-2.26230.114 (e7aa4b537d95ae955b5c98c25fa9b9220e7eb71e)",
+        "semanticVersion": "5.3.0",
+        "language": "zh-CN"
+      },
+      "results": [
+      ]
+    }
+  ]
+}

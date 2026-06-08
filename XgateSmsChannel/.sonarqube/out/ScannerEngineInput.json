@@ -1,0 +1,232 @@
+{
+  "scannerProperties": [
+    {
+      "key": "sonar.scanner.app",
+      "value": "ScannerMSBuild"
+    },
+    {
+      "key": "sonar.scanner.appVersion",
+      "value": "11.2.1"
+    },
+    {
+      "key": "sonar.scanner.bootstrapStartTime",
+      "value": "1780649461000"
+    },
+    {
+      "key": "sonar.projectKey",
+      "value": "xgate-sms-channel"
+    },
+    {
+      "key": "sonar.projectName",
+      "value": "xgate-sms-channel"
+    },
+    {
+      "key": "sonar.working.directory",
+      "value": "D:\\work\\Dynamics365-Solution\\XgateSmsChannel\\.sonarqube\\out\\.sonar"
+    },
+    {
+      "key": "sonar.projectBaseDir",
+      "value": "D:\\work\\Dynamics365-Solution\\XgateSmsChannel"
+    },
+    {
+      "key": "sonar.pullrequest.cache.basepath",
+      "value": "D:\\work\\Dynamics365-Solution\\XgateSmsChannel"
+    },
+    {
+      "key": "sonar.sources",
+      "value": ""
+    },
+    {
+      "key": "sonar.tests",
+      "value": ""
+    },
+    {
+      "key": "sonar.modules",
+      "value": "F7B50068-3CA0-4BBB-9E37-3AA0B34F8056,FCDF3C88-8165-439C-92EA-4535DFDB742D,9CF0806F-AB1D-4696-9505-7226513BFC5C,F2BFFAB8-640F-4F41-84A7-C043332C33A9"
+    },
+    {
+      "key": "F7B50068-3CA0-4BBB-9E37-3AA0B34F8056.sonar.projectKey",
+      "value": "xgate-sms-channel:F7B50068-3CA0-4BBB-9E37-3AA0B34F8056"
+    },
+    {
+      "key": "F7B50068-3CA0-4BBB-9E37-3AA0B34F8056.sonar.projectName",
+      "value": "XgateSmsChannel.Plugins"
+    },
+    {
+      "key": "F7B50068-3CA0-4BBB-9E37-3AA0B34F8056.sonar.projectBaseDir",
+      "value": "D:\\work\\Dynamics365-Solution\\XgateSmsChannel\\XgateSmsChannel.Plugins"
+    },
+    {
+      "key": "F7B50068-3CA0-4BBB-9E37-3AA0B34F8056.sonar.working.directory",
+      "value": "D:\\work\\Dynamics365-Solution\\XgateSmsChannel\\.sonarqube\\out\\.sonar\\mod0"
+    },
+    {
+      "key": "F7B50068-3CA0-4BBB-9E37-3AA0B34F8056.sonar.sourceEncoding",
+      "value": "utf-8"
+    },
+    {
+      "key": "F7B50068-3CA0-4BBB-9E37-3AA0B34F8056.sonar.tests",
+      "value": ""
+    },
+    {
+      "key": "F7B50068-3CA0-4BBB-9E37-3AA0B34F8056.sonar.sources",
+      "value": "D:\\work\\Dynamics365-Solution\\XgateSmsChannel\\XgateSmsChannel.Plugins\\ChannelContracts\\Payload.cs,D:\\work\\Dynamics365-Solution\\XgateSmsChannel\\XgateSmsChannel.Plugins\\ChannelContracts\\Response.cs,D:\\work\\Dynamics365-Solution\\XgateSmsChannel\\XgateSmsChannel.Plugins\\ConsumingApplicationContracts\\DeliveryReport.cs,D:\\work\\Dynamics365-Solution\\XgateSmsChannel\\XgateSmsChannel.Plugins\\DeliveryReportPlugin.cs,D:\\work\\Dynamics365-Solution\\XgateSmsChannel\\XgateSmsChannel.Plugins\\InboundPlugin.cs,D:\\work\\Dynamics365-Solution\\XgateSmsChannel\\XgateSmsChannel.Plugins\\JsonUtils.cs,D:\\work\\Dynamics365-Solution\\XgateSmsChannel\\XgateSmsChannel.Plugins\\OutboundPlugin.cs,D:\\work\\Dynamics365-Solution\\XgateSmsChannel\\XgateSmsChannel.Plugins\\ProviderContracts\\ProviderDeliveryReport.cs,D:\\work\\Dynamics365-Solution\\XgateSmsChannel\\XgateSmsChannel.Plugins\\XgateContracts\\SmsCountOfStatus.cs,D:\\work\\Dynamics365-Solution\\XgateSmsChannel\\XgateSmsChannel.Plugins\\XgateContracts\\SmsReceiveInfo.cs,D:\\work\\Dynamics365-Solution\\XgateSmsChannel\\XgateSmsChannel.Plugins\\XgateContracts\\SmsRecipient.cs,D:\\work\\Dynamics365-Solution\\XgateSmsChannel\\XgateSmsChannel.Plugins\\XgateContracts\\SmsRequest.cs,D:\\work\\Dynamics365-Solution\\XgateSmsChannel\\XgateSmsChannel.Plugins\\XgateContracts\\SmsResponse.cs,D:\\work\\Dynamics365-Solution\\XgateSmsChannel\\XgateSmsChannel.Plugins\\XgateContracts\\TokenRequest.cs,D:\\work\\Dynamics365-Solution\\XgateSmsChannel\\XgateSmsChannel.Plugins\\XgateContracts\\TokenResponse.cs,D:\\work\\Dynamics365-Solution\\XgateSmsChannel\\XgateSmsChannel.Plugins\\XgateGatewayException.cs,D:\\work\\Dynamics365-Solution\\XgateSmsChannel\\XgateSmsChannel.Plugins\\XgateKey.snk,D:\\work\\Dynamics365-Solution\\XgateSmsChannel\\XgateSmsChannel.Plugins\\obj\\project.assets.json,D:\\work\\Dynamics365-Solution\\XgateSmsChannel\\XgateSmsChannel.Plugins\\obj\\XgateSmsChannel.Plugins.csproj.nuget.dgspec.json,D:\\work\\Dynamics365-Solution\\XgateSmsChannel\\XgateSmsChannel.Plugins\\obj\\Debug\\net471\\XgateSmsChannel.Plugins.sourcelink.json,D:\\work\\Dynamics365-Solution\\XgateSmsChannel\\XgateSmsChannel.Plugins\\obj\\Release\\net471\\XgateSmsChannel.Plugins.sourcelink.json"
+    },
+    {
+      "key": "F7B50068-3CA0-4BBB-9E37-3AA0B34F8056.sonar.cs.analyzer.projectOutPaths",
+      "value": "D:\\work\\Dynamics365-Solution\\XgateSmsChannel\\.sonarqube\\out\\0"
+    },
+    {
+      "key": "F7B50068-3CA0-4BBB-9E37-3AA0B34F8056.sonar.cs.roslyn.reportFilePaths",
+      "value": "D:\\work\\Dynamics365-Solution\\XgateSmsChannel\\.sonarqube\\out\\0\\Issues.json"
+    },
+    {
+      "key": "F7B50068-3CA0-4BBB-9E37-3AA0B34F8056.sonar.cs.scanner.telemetry",
+      "value": "D:\\work\\Dynamics365-Solution\\XgateSmsChannel\\.sonarqube\\out\\0\\Telemetry.json"
+    },
+    {
+      "key": "FCDF3C88-8165-439C-92EA-4535DFDB742D.sonar.projectKey",
+      "value": "xgate-sms-channel:FCDF3C88-8165-439C-92EA-4535DFDB742D"
+    },
+    {
+      "key": "FCDF3C88-8165-439C-92EA-4535DFDB742D.sonar.projectName",
+      "value": "XgateSmsChannel.Plugins.Tests"
+    },
+    {
+      "key": "FCDF3C88-8165-439C-92EA-4535DFDB742D.sonar.projectBaseDir",
+      "value": "D:\\work\\Dynamics365-Solution\\XgateSmsChannel\\XgateSmsChannel.Plugins.Tests"
+    },
+    {
+      "key": "FCDF3C88-8165-439C-92EA-4535DFDB742D.sonar.working.directory",
+      "value": "D:\\work\\Dynamics365-Solution\\XgateSmsChannel\\.sonarqube\\out\\.sonar\\mod1"
+    },
+    {
+      "key": "FCDF3C88-8165-439C-92EA-4535DFDB742D.sonar.sourceEncoding",
+      "value": "utf-8"
+    },
+    {
+      "key": "FCDF3C88-8165-439C-92EA-4535DFDB742D.sonar.sources",
+      "value": ""
+    },
+    {
+      "key": "FCDF3C88-8165-439C-92EA-4535DFDB742D.sonar.tests",
+      "value": "D:\\work\\Dynamics365-Solution\\XgateSmsChannel\\XgateSmsChannel.Plugins.Tests\\obj\\project.assets.json,D:\\work\\Dynamics365-Solution\\XgateSmsChannel\\XgateSmsChannel.Plugins.Tests\\obj\\XgateSmsChannel.Plugins.Tests.csproj.nuget.dgspec.json,D:\\work\\Dynamics365-Solution\\XgateSmsChannel\\XgateSmsChannel.Plugins.Tests\\obj\\Debug\\net471\\XgateSmsChannel.Plugins.Tests.sourcelink.json,D:\\work\\Dynamics365-Solution\\XgateSmsChannel\\XgateSmsChannel.Plugins.Tests\\DeliveryReportPluginTests.cs,D:\\work\\Dynamics365-Solution\\XgateSmsChannel\\XgateSmsChannel.Plugins.Tests\\InboundPluginTests.cs,D:\\work\\Dynamics365-Solution\\XgateSmsChannel\\XgateSmsChannel.Plugins.Tests\\JsonUtilsTests.cs,D:\\work\\Dynamics365-Solution\\XgateSmsChannel\\XgateSmsChannel.Plugins.Tests\\OutboundPluginTests.cs,D:\\work\\Dynamics365-Solution\\XgateSmsChannel\\XgateSmsChannel.Plugins.Tests\\PluginContextMockTests.cs,D:\\work\\Dynamics365-Solution\\XgateSmsChannel\\XgateSmsChannel.Plugins.Tests\\PluginPipeline.cs"
+    },
+    {
+      "key": "FCDF3C88-8165-439C-92EA-4535DFDB742D.sonar.cs.analyzer.projectOutPaths",
+      "value": "D:\\work\\Dynamics365-Solution\\XgateSmsChannel\\.sonarqube\\out\\1"
+    },
+    {
+      "key": "FCDF3C88-8165-439C-92EA-4535DFDB742D.sonar.cs.roslyn.reportFilePaths",
+      "value": "D:\\work\\Dynamics365-Solution\\XgateSmsChannel\\.sonarqube\\out\\1\\Issues.json"
+    },
+    {
+      "key": "FCDF3C88-8165-439C-92EA-4535DFDB742D.sonar.cs.scanner.telemetry",
+      "value": "D:\\work\\Dynamics365-Solution\\XgateSmsChannel\\.sonarqube\\out\\1\\Telemetry.json"
+    },
+    {
+      "key": "9CF0806F-AB1D-4696-9505-7226513BFC5C.sonar.projectKey",
+      "value": "xgate-sms-channel:9CF0806F-AB1D-4696-9505-7226513BFC5C"
+    },
+    {
+      "key": "9CF0806F-AB1D-4696-9505-7226513BFC5C.sonar.projectName",
+      "value": "XgateSmsChannel.Plugins"
+    },
+    {
+      "key": "9CF0806F-AB1D-4696-9505-7226513BFC5C.sonar.projectBaseDir",
+      "value": "D:\\work\\Dynamics365-Solution\\XgateSmsChannel\\XgateSmsChannel.Plugins"
+    },
+    {
+      "key": "9CF0806F-AB1D-4696-9505-7226513BFC5C.sonar.working.directory",
+      "value": "D:\\work\\Dynamics365-Solution\\XgateSmsChannel\\.sonarqube\\out\\.sonar\\mod2"
+    },
+    {
+      "key": "9CF0806F-AB1D-4696-9505-7226513BFC5C.sonar.sourceEncoding",
+      "value": "utf-8"
+    },
+    {
+      "key": "9CF0806F-AB1D-4696-9505-7226513BFC5C.sonar.tests",
+      "value": ""
+    },
+    {
+      "key": "9CF0806F-AB1D-4696-9505-7226513BFC5C.sonar.sources",
+      "value": ""
+    },
+    {
+      "key": "9CF0806F-AB1D-4696-9505-7226513BFC5C.sonar.cs.analyzer.projectOutPaths",
+      "value": "D:\\work\\Dynamics365-Solution\\XgateSmsChannel\\.sonarqube\\out\\2"
+    },
+    {
+      "key": "9CF0806F-AB1D-4696-9505-7226513BFC5C.sonar.cs.roslyn.reportFilePaths",
+      "value": "D:\\work\\Dynamics365-Solution\\XgateSmsChannel\\.sonarqube\\out\\2\\Issues.json"
+    },
+    {
+      "key": "9CF0806F-AB1D-4696-9505-7226513BFC5C.sonar.cs.scanner.telemetry",
+      "value": "D:\\work\\Dynamics365-Solution\\XgateSmsChannel\\.sonarqube\\out\\2\\Telemetry.json"
+    },
+    {
+      "key": "F2BFFAB8-640F-4F41-84A7-C043332C33A9.sonar.projectKey",
+      "value": "xgate-sms-channel:F2BFFAB8-640F-4F41-84A7-C043332C33A9"
+    },
+    {
+      "key": "F2BFFAB8-640F-4F41-84A7-C043332C33A9.sonar.projectName",
+      "value": "XgateSmsChannel.Plugins.Tests"
+    },
+    {
+      "key": "F2BFFAB8-640F-4F41-84A7-C043332C33A9.sonar.projectBaseDir",
+      "value": "D:\\work\\Dynamics365-Solution\\XgateSmsChannel\\XgateSmsChannel.Plugins.Tests"
+    },
+    {
+      "key": "F2BFFAB8-640F-4F41-84A7-C043332C33A9.sonar.working.directory",
+      "value": "D:\\work\\Dynamics365-Solution\\XgateSmsChannel\\.sonarqube\\out\\.sonar\\mod3"
+    },
+    {
+      "key": "F2BFFAB8-640F-4F41-84A7-C043332C33A9.sonar.sourceEncoding",
+      "value": "utf-8"
+    },
+    {
+      "key": "F2BFFAB8-640F-4F41-84A7-C043332C33A9.sonar.sources",
+      "value": ""
+    },
+    {
+      "key": "F2BFFAB8-640F-4F41-84A7-C043332C33A9.sonar.tests",
+      "value": ""
+    },
+    {
+      "key": "F2BFFAB8-640F-4F41-84A7-C043332C33A9.sonar.cs.analyzer.projectOutPaths",
+      "value": "D:\\work\\Dynamics365-Solution\\XgateSmsChannel\\.sonarqube\\out\\3"
+    },
+    {
+      "key": "F2BFFAB8-640F-4F41-84A7-C043332C33A9.sonar.cs.roslyn.reportFilePaths",
+      "value": "D:\\work\\Dynamics365-Solution\\XgateSmsChannel\\.sonarqube\\out\\3\\Issues.json"
+    },
+    {
+      "key": "F2BFFAB8-640F-4F41-84A7-C043332C33A9.sonar.cs.scanner.telemetry",
+      "value": "D:\\work\\Dynamics365-Solution\\XgateSmsChannel\\.sonarqube\\out\\3\\Telemetry.json"
+    },
+    {
+      "key": "sonar.login",
+      "value": "***"
+    },
+    {
+      "key": "sonar.host.url",
+      "value": "http://localhost:9000"
+    },
+    {
+      "key": "sonar.cs.opencover.reportsPaths",
+      "value": "D:\\work\\Dynamics365-Solution\\XgateSmsChannel\\XgateSmsChannel.Plugins.Tests\\TestResults\\coverage.opencover.xml"
+    },
+    {
+      "key": "sonar.coverage.exclusions",
+      "value": "**/*.Tests/**,**/*Tests.cs"
+    },
+    {
+      "key": "sonar.exclusions",
+      "value": "**/obj/**,**/bin/**,D:\\work\\Dynamics365-Solution\\XgateSmsChannel\\XgateSmsChannel.Plugins.Tests\\TestResults\\coverage.opencover.xml"
+    },
+    {
+      "key": "sonar.visualstudio.enable",
+      "value": "false"
+    }
+  ]
+}

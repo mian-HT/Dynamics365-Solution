@@ -1,0 +1,17 @@
+﻿D:\work\Dynamics365-Solution\XgateSmsChannel\XgateSmsChannel.Plugins\ChannelContracts\Payload.cs
+D:\work\Dynamics365-Solution\XgateSmsChannel\XgateSmsChannel.Plugins\ChannelContracts\Response.cs
+D:\work\Dynamics365-Solution\XgateSmsChannel\XgateSmsChannel.Plugins\ConsumingApplicationContracts\DeliveryReport.cs
+D:\work\Dynamics365-Solution\XgateSmsChannel\XgateSmsChannel.Plugins\DeliveryReportPlugin.cs
+D:\work\Dynamics365-Solution\XgateSmsChannel\XgateSmsChannel.Plugins\InboundPlugin.cs
+D:\work\Dynamics365-Solution\XgateSmsChannel\XgateSmsChannel.Plugins\JsonUtils.cs
+D:\work\Dynamics365-Solution\XgateSmsChannel\XgateSmsChannel.Plugins\OutboundPlugin.cs
+D:\work\Dynamics365-Solution\XgateSmsChannel\XgateSmsChannel.Plugins\ProviderContracts\ProviderDeliveryReport.cs
+D:\work\Dynamics365-Solution\XgateSmsChannel\XgateSmsChannel.Plugins\XgateContracts\SmsCountOfStatus.cs
+D:\work\Dynamics365-Solution\XgateSmsChannel\XgateSmsChannel.Plugins\XgateContracts\SmsReceiveInfo.cs
+D:\work\Dynamics365-Solution\XgateSmsChannel\XgateSmsChannel.Plugins\XgateContracts\SmsRecipient.cs
+D:\work\Dynamics365-Solution\XgateSmsChannel\XgateSmsChannel.Plugins\XgateContracts\SmsRequest.cs
+D:\work\Dynamics365-Solution\XgateSmsChannel\XgateSmsChannel.Plugins\XgateContracts\SmsResponse.cs
+D:\work\Dynamics365-Solution\XgateSmsChannel\XgateSmsChannel.Plugins\XgateContracts\TokenRequest.cs
+D:\work\Dynamics365-Solution\XgateSmsChannel\XgateSmsChannel.Plugins\XgateContracts\TokenResponse.cs
+D:\work\Dynamics365-Solution\XgateSmsChannel\XgateSmsChannel.Plugins\XgateGatewayException.cs
+D:\work\Dynamics365-Solution\XgateSmsChannel\XgateSmsChannel.Plugins\XgateKey.snk

@@ -5,7 +5,8 @@
     <AssemblyName>XgateSmsChannel.Plugins</AssemblyName>
     <RootNamespace>XgateSmsChannel.Plugins</RootNamespace>
     <AssemblyOriginatorKeyFile>XgateKey.snk</AssemblyOriginatorKeyFile>
-    <SignAssembly>True</SignAssembly>
+    <!-- 覆盖率插桩(coverlet)会改写程序集破坏强名称签名，故仅在覆盖率构建(Coverage=true)时关闭签名 -->
+    <SignAssembly Condition=" '$(Coverage)' != 'true' ">True</SignAssembly>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -22,7 +23,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.CrmSdk.CoreAssemblies" Version="9.0.2.46" />
   </ItemGroup>
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition=" '$(Coverage)' != 'true' ">
         <Copy SourceFiles="$(OutDir)$(TargetName).dll" DestinationFiles="$(MSBuildProjectDirectory)\..\XgateSmsChannel.Solution\unmanaged\PluginAssemblies\XgateSmsChannelPlugins-BD9E885E-B45B-4452-A448-C7E6B93F231F\XgateSmsChannelPlugins.dll" />
   </Target>
 </Project>

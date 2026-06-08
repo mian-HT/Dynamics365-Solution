@@ -13,7 +13,28 @@ namespace XgateSmsChannel.Plugins
 
     public class OutboundPlugin : IPlugin
     {
-        private static readonly HttpClient httpClient = new HttpClient();
+        [System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "Major Code Smell", "S1075:URIs should not be hardcoded",
+            Justification = "网关默认基地址，仅在账号未配置 ApiBaseUrl 时作为兜底使用")]
+        private const string DefaultBaseUrl = "https://sms-api.xgate.com/sms/2.0";
+        private const string DefaultFrom = "10690000";
+        private const string AccountEntityName = "xgate_xgatesmschannelinstanceaccount";
+
+        // D365 运行时所有插件实例共享同一个 HttpClient，避免 socket 耗尽
+        private static readonly HttpClient SharedHttpClient = new HttpClient();
+
+        private readonly HttpClient httpClient;
+
+        public OutboundPlugin()
+        {
+            this.httpClient = SharedHttpClient;
+        }
+
+        // 供单元测试注入自定义 HttpMessageHandler 以模拟网关响应
+        public OutboundPlugin(HttpMessageHandler httpMessageHandler)
+        {
+            this.httpClient = new HttpClient(httpMessageHandler);
+        }
 
         public void Execute(IServiceProvider serviceProvider)
         {
@@ -26,190 +47,214 @@ namespace XgateSmsChannel.Plugins
 
             var payloadObject = JsonUtils.Deserialize<Payload>(payload);
 
-            // --- 核心改动：提前初始化状态变量，准备随时接住异常 ---
-            var status = "Failed"; // 默认状态为失败，只有成功走到最后才会变为 Sent
+            var status = "Failed"; // 默认失败，只有成功走到最后才会变为 Sent
             var msgGuid = string.IsNullOrEmpty(payloadObject.RequestId) ? Guid.NewGuid() : Guid.Parse(payloadObject.RequestId);
             var messageId = msgGuid.ToString();
-            var statusDetails = new Dictionary<string, object>(); // 专门用来装载给前端展示的错误信息
+            var statusDetails = new Dictionary<string, object>();
 
             try
             {
-                var rawFrom = payloadObject.From ?? "10690000";
+                var rawFrom = payloadObject.From ?? DefaultFrom;
                 tracingService.Trace($"用户选择的发件人: {rawFrom}, 所属账号ID: {payloadObject.ChannelInstanceId}");
 
-                var serviceFactory = serviceProvider.Get<IOrganizationServiceFactory>();
-                var orgService = serviceFactory.CreateOrganizationService(null);
+                var orgService = serviceProvider.Get<IOrganizationServiceFactory>().CreateOrganizationService(null);
 
-                Entity accountEntity = null;
-
-                // 按主键直查 ChannelInstanceId存在就用ChannelInstanceId查找
-                if (!string.IsNullOrEmpty(payloadObject.ChannelInstanceId) && 
-                    payloadObject.ChannelInstanceId != Guid.Empty.ToString() && 
-                    payloadObject.ChannelInstanceId.Replace("-", "") != "00000000000000000000000000000000")
-                {
-                    tracingService.Trace("检测到完整 InstanceId，进入主键直查...");
-                    try
-                    {
-                        accountEntity = orgService.Retrieve(
-                            "xgate_xgatesmschannelinstanceaccount", 
-                            Guid.Parse(payloadObject.ChannelInstanceId), 
-                            new ColumnSet("xgate_accountid", "xgate_accountsecret", "xgate_apibaseurl", "statecode")
-                        );
-                    }
-                    catch { /* 如果查不到，静默失败，交给下面的兜底通道处理 */ }
-                }
-
-                // (关联查询)
-                if (accountEntity == null)
-                {
-                    tracingService.Trace($"通道 2：启动标准 CI-J 链路查询，From: {rawFrom}");
-
-                    // 1. 起点：您的自定义配置表 (获取 API Secret/URL)
-                    var fallbackQuery = new QueryExpression("xgate_xgatesmschannelinstanceaccount")
-                    {
-                        TopCount = 1,
-                        ColumnSet = new ColumnSet("xgate_accountid", "xgate_accountsecret", "xgate_apibaseurl", "statecode")
-                    };
-                    fallbackQuery.Criteria.AddCondition("statecode", ConditionOperator.Equal, 0);
-
-                    // 2. 第一级关联：自定义配置表 <-> 标准账户表 (msdyn_channelinstanceaccount)
-                    // 关键点：标准表通过 msdyn_extendedentityid 字段存储了您自定义记录的 GUID 字符串
-                    var accountLink = fallbackQuery.AddLink(
-                        "msdyn_channelinstanceaccount", 
-                        "xgate_xgatesmschannelinstanceaccountid", 
-                        "msdyn_extendedentityid", 
-                        JoinOperator.Inner
-                    );
-
-                    // 3. 第二级关联：标准账户表 <-> 标准实例表 (msdyn_channelinstance)
-                    var instanceLink = accountLink.AddLink(
-                        "msdyn_channelinstance", 
-                        "msdyn_channelinstanceaccountid", // 账户表主键
-                        "msdyn_channelinstanceaccountid", // 实例表外键
-                        JoinOperator.Inner
-                    );
-
-                    // 4. 终点：匹配发件人名称 msdyn_name = rawFrom
-                    instanceLink.LinkCriteria.AddCondition("msdyn_contactpoint", ConditionOperator.Equal, rawFrom);
-
-                    var fallbackResults = orgService.RetrieveMultiple(fallbackQuery);
-                    if (fallbackResults.Entities.Count > 0)
-                    {
-                        accountEntity = fallbackResults.Entities[0];
-                        tracingService.Trace($"三表联动查询成功！已找到对应环境配置。Id={accountEntity.Id}, AccountId={accountEntity.GetAttributeValue<string>("xgate_accountid")}, ApiBaseUrl={accountEntity.GetAttributeValue<string>("xgate_apibaseurl")}");
-                    }
-                }
-
-                // ==========================================
-                // 最终校验与赋值
-                // ==========================================
-                if (accountEntity == null)
-                {
-                    throw new Exception($"配置异常: 未在系统中找到发件人 [{rawFrom}] 对应的启用状态的账号配置 (测试发送或正式发送均匹配失败)。");
-                }
-
-                var stateCode = accountEntity.GetAttributeValue<OptionSetValue>("statecode");
-                if (stateCode != null && stateCode.Value != 0) 
-                {
-                    throw new Exception($"配置异常: 当前选择的发件人所属的账号已被停用。");
-                }
+                var accountEntity = ResolveAccountEntity(orgService, payloadObject, rawFrom, tracingService);
+                ValidateAccount(accountEntity, rawFrom);
 
                 var appId = accountEntity.GetAttributeValue<string>("xgate_accountid");
                 var appSecret = accountEntity.GetAttributeValue<string>("xgate_accountsecret");
+                var baseUrl = ResolveBaseUrl(accountEntity);
 
-                var baseUrl = accountEntity.GetAttributeValue<string>("xgate_apibaseurl");
-                if (string.IsNullOrWhiteSpace(baseUrl)) baseUrl = "https://sms-api.xgate.com/sms/2.0";
-                baseUrl = baseUrl.TrimEnd('/'); 
+                var superExternalId = BuildExternalId(msgGuid, rawFrom);
+                var accessToken = AcquireToken(baseUrl, appId, appSecret);
 
-                // xgate sms接口中的ExternalId有长度限制最大64个字符，所以这里压缩字符长度
-                var safeFromNumber = Uri.EscapeDataString(rawFrom); 
-                var msgB64 = Convert.ToBase64String(msgGuid.ToByteArray()).Replace("+", "-").Replace("/", "_").         TrimEnd('=');
-                var superExternalId = $"{msgB64}.{safeFromNumber}";
-
-                // 3：动态拼接 Token 接口地址
-                var tokenRequestBody = JsonUtils.Serialize(new TokenRequest { AppId = appId, AppSecret = appSecret });
-                var tokenHttpResponse = httpClient.PostAsync(
-                    $"{baseUrl}/token", // 动态 URL！
-                    new StringContent(tokenRequestBody, Encoding.UTF8, "application/json")
-                ).GetAwaiter().GetResult();
-
-                var tokenResponseBody = tokenHttpResponse.Content.ReadAsStringAsync().GetAwaiter().GetResult();
-
-                if (!tokenHttpResponse.IsSuccessStatusCode)
-                {
-                    throw new Exception($"登录网关失败 (HTTP {tokenHttpResponse.StatusCode}): {tokenResponseBody}");
-                }
-
-                var tokenResponse = JsonUtils.Deserialize<TokenResponse>(tokenResponseBody);
-                var accessToken = tokenResponse.AccessToken;
-
-                // Step 2: 组装并发送短信
-                var smsRequestBody = JsonUtils.Serialize(new SmsRequest
-                {
-                    MessageBody = payloadObject.Message.ContainsKey("text")
-                        ? payloadObject.Message["text"]
-                        : payloadObject.Message.Values.FirstOrDefault() ?? string.Empty,
-                    ToList = new List<SmsRecipient>
-                    {
-                        new SmsRecipient { To = payloadObject.To, ExternalId = superExternalId }
-                    }
-                });
-
-                //4：动态拼接 Send 接口地址
-                var smsHttpRequest = new HttpRequestMessage(HttpMethod.Post, $"{baseUrl}/send") // 动态 URL！
-                {
-                    Content = new StringContent(smsRequestBody, Encoding.UTF8, "application/json")
-                };
-                smsHttpRequest.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
-
-                var smsHttpResponse = httpClient.SendAsync(smsHttpRequest).GetAwaiter().GetResult();
-                var smsResponseBody = smsHttpResponse.Content.ReadAsStringAsync().GetAwaiter().GetResult();
-                
-                // 【兜底 2】如果发送接口挂了报 500、404，优雅拦截！
-                if (!smsHttpResponse.IsSuccessStatusCode)
-                {
-                    throw new Exception($"请求发送接口异常 (HTTP {smsHttpResponse.StatusCode}): {smsResponseBody}");
-                }
-
-                // Step 3: 解析真实的网关业务回执
-                var smsResponse = JsonUtils.Deserialize<SmsResponse>(smsResponseBody);
-                
-                // 【兜底 3】HTTP 是 200，但 Xgate 告诉你业务失败（如：欠费、空号、内容违规）
-                if (smsResponse.CountOfStatus != null && smsResponse.CountOfStatus.Success == 1 && smsResponse.ReceiveInfo != null && smsResponse.ReceiveInfo.Count > 0)
-                {
-                    messageId = smsResponse.ReceiveInfo[0].MessageId; // 成功！拿到真 ID
-                    status = "Sent"; // 只有在这里，状态才真正变为 Sent
-                    tracingService.Trace("SMS sent successfully. MessageId: " + messageId);
-                }
-                else
-                {
-                    // 把 Xgate 返回的真实 JSON 错误信息暴露出去，让业务员看到是欠费还是拒收
-                    throw new Exception($"网关拒绝发送 (业务异常): {smsResponseBody}");
-                }
+                messageId = SendSms(baseUrl, accessToken, payloadObject, superExternalId, tracingService);
+                status = "Sent";
             }
             catch (Exception ex)
             {
-                // 🔥 终极兜底：所有异常都会流向这里！
-                // 确保插件不崩溃，而是把报错信息装进 StatusDetails 字典
+                // 终极兜底：所有异常都会流向这里，确保插件不崩溃，而是把错误信息装进 StatusDetails
                 status = "Failed";
                 statusDetails.Add("ErrorDetails", ex.Message);
-                
-                // 将错误写入系统日志，方便开发人员后台排查
                 tracingService.Trace("🚨 短信发送被拦截/发生异常: " + ex.ToString());
             }
 
-            // --- 组装最终响应 ---
             var responseObject = new Response()
             {
                 ChannelDefinitionId = payloadObject.ChannelDefinitionId,
                 MessageId = messageId,
                 RequestId = payloadObject.RequestId,
                 Status = status,
-                // 如果 statusDetails 里有数据（报错了），就一并交还给 D365
-                StatusDetails = statusDetails.Count > 0 ? statusDetails : null 
+                StatusDetails = statusDetails.Count > 0 ? statusDetails : null
             };
 
             pluginExecutionContext.OutputParameters["response"] = JsonUtils.Serialize(responseObject);
+        }
+
+        // 先按主键直查，查不到再走标准 CI-J 三表联动兜底查询
+        private static Entity ResolveAccountEntity(IOrganizationService orgService, Payload payloadObject, string rawFrom, ITracingService tracingService)
+        {
+            Entity accountEntity = null;
+
+            if (IsConcreteInstanceId(payloadObject.ChannelInstanceId))
+            {
+                tracingService.Trace("检测到完整 InstanceId，进入主键直查...");
+                try
+                {
+                    accountEntity = orgService.Retrieve(
+                        AccountEntityName,
+                        Guid.Parse(payloadObject.ChannelInstanceId),
+                        new ColumnSet("xgate_accountid", "xgate_accountsecret", "xgate_apibaseurl", "statecode"));
+                }
+                catch (Exception ex)
+                {
+                    // 查不到则静默降级，交给下面的兜底通道处理
+                    tracingService.Trace("主键直查失败，转兜底查询: " + ex.Message);
+                }
+            }
+
+            return accountEntity ?? QueryAccountByContactPoint(orgService, rawFrom, tracingService);
+        }
+
+        private static bool IsConcreteInstanceId(string channelInstanceId)
+        {
+            return !string.IsNullOrEmpty(channelInstanceId)
+                && channelInstanceId != Guid.Empty.ToString()
+                && channelInstanceId.Replace("-", "") != "00000000000000000000000000000000";
+        }
+
+        // 标准 CI-J 链路查询：自定义配置表 -> msdyn_channelinstanceaccount -> msdyn_channelinstance，按发件人号码匹配
+        private static Entity QueryAccountByContactPoint(IOrganizationService orgService, string rawFrom, ITracingService tracingService)
+        {
+            tracingService.Trace($"通道 2：启动标准 CI-J 链路查询，From: {rawFrom}");
+
+            var fallbackQuery = new QueryExpression(AccountEntityName)
+            {
+                TopCount = 1,
+                ColumnSet = new ColumnSet("xgate_accountid", "xgate_accountsecret", "xgate_apibaseurl", "statecode")
+            };
+            fallbackQuery.Criteria.AddCondition("statecode", ConditionOperator.Equal, 0);
+
+            var accountLink = fallbackQuery.AddLink(
+                "msdyn_channelinstanceaccount",
+                "xgate_xgatesmschannelinstanceaccountid",
+                "msdyn_extendedentityid",
+                JoinOperator.Inner);
+
+            var instanceLink = accountLink.AddLink(
+                "msdyn_channelinstance",
+                "msdyn_channelinstanceaccountid",
+                "msdyn_channelinstanceaccountid",
+                JoinOperator.Inner);
+
+            instanceLink.LinkCriteria.AddCondition("msdyn_contactpoint", ConditionOperator.Equal, rawFrom);
+
+            var fallbackResults = orgService.RetrieveMultiple(fallbackQuery);
+            if (fallbackResults.Entities.Count > 0)
+            {
+                var entity = fallbackResults.Entities[0];
+                tracingService.Trace($"三表联动查询成功！Id={entity.Id}, AccountId={entity.GetAttributeValue<string>("xgate_accountid")}, ApiBaseUrl={entity.GetAttributeValue<string>("xgate_apibaseurl")}");
+                return entity;
+            }
+
+            return null;
+        }
+
+        private static void ValidateAccount(Entity accountEntity, string rawFrom)
+        {
+            if (accountEntity == null)
+            {
+                throw new XgateGatewayException($"配置异常: 未在系统中找到发件人 [{rawFrom}] 对应的启用状态的账号配置 (测试发送或正式发送均匹配失败)。");
+            }
+
+            var stateCode = accountEntity.GetAttributeValue<OptionSetValue>("statecode");
+            if (stateCode != null && stateCode.Value != 0)
+            {
+                throw new XgateGatewayException("配置异常: 当前选择的发件人所属的账号已被停用。");
+            }
+        }
+
+        private static string ResolveBaseUrl(Entity accountEntity)
+        {
+            var baseUrl = accountEntity.GetAttributeValue<string>("xgate_apibaseurl");
+            if (string.IsNullOrWhiteSpace(baseUrl))
+            {
+                baseUrl = DefaultBaseUrl;
+            }
+
+            return baseUrl.TrimEnd('/');
+        }
+
+        // xgate 接口 ExternalId 最长 64 字符，这里把 Guid 压缩为 url-safe base64 再拼上发件人号码
+        private static string BuildExternalId(Guid msgGuid, string rawFrom)
+        {
+            var safeFromNumber = Uri.EscapeDataString(rawFrom);
+            var msgB64 = Convert.ToBase64String(msgGuid.ToByteArray()).Replace("+", "-").Replace("/", "_").TrimEnd('=');
+            return $"{msgB64}.{safeFromNumber}";
+        }
+
+        private string AcquireToken(string baseUrl, string appId, string appSecret)
+        {
+            var tokenRequestBody = JsonUtils.Serialize(new TokenRequest { AppId = appId, AppSecret = appSecret });
+            var tokenHttpResponse = httpClient.PostAsync(
+                $"{baseUrl}/token",
+                new StringContent(tokenRequestBody, Encoding.UTF8, "application/json")).GetAwaiter().GetResult();
+
+            var tokenResponseBody = tokenHttpResponse.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+            if (!tokenHttpResponse.IsSuccessStatusCode)
+            {
+                throw new XgateGatewayException($"登录网关失败 (HTTP {tokenHttpResponse.StatusCode}): {tokenResponseBody}");
+            }
+
+            return JsonUtils.Deserialize<TokenResponse>(tokenResponseBody).AccessToken;
+        }
+
+        private string SendSms(string baseUrl, string accessToken, Payload payloadObject, string superExternalId, ITracingService tracingService)
+        {
+            var smsRequestBody = JsonUtils.Serialize(new SmsRequest
+            {
+                MessageBody = ResolveMessageBody(payloadObject),
+                ToList = new List<SmsRecipient>
+                {
+                    new SmsRecipient { To = payloadObject.To, ExternalId = superExternalId }
+                }
+            });
+
+            var smsHttpRequest = new HttpRequestMessage(HttpMethod.Post, $"{baseUrl}/send")
+            {
+                Content = new StringContent(smsRequestBody, Encoding.UTF8, "application/json")
+            };
+            smsHttpRequest.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
+
+            var smsHttpResponse = httpClient.SendAsync(smsHttpRequest).GetAwaiter().GetResult();
+            var smsResponseBody = smsHttpResponse.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+
+            // 兜底：发送接口 HTTP 异常（500/404 等）
+            if (!smsHttpResponse.IsSuccessStatusCode)
+            {
+                throw new XgateGatewayException($"请求发送接口异常 (HTTP {smsHttpResponse.StatusCode}): {smsResponseBody}");
+            }
+
+            var smsResponse = JsonUtils.Deserialize<SmsResponse>(smsResponseBody);
+
+            // 兜底：HTTP 200 但业务失败（欠费、空号、内容违规等）
+            if (smsResponse.CountOfStatus != null && smsResponse.CountOfStatus.Success == 1
+                && smsResponse.ReceiveInfo != null && smsResponse.ReceiveInfo.Count > 0)
+            {
+                var messageId = smsResponse.ReceiveInfo[0].MessageId;
+                tracingService.Trace("SMS sent successfully. MessageId: " + messageId);
+                return messageId;
+            }
+
+            throw new XgateGatewayException($"网关拒绝发送 (业务异常): {smsResponseBody}");
+        }
+
+        private static string ResolveMessageBody(Payload payloadObject)
+        {
+            return payloadObject.Message.ContainsKey("text")
+                ? payloadObject.Message["text"]
+                : payloadObject.Message.Values.FirstOrDefault() ?? string.Empty;
         }
     }
 }

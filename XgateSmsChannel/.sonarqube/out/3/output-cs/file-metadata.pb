@@ -1,0 +1,9 @@
+p
+gD:\work\Dynamics365-Solution\XgateSmsChannel\XgateSmsChannel.Plugins.Tests\DeliveryReportPluginTests.csutf-8i
+`D:\work\Dynamics365-Solution\XgateSmsChannel\XgateSmsChannel.Plugins.Tests\InboundPluginTests.csutf-8e
+\D:\work\Dynamics365-Solution\XgateSmsChannel\XgateSmsChannel.Plugins.Tests\JsonUtilsTests.csutf-8j
+aD:\work\Dynamics365-Solution\XgateSmsChannel\XgateSmsChannel.Plugins.Tests\OutboundPluginTests.csutf-8m
+dD:\work\Dynamics365-Solution\XgateSmsChannel\XgateSmsChannel.Plugins.Tests\PluginContextMockTests.csutf-8e
+\D:\work\Dynamics365-Solution\XgateSmsChannel\XgateSmsChannel.Plugins.Tests\PluginPipeline.csutf-8š
+ŽD:\work\Dynamics365-Solution\XgateSmsChannel\XgateSmsChannel.Plugins.Tests\obj\Debug\net471\.NETFramework,Version=v4.7.1.AssemblyAttributes.csutf-8•
+‰D:\work\Dynamics365-Solution\XgateSmsChannel\XgateSmsChannel.Plugins.Tests\obj\Debug\net471\XgateSmsChannel.Plugins.Tests.AssemblyInfo.csutf-8

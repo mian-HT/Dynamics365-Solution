@@ -1,0 +1,10 @@
+﻿D:\work\Dynamics365-Solution\XgateSmsChannel\XgateSmsChannel.Plugins.Tests\DeliveryReportPluginTests.cs
+D:\work\Dynamics365-Solution\XgateSmsChannel\XgateSmsChannel.Plugins.Tests\InboundPluginTests.cs
+D:\work\Dynamics365-Solution\XgateSmsChannel\XgateSmsChannel.Plugins.Tests\JsonUtilsTests.cs
+D:\work\Dynamics365-Solution\XgateSmsChannel\XgateSmsChannel.Plugins.Tests\OutboundPluginTests.cs
+D:\work\Dynamics365-Solution\XgateSmsChannel\XgateSmsChannel.Plugins.Tests\PluginContextMockTests.cs
+D:\work\Dynamics365-Solution\XgateSmsChannel\XgateSmsChannel.Plugins.Tests\PluginPipeline.cs
+C:\Users\Administrator\.nuget\packages\xunit.runner.visualstudio\2.5.8\build\net462\xunit.runner.visualstudio.testadapter.dll
+C:\Users\Administrator\.nuget\packages\xunit.runner.visualstudio\2.5.8\build\net462\xunit.abstractions.dll
+C:\Users\Administrator\.nuget\packages\xunit.runner.visualstudio\2.5.8\build\net462\xunit.runner.reporters.net452.dll
+C:\Users\Administrator\.nuget\packages\xunit.runner.visualstudio\2.5.8\build\net462\xunit.runner.utility.net452.dll
