@@ -1,7 +1,7 @@
 {
-  "version": 3,
+  "version": 4,
   "targets": {
-    ".NETFramework,Version=v4.7.2": {
+    "net472": {
       "Microsoft.CrmSdk.CoreAssemblies/9.0.2.25": {
         "type": "package",
         "frameworkAssemblies": [
@@ -484,7 +484,7 @@
     }
   },
   "projectFileDependencyGroups": {
-    ".NETFramework,Version=v4.7.2": [
+    "net472": [
       "Microsoft.CrmSdk.XrmTooling.CoreAssembly >= 9.1.0.79",
       "Microsoft.CrmSdk.XrmTooling.PackageDeployment >= 9.1.0.74",
       "Microsoft.PowerApps.MSBuild.PDPackage >= 1.*"
@@ -520,6 +520,7 @@
       },
       "frameworks": {
         "net472": {
+          "framework": "net472",
           "targetAlias": "net472",
           "projectReferences": {}
         }
@@ -534,10 +535,11 @@
         "auditLevel": "low",
         "auditMode": "direct"
       },
-      "SdkAnalysisLevel": "10.0.200"
+      "SdkAnalysisLevel": "10.0.300"
     },
     "frameworks": {
       "net472": {
+        "framework": "net472",
         "targetAlias": "net472",
         "dependencies": {
           "Microsoft.CrmSdk.XrmTooling.CoreAssembly": {
@@ -557,7 +559,7 @@
             "version": "[1.*, )"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.204\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.301\\RuntimeIdentifierGraph.json"
       }
     }
   }

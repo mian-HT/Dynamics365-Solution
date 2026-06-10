@@ -34,18 +34,18 @@ export class HelloWorld extends React.Component<IHelloWorldProps, IHelloWorldSta
 
     // 1. 构造 Custom API 的请求体
     const request = {
-      TemplateId: templateIdInput,
+      payload: JSON.stringify({ templateId: templateIdInput }),
       getMetadata: function () {
         return {
           boundParameter: null,
           parameterTypes: {
-            "TemplateId": {
+            "payload": {
               typeName: "Edm.String",
               structuralProperty: 1
             }
           },
           operationType: 0,
-          operationName: "xgate_GetWhatsAppTemplate"
+          operationName: "xgate_GetTemplateCustomApi"
         };
       }
     };
@@ -81,7 +81,7 @@ export class HelloWorld extends React.Component<IHelloWorldProps, IHelloWorldSta
       })
       .then((responseBody: Record<string, unknown>) => {
         // 安全地提取字符串
-        const templateData = responseBody.TemplateDataJson;
+        const templateData = responseBody.response;
         const rawJsonString = typeof templateData === "string" ? templateData : "{}";
         console.log("C# 返回的原始数据:", rawJsonString);
 

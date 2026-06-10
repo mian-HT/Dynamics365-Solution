@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyCopyrightAttribute("Copyright © 2026")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0520a6a6d31a9ce3f459f3cd4cb1681bb1eac5ab")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+94c78ee393b8ca90c9964cc31ebe7c2b7b821e65")]
 [assembly: System.Reflection.AssemblyProductAttribute("XgateSmsPackage")]
 [assembly: System.Reflection.AssemblyTitleAttribute("XgateSmsPackage")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
