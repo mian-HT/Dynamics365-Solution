@@ -1,22 +1,22 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <forms xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <systemform>
     <formid>{13964edc-3cdb-49a2-bf48-247e09ef586c}</formid>
     <IntroducedVersion>1.0.0.0</IntroducedVersion>
     <FormPresentation>1</FormPresentation>
     <FormActivationState>1</FormActivationState>
-    <form>
+    <form headerdensity="HighWithControls">
       <tabs>
         <tab verticallayout="true" id="{ed45df4e-c61c-455b-86ac-4ec7a94edac2}" IsUserDefined="1">
           <labels>
-            <label description="General" languagecode="1033" />
+            <label description="" languagecode="1033" />
           </labels>
           <columns>
             <column width="100%">
               <sections>
                 <section showlabel="false" showbar="false" IsUserDefined="0" id="{e9ed1c09-3ae3-46cb-b432-f1ecd0e6920a}">
                   <labels>
-                    <label description="General" languagecode="1033" />
+                    <label description="" languagecode="1033" />
                   </labels>
                   <rows>
                     <row>
@@ -36,13 +36,33 @@
                       </cell>
                     </row>
                     <row>
-                      <cell id="{25ab93e8-cc05-4c6c-ab3a-196d832310b7}" locklevel="0" colspan="1" rowspan="1">
+                      <cell rowspan="8" id="{2ccfce84-77a3-4488-8316-99349adfb0a4}" showlabel="false" colspan="1">
                         <labels>
-                          <label description="API Base URL" languagecode="1033" />
+                          <label description="Xgate Account Select" languagecode="1033" />
                         </labels>
-                        <control id="xgate_apibaseurl" classid="{71716B6C-711E-476C-8AB8-5D11542BFB47}" datafieldname="xgate_apibaseurl" disabled="false" />
+                        <control id="WebResource_xgate_select_account" classid="{9FDF5F91-88B1-47F4-AD53-C11EFC01A01D}">
+                          <parameters>
+                            <Url>xgate_xgate_account_select</Url>
+                            <PassParameters>false</PassParameters>
+                            <Security>false</Security>
+                            <Scrolling>auto</Scrolling>
+                            <Border>false</Border>
+                            <ShowOnMobileClient>false</ShowOnMobileClient>
+                            <WebResourceId>{8fb036e9-7765-f111-a825-70a8a5b1e115}</WebResourceId>
+                          </parameters>
+                        </control>
+                        <events>
+                          <event name="onload" application="false" active="false" />
+                        </events>
                       </cell>
                     </row>
+                    <row />
+                    <row />
+                    <row />
+                    <row />
+                    <row />
+                    <row />
+                    <row />
                   </rows>
                 </section>
               </sections>
@@ -80,6 +100,51 @@
           </NavBarArea>
         </NavBarAreas>
       </Navigation>
+      <header id="{83507da8-cbcb-4f0b-8d94-b863124f8d38}" celllabelposition="Top" columns="111" labelwidth="115" celllabelalignment="Left">
+        <rows>
+          <row>
+            <cell id="{8342c00e-788e-4c67-ae6a-ae100af67f36}" showlabel="false">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+            <cell id="{0e418809-afea-48e7-aa22-13aa199438bc}" showlabel="false">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+            <cell id="{95621307-dc89-452c-bbb1-698e41e7d06b}" showlabel="false">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+          </row>
+        </rows>
+      </header>
+      <footer id="{0ba7727f-50c7-40df-81f2-91ae288e2665}" celllabelposition="Top" columns="111" labelwidth="115" celllabelalignment="Left">
+        <rows>
+          <row>
+            <cell id="{ea65402c-983c-4ace-97e5-df6e0219760d}" showlabel="false">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+            <cell id="{0c568381-8165-4d94-80c1-34233c5438e9}" showlabel="false">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+            <cell id="{f1f28bcd-ad4e-41b0-921d-a6fb9f26b371}" showlabel="false">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+          </row>
+        </rows>
+      </footer>
+      <DisplayConditions Order="0" FallbackForm="true">
+        <Everyone />
+      </DisplayConditions>
     </form>
     <IsCustomizable>0</IsCustomizable>
     <CanBeDeleted>0</CanBeDeleted>

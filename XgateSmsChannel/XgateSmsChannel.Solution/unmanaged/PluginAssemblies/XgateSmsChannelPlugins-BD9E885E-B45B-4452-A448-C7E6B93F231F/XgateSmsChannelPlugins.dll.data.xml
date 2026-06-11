@@ -1,10 +1,9 @@
-<?xml version="1.0" encoding="utf-8"?>
-<PluginAssembly FullName="XgateSmsChannel.Plugins, Version=1.0.0.0, Culture=neutral, PublicKeyToken=ce2803c0831125f1" CustomizationLevel="1" PluginAssemblyId="bd9e885e-b45b-4452-a448-c7e6b93f231f" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PluginAssembly FullName="XgateSmsChannel.Plugins, Version=1.0.0.0, Culture=neutral, PublicKeyToken=ce2803c0831125f1" PluginAssemblyId="bd9e885e-b45b-4452-a448-c7e6b93f231f" CustomizationLevel="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <IsolationMode>2</IsolationMode>
   <SourceType>0</SourceType>
   <IntroducedVersion>1.0</IntroducedVersion>
   <FileName>/PluginAssemblies/XgateSmsChannelPlugins-BD9E885E-B45B-4452-A448-C7E6B93F231F/XgateSmsChannelPlugins.dll</FileName>
-  <IsCustomizable>0</IsCustomizable>
   <PluginTypes>
     <PluginType AssemblyQualifiedName="XgateSmsChannel.Plugins.DeliveryReportPlugin, XgateSmsChannel.Plugins, Version=1.0.0.0, Culture=neutral, PublicKeyToken=ce2803c0831125f1" PluginTypeId="b7763b99-7976-4b0a-8787-407d9ae29051" Name="XgateSmsChannel.Plugins.DeliveryReportPlugin">
       <FriendlyName>b7763b99-7976-4b0a-8787-407d9ae290511.0.0.0</FriendlyName>

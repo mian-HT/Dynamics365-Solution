@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>XGATE SMS Provider Setup</title>
+    <script src="../ClientGlobalContext.js.aspx" type="text/javascript"></script>
+    <style>
+        body {
+            /* 采用微软 Fluent Design 标准字体族 */
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', sans-serif;
+            margin: 0;
+            padding: 10px 0;
+            color: #323130; /* D365 标准文本灰黑 */
+            background-color: transparent;
+        }
+        
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #323130;
+        }
+
+        .cards-container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .card {
+            flex: 1;
+            min-width: 250px;
+            max-width: 320px;
+            border: 1px solid #edebe9;
+            border-radius: 4px;
+            padding: 24px;
+            background-color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .card h4 {
+            margin: 0 0 8px 0;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .card p {
+            margin: 0 0 24px 0;
+            font-size: 13px;
+            color: #605e5c;
+            line-height: 1.5;
+            flex-grow: 1;
+        }
+
+        .btn {
+            align-self: flex-start;
+            padding: 6px 16px;
+            background-color: #0f6cbd; /* 微软标准品牌蓝 */
+            color: white;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .btn:hover {
+            background-color: #115ea3;
+        }
+
+        .footer-note {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #605e5c;
+        }
+
+        .footer-note a {
+            color: #0f6cbd;
+            text-decoration: none;
+        }
+
+        .footer-note a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="section-title">Connect to XGATE to create API Credentials</div>
+    
+    <div class="cards-container">
+        <div class="card">
+            <h4>Create Trial Account</h4>
+            <p>Create a new XGATE trial account to generate your API credentials.</p>
+            <button class="btn" onclick="openXgateAuth('trial')">Start New Trial</button>
+        </div>
+
+        <div class="card">
+            <h4>Use Existing Account</h4>
+            <p>Connect your existing XGATE account to retrieve or generate API credentials.</p>
+            <button class="btn" onclick="openXgateAuth('existing')">Connect Existing</button>
+        </div>
+    </div>
+
+    <div class="footer-note">
+        Reply Callback Url is used to enable incoming text messages and delivery reports. <a href="https://www.xgate.com/support" target="_blank">Learn more.</a>
+    </div>
+
+    <script type="text/javascript">
+        /**
+         * 触发鉴权窗口
+         * @param {string} actionType - 'trial' (试用) 或 'existing' (已有账号)
+         */
+        function openXgateAuth(actionType) {
+            try {
+                // 1. 尝试获取 D365 全局上下文环境 (加 try-catch 防止在本地单独打开 HTML 时报错)
+                var globalContext = window.parent.Xrm.Utility.getGlobalContext();
+                var orgId = globalContext.organizationSettings.organizationId;
+                var userId = globalContext.userSettings.userId;
+                var orgUrl = globalContext.getClientUrl();
+
+                // 2. 拼接授权 URL (加上 type 参数告诉网关客户点的是哪个按钮)
+                var authUrl = "https://portal.xgate.com/d365-auth" +
+                              "?type=" + encodeURIComponent(actionType) +
+                              "&orgId=" + encodeURIComponent(orgId) +
+                              "&userId=" + encodeURIComponent(userId) +
+                              "&orgUrl=" + encodeURIComponent(orgUrl);
+
+                // 3. 打开弹出窗口
+                var features = "width=800,height=650,left=200,top=100,status=yes,resizable=yes";
+                window.open(authUrl, "XgateAuthWindow", features);
+            } catch (e) {
+                // 本地调试时的备选行为
+                console.error("Xrm context not found. Are you running this inside Dynamics 365?", e);
+                alert("Simulating redirect to: https://portal.xgate.com/d365-auth?type=" + actionType);
+                
+                // 本地调试：模拟直接调用成功回传
+                // onAuthSuccess("XG-TEST-ID-123", "XG-TEST-SECRET-456", "https://api.xgate.com");
+            }
+        }
+
+        /**
+         * 供外部子窗口 (XGATE 授权页) 成功后反向调用的回调函数
+         */
+        function onAuthSuccess(appId, appSecret, apiBaseUrl) {
+            try {
+                // 将获取到的参数填充到 D365 父表单对应的字段中
+                // 注意：请确保下方括号内的逻辑名与你环境中的真实字段名一致
+                window.parent.Xrm.Page.getAttribute("xgate_accountid").setValue(appId);
+                window.parent.Xrm.Page.getAttribute("xgate_accountsecret").setValue(appSecret);
+                window.parent.Xrm.Page.getAttribute("xgate_apibaseurl").setValue(apiBaseUrl);
+                
+                // 强制保存表单（可选，如果想让客户手动点下一步，可以注释掉这行）
+                // window.parent.Xrm.Page.data.entity.save();
+
+                // 给出成功提示
+                window.parent.Xrm.Navigation.openAlertDialog({ text: "Account connected successfully. You can now proceed to the next step." });
+            } catch (e) {
+                console.error("Failed to populate form fields.", e);
+                alert("Authentication successful, but unable to fill the form. App ID: " + appId);
+            }
+        }
+    </script>
+
+</body>
+</html>

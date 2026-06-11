@@ -1,0 +1,18 @@
+<customapi uniquename="xgate_InboundCustomApi">
+  <allowedcustomprocessingsteptype>0</allowedcustomprocessingsteptype>
+  <bindingtype>0</bindingtype>
+  <description default="Inbound custom api">
+    <label description="Inbound custom api" languagecode="1033" />
+  </description>
+  <displayname default="InboundCustomApi">
+    <label description="InboundCustomApi" languagecode="1033" />
+  </displayname>
+  <iscustomizable>0</iscustomizable>
+  <isfunction>0</isfunction>
+  <isprivate>0</isprivate>
+  <name>InboundCustomApi</name>
+  <plugintypeid>
+    <plugintypeexportkey>642d8cbb-b0e7-493c-b30a-3e5bfca32e9e</plugintypeexportkey>
+  </plugintypeid>
+  <workflowsdkstepenabled>0</workflowsdkstepenabled>
+</customapi>

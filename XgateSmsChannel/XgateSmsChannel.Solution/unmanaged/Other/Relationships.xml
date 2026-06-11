@@ -12,6 +12,4 @@
   <EntityRelationship Name="team_xgate_xgatesmschannelinstanceaccount" />
   <EntityRelationship Name="user_xgate_xgatesmschannelinstance" />
   <EntityRelationship Name="user_xgate_xgatesmschannelinstanceaccount" />
-  <EntityRelationship Name="msdyn_ChannelInstance_extendedentityid_xgate_xgatesmschannelinstance" />
-  <EntityRelationship Name="msdyn_ChannelInstanceAccount_extendedentityid_xgate_xgatesmschannelinstanceaccount" />
 </EntityRelationships>
