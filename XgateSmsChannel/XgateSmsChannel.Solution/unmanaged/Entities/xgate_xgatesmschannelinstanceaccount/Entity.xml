@@ -523,10 +523,10 @@
             <IntroducedVersion>1.0.0.0</IntroducedVersion>
             <IsCustomizable>1</IsCustomizable>
             <displaynames>
-              <displayname description="状态" languagecode="1033" />
+              <displayname description="Status" languagecode="1033" />
             </displaynames>
             <Descriptions>
-              <Description description="Xgate Sms Channel instance account的状态" languagecode="1033" />
+              <Description description="Status of the Xgate Sms Channel instance account" languagecode="1033" />
             </Descriptions>
             <states>
               <state value="0" defaultstatus="1" invariantname="Active" IsHidden="0">
@@ -583,10 +583,10 @@
             <IntroducedVersion>1.0.0.0</IntroducedVersion>
             <IsCustomizable>1</IsCustomizable>
             <displaynames>
-              <displayname description="状态描述" languagecode="1033" />
+              <displayname description="Status Reason" languagecode="1033" />
             </displaynames>
             <Descriptions>
-              <Description description="Xgate Sms Channel instance account的状态描述" languagecode="1033" />
+              <Description description="Reason for the status of the Xgate Sms Channel instance account" languagecode="1033" />
             </Descriptions>
             <statuses>
               <status value="1" state="0" IsHidden="0">
