@@ -9,7 +9,7 @@
       <tabs>
         <tab verticallayout="true" id="{ed45df4e-c61c-455b-86ac-4ec7a94edac2}" IsUserDefined="1">
           <labels>
-            <label description="" languagecode="1033" />
+            <label description="General" languagecode="1033" />
           </labels>
           <columns>
             <column width="100%">
@@ -35,33 +35,13 @@
                         <control id="xgate_accountsecret" classid="{4273EDBD-AC1D-40d3-9FB2-095C621B552D}" datafieldname="xgate_accountsecret" disabled="false" />
                       </cell>
                     </row>
-                    <row>
-                      <cell rowspan="8" id="{2ccfce84-77a3-4488-8316-99349adfb0a4}" showlabel="false" colspan="1">
-                        <labels>
-                          <label description="Xgate Account Select" languagecode="1033" />
-                        </labels>
-                        <control id="WebResource_xgate_select_account" classid="{9FDF5F91-88B1-47F4-AD53-C11EFC01A01D}">
-                          <parameters>
-                            <Url>xgate_xgate_account_select</Url>
-                            <PassParameters>false</PassParameters>
-                            <Security>false</Security>
-                            <Scrolling>auto</Scrolling>
-                            <Border>false</Border>
-                            <ShowOnMobileClient>false</ShowOnMobileClient>
-                            <WebResourceId>{8fb036e9-7765-f111-a825-70a8a5b1e115}</WebResourceId>
-                          </parameters>
-                        </control>
-                        <events>
-                          <event name="onload" application="false" active="false" />
-                        </events>
-                      </cell>
-                    </row>
-                    <row />
-                    <row />
-                    <row />
-                    <row />
-                    <row />
-                    <row />
+                  </rows>
+                </section>
+                <section name="xgate_account_section" id="b327f080-bbea-4fee-808b-1cd5b073c374" IsUserDefined="0" locklevel="0" showlabel="true" showbar="false" layout="varwidth" celllabelalignment="Left" celllabelposition="Left" columns="1" labelwidth="115">
+                  <labels>
+                    <label description="To create AccountId and AccountSecret" languagecode="1033" />
+                  </labels>
+                  <rows>
                     <row />
                   </rows>
                 </section>
@@ -71,7 +51,7 @@
         </tab>
       </tabs>
       <Navigation>
-        <NavBar></NavBar>
+        <NavBar />
         <NavBarAreas>
           <NavBarArea Id="Info">
             <Titles>
@@ -145,6 +125,21 @@
       <DisplayConditions Order="0" FallbackForm="true">
         <Everyone />
       </DisplayConditions>
+      <formLibraries>
+        <Library name="xgate_credentialHelper.js" libraryUniqueId="{0e99e092-5508-48d7-9e3d-ec21d63dd20b}" />
+      </formLibraries>
+      <events>
+        <event name="onload" application="false" active="false">
+          <Handlers>
+            <Handler functionName="xgateCredentialHelper" libraryName="xgate_credentialHelper.js" handlerUniqueId="{25663b7c-6649-4cbd-83d1-b8bf92156b98}" enabled="true" parameters="" passExecutionContext="true" />
+          </Handlers>
+        </event>
+        <event name="onchange" application="false" active="false" attribute="xgate_accountid">
+          <Handlers>
+            <Handler functionName="xgateCredentialHelper" libraryName="xgate_credentialHelper.js" handlerUniqueId="{6eab4f90-1fc2-418a-b36c-9bd6d7de0969}" enabled="true" parameters="" passExecutionContext="true" />
+          </Handlers>
+        </event>
+      </events>
     </form>
     <IsCustomizable>0</IsCustomizable>
     <CanBeDeleted>0</CanBeDeleted>
