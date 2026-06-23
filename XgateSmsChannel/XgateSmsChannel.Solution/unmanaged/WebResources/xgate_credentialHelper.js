@@ -3,11 +3,6 @@ function xgateCredentialHelper(executionContext) {
         var formContext = executionContext.getFormContext();
         var accountId = formContext.getAttribute("xgate_accountid").getValue();
 
-        // 删掉了藏字段的逻辑 —— AccountId / Secret 始终显示
-        // 用户可以选择:
-        //   1) 直接粘贴已有凭据到字段里
-        //   2) 点卡片去 Xgate 申请新凭据再回来粘贴
-
         var controlElement = document.querySelector('[aria-label="To create AccountId and AccountSecret"]');
         var hasAccountId = !!accountId;
         window._xgateHasAccountId = hasAccountId;
