@@ -151,12 +151,16 @@ function _xgateInsertContainer(controlElement) {
     var connectExistingBtn = document.getElementById("xgateConnectExistingBtn");
 
     if (startTrialBtn && connectExistingBtn) {
-        // TODO: 替换成你真实的 Xgate 注册和 console 链接
+        // 1. 获取当前 D365 环境的 URL (例如：https://org12345.crm.dynamics.com)
+        var orgUrl = "";
+        if (typeof Xrm !== "undefined" && Xrm.Utility && Xrm.Utility.getGlobalContext) {
+            orgUrl = Xrm.Utility.getGlobalContext().getClientUrl();
+        }
         startTrialBtn.onclick = function () {
-            window.open("https://smsc.xgate.com.hk", "_blank");
+            window.open("https://smsc.xgate.com.hk?orgUrl=" + encodeURIComponent(orgUrl), "_blank");
         };
         connectExistingBtn.onclick = function () {
-            window.open("https://smsc.xgate.com.hk", "_blank");
+            window.open("https://smsc.xgate.com.hk?orgUrl=" + encodeURIComponent(orgUrl), "_blank");
         };
     }
 }
