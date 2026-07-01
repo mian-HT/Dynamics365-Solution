@@ -33,7 +33,6 @@ namespace XgateSmsChannel.Plugins.Tests
             ctx.SetPayload(payload);
 
             var handler = BuildHttpHandler(
-                tokenStatus: HttpStatusCode.OK, tokenBody: "{\"accessToken\":\"tok-123\"}",
                 sendStatus: HttpStatusCode.OK, sendBody: "{\"CountOfStatus\":{\"SUCCESS\":1,\"FAILED\":0},\"ReceiveInfo\":[{\"MessageId\":\"MSG-REAL-1\"}]}");
 
             new OutboundPlugin(handler.Object).Execute(ctx.ServiceProvider.Object);
@@ -52,11 +51,9 @@ namespace XgateSmsChannel.Plugins.Tests
                 .Setup(s => s.RetrieveMultiple(It.IsAny<QueryBase>()))
                 .Returns(new EntityCollection(new List<Entity> { BuildAccount(stateCode: 0) }));
 
-            // ChannelInstanceId 为空 -> 跳过主键直查，走三表联动 RetrieveMultiple
             ctx.SetPayload(BuildPayloadJson(channelInstanceId: string.Empty, requestId: Guid.NewGuid().ToString()));
 
             var handler = BuildHttpHandler(
-                tokenStatus: HttpStatusCode.OK, tokenBody: "{\"accessToken\":\"tok-123\"}",
                 sendStatus: HttpStatusCode.OK, sendBody: "{\"CountOfStatus\":{\"SUCCESS\":1,\"FAILED\":0},\"ReceiveInfo\":[{\"MessageId\":\"MSG-FB-9\"}]}");
 
             new OutboundPlugin(handler.Object).Execute(ctx.ServiceProvider.Object);
@@ -76,7 +73,7 @@ namespace XgateSmsChannel.Plugins.Tests
 
             ctx.SetPayload(BuildPayloadJson(channelInstanceId: string.Empty, requestId: Guid.NewGuid().ToString()));
 
-            var handler = BuildHttpHandler(); // 不会走到 HTTP
+            var handler = BuildHttpHandler();
 
             new OutboundPlugin(handler.Object).Execute(ctx.ServiceProvider.Object);
 
@@ -93,7 +90,7 @@ namespace XgateSmsChannel.Plugins.Tests
             var ctx = new PipelineContext();
             ctx.OrgService
                 .Setup(s => s.Retrieve("xgate_xgatesmschannelinstanceaccount", It.IsAny<Guid>(), It.IsAny<ColumnSet>()))
-                .Returns(BuildAccount(stateCode: 1)); // 停用
+                .Returns(BuildAccount(stateCode: 1));
 
             ctx.SetPayload(BuildPayloadJson(channelInstanceId: Guid.NewGuid().ToString(), requestId: Guid.NewGuid().ToString()));
 
@@ -107,24 +104,23 @@ namespace XgateSmsChannel.Plugins.Tests
         }
 
         [Fact]
-        public void Execute_TokenEndpointFails_ReturnsFailed()
+        public void Execute_SendEndpointHttpError_ReturnsFailed()
         {
             var ctx = new PipelineContext();
             ctx.OrgService
                 .Setup(s => s.Retrieve("xgate_xgatesmschannelinstanceaccount", It.IsAny<Guid>(), It.IsAny<ColumnSet>()))
                 .Returns(BuildAccount(stateCode: 0));
 
-            ctx.SetPayload(BuildPayloadJson(channelInstanceId: Guid.NewGuid().ToString(), requestId: Guid.NewGuid().ToString()));
+            ctx.SetPayload(BuildPayloadJson(Guid.NewGuid().ToString(), Guid.NewGuid().ToString()));
 
             var handler = BuildHttpHandler(
-                tokenStatus: HttpStatusCode.Unauthorized, tokenBody: "{\"error\":\"bad credentials\"}",
-                sendStatus: HttpStatusCode.OK, sendBody: "{}");
+                sendStatus: HttpStatusCode.InternalServerError, sendBody: "boom");
 
             new OutboundPlugin(handler.Object).Execute(ctx.ServiceProvider.Object);
 
             var response = ctx.GetResponse();
             Assert.Equal("Failed", response.Status);
-            Assert.Contains("登录网关失败", response.StatusDetails["ErrorDetails"].ToString());
+            Assert.Contains("请求发送接口异常", response.StatusDetails["ErrorDetails"].ToString());
         }
 
         [Fact]
@@ -137,9 +133,7 @@ namespace XgateSmsChannel.Plugins.Tests
 
             ctx.SetPayload(BuildPayloadJson(channelInstanceId: Guid.NewGuid().ToString(), requestId: Guid.NewGuid().ToString()));
 
-            // HTTP 200 但业务失败（如欠费/空号）：SUCCESS=0
             var handler = BuildHttpHandler(
-                tokenStatus: HttpStatusCode.OK, tokenBody: "{\"accessToken\":\"tok-123\"}",
                 sendStatus: HttpStatusCode.OK, sendBody: "{\"CountOfStatus\":{\"SUCCESS\":0,\"FAILED\":1},\"ReceiveInfo\":[]}");
 
             new OutboundPlugin(handler.Object).Execute(ctx.ServiceProvider.Object);
@@ -152,7 +146,6 @@ namespace XgateSmsChannel.Plugins.Tests
         [Fact]
         public void Constructor_Default_UsesSharedHttpClientWithoutThrowing()
         {
-            // 覆盖 D365 运行时使用的无参构造函数
             var plugin = new OutboundPlugin();
             Assert.NotNull(plugin);
         }
@@ -163,12 +156,11 @@ namespace XgateSmsChannel.Plugins.Tests
             var ctx = new PipelineContext();
             ctx.OrgService
                 .Setup(s => s.Retrieve("xgate_xgatesmschannelinstanceaccount", It.IsAny<Guid>(), It.IsAny<ColumnSet>()))
-                .Returns(BuildAccount(stateCode: 0, apiBaseUrl: string.Empty)); // 空 URL -> 使用默认地址
+                .Returns(BuildAccount(stateCode: 0, apiBaseUrl: string.Empty));
 
             ctx.SetPayload(BuildPayloadJson(channelInstanceId: Guid.NewGuid().ToString(), requestId: Guid.NewGuid().ToString()));
 
             var handler = BuildHttpHandler(
-                tokenStatus: HttpStatusCode.OK, tokenBody: "{\"accessToken\":\"tok-123\"}",
                 sendStatus: HttpStatusCode.OK, sendBody: "{\"CountOfStatus\":{\"SUCCESS\":1,\"FAILED\":0},\"ReceiveInfo\":[{\"MessageId\":\"MSG-DEF-1\"}]}");
 
             new OutboundPlugin(handler.Object).Execute(ctx.ServiceProvider.Object);
@@ -190,33 +182,11 @@ namespace XgateSmsChannel.Plugins.Tests
             ctx.SetPayload(BuildPayloadJson(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), message));
 
             var handler = BuildHttpHandler(
-                tokenStatus: HttpStatusCode.OK, tokenBody: "{\"accessToken\":\"tok-123\"}",
                 sendStatus: HttpStatusCode.OK, sendBody: "{\"CountOfStatus\":{\"SUCCESS\":1,\"FAILED\":0},\"ReceiveInfo\":[{\"MessageId\":\"MSG-2\"}]}");
 
             new OutboundPlugin(handler.Object).Execute(ctx.ServiceProvider.Object);
 
             Assert.Equal("Sent", ctx.GetResponse().Status);
-        }
-
-        [Fact]
-        public void Execute_SendEndpointHttpError_ReturnsFailed()
-        {
-            var ctx = new PipelineContext();
-            ctx.OrgService
-                .Setup(s => s.Retrieve("xgate_xgatesmschannelinstanceaccount", It.IsAny<Guid>(), It.IsAny<ColumnSet>()))
-                .Returns(BuildAccount(stateCode: 0));
-
-            ctx.SetPayload(BuildPayloadJson(Guid.NewGuid().ToString(), Guid.NewGuid().ToString()));
-
-            var handler = BuildHttpHandler(
-                tokenStatus: HttpStatusCode.OK, tokenBody: "{\"accessToken\":\"tok-123\"}",
-                sendStatus: HttpStatusCode.InternalServerError, sendBody: "boom");
-
-            new OutboundPlugin(handler.Object).Execute(ctx.ServiceProvider.Object);
-
-            var response = ctx.GetResponse();
-            Assert.Equal("Failed", response.Status);
-            Assert.Contains("请求发送接口异常", response.StatusDetails["ErrorDetails"].ToString());
         }
 
         [Fact]
@@ -227,11 +197,9 @@ namespace XgateSmsChannel.Plugins.Tests
                 .Setup(s => s.Retrieve("xgate_xgatesmschannelinstanceaccount", It.IsAny<Guid>(), It.IsAny<ColumnSet>()))
                 .Returns(BuildAccount(stateCode: 0));
 
-            // RequestId 为空 -> 内部用新生成的 Guid 作为 externalId 基准
             ctx.SetPayload(BuildPayloadJson(Guid.NewGuid().ToString(), requestId: string.Empty));
 
             var handler = BuildHttpHandler(
-                tokenStatus: HttpStatusCode.OK, tokenBody: "{\"accessToken\":\"tok-123\"}",
                 sendStatus: HttpStatusCode.OK, sendBody: "{\"CountOfStatus\":{\"SUCCESS\":1,\"FAILED\":0},\"ReceiveInfo\":[{\"MessageId\":\"MSG-3\"}]}");
 
             new OutboundPlugin(handler.Object).Execute(ctx.ServiceProvider.Object);
@@ -255,7 +223,6 @@ namespace XgateSmsChannel.Plugins.Tests
             ctx.SetPayload(BuildPayloadJson(Guid.NewGuid().ToString(), Guid.NewGuid().ToString()));
 
             var handler = BuildHttpHandler(
-                tokenStatus: HttpStatusCode.OK, tokenBody: "{\"accessToken\":\"tok-123\"}",
                 sendStatus: HttpStatusCode.OK, sendBody: "{\"CountOfStatus\":{\"SUCCESS\":1,\"FAILED\":0},\"ReceiveInfo\":[{\"MessageId\":\"MSG-FB-X\"}]}");
 
             new OutboundPlugin(handler.Object).Execute(ctx.ServiceProvider.Object);
@@ -263,6 +230,38 @@ namespace XgateSmsChannel.Plugins.Tests
             var response = ctx.GetResponse();
             Assert.Equal("Sent", response.Status);
             Assert.Equal("MSG-FB-X", response.MessageId);
+        }
+
+        [Fact]
+        public void Execute_SendRequest_UsesBasicAuth()
+        {
+            var ctx = new PipelineContext();
+            ctx.OrgService
+                .Setup(s => s.Retrieve("xgate_xgatesmschannelinstanceaccount", It.IsAny<Guid>(), It.IsAny<ColumnSet>()))
+                .Returns(BuildAccount(stateCode: 0));
+
+            ctx.SetPayload(BuildPayloadJson(Guid.NewGuid().ToString(), Guid.NewGuid().ToString()));
+
+            HttpRequestMessage capturedRequest = null;
+            var handler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+            handler.Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>())
+                .Callback<HttpRequestMessage, CancellationToken>((r, _) => capturedRequest = r)
+                .Returns(() => Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+                {
+                    Content = new StringContent("{\"CountOfStatus\":{\"SUCCESS\":1,\"FAILED\":0},\"ReceiveInfo\":[{\"MessageId\":\"MSG-BA\"}]}")
+                }));
+
+            new OutboundPlugin(handler.Object).Execute(ctx.ServiceProvider.Object);
+
+            Assert.NotNull(capturedRequest);
+            Assert.Equal("Basic", capturedRequest.Headers.Authorization.Scheme);
+            var decoded = System.Text.Encoding.UTF8.GetString(
+                Convert.FromBase64String(capturedRequest.Headers.Authorization.Parameter));
+            Assert.Equal("test-app-id:test-app-secret", decoded);
         }
 
         // ----------------- 测试辅助 -----------------
@@ -292,20 +291,9 @@ namespace XgateSmsChannel.Plugins.Tests
         }
 
         private static Mock<HttpMessageHandler> BuildHttpHandler(
-            HttpStatusCode tokenStatus = HttpStatusCode.OK, string tokenBody = "{}",
             HttpStatusCode sendStatus = HttpStatusCode.OK, string sendBody = "{}")
         {
             var handler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
-
-            handler.Protected()
-                .Setup<Task<HttpResponseMessage>>(
-                    "SendAsync",
-                    ItExpr.Is<HttpRequestMessage>(r => r.RequestUri.AbsoluteUri.EndsWith("/token")),
-                    ItExpr.IsAny<CancellationToken>())
-                .Returns(() => Task.FromResult(new HttpResponseMessage(tokenStatus)
-                {
-                    Content = new StringContent(tokenBody)
-                }));
 
             handler.Protected()
                 .Setup<Task<HttpResponseMessage>>(
@@ -343,6 +331,7 @@ namespace XgateSmsChannel.Plugins.Tests
                 OutputParameters = new ParameterCollection();
                 PluginContext.Setup(c => c.InputParameters).Returns(InputParameters);
                 PluginContext.Setup(c => c.OutputParameters).Returns(OutputParameters);
+                PluginContext.Setup(c => c.OrganizationId).Returns(Guid.NewGuid());
 
                 factory.Setup(f => f.CreateOrganizationService(It.IsAny<Guid?>())).Returns(OrgService.Object);
 

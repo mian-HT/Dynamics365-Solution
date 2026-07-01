@@ -48,8 +48,8 @@ namespace XgateSmsChannel.Plugins
             var payloadObject = JsonUtils.Deserialize<Payload>(payload);
 
             var status = "Failed"; // 默认失败，只有成功走到最后才会变为 Sent
-            var msgGuid = string.IsNullOrEmpty(payloadObject.RequestId) ? Guid.NewGuid() : Guid.Parse(payloadObject.RequestId);
-            var messageId = msgGuid.ToString();
+            var requestId = string.IsNullOrEmpty(payloadObject.RequestId) ? Guid.NewGuid().ToString() : payloadObject.RequestId;
+            var messageId = requestId;
             var statusDetails = new Dictionary<string, object>();
 
             try
@@ -66,10 +66,7 @@ namespace XgateSmsChannel.Plugins
                 var appSecret = accountEntity.GetAttributeValue<string>("xgate_accountsecret");
                 var baseUrl = ResolveBaseUrl(accountEntity);
 
-                var superExternalId = BuildExternalId(msgGuid, rawFrom);
-                var accessToken = AcquireToken(baseUrl, appId, appSecret);
-
-                messageId = SendSms(baseUrl, accessToken, payloadObject, superExternalId, tracingService);
+                messageId = SendSms(baseUrl, appId, appSecret, payloadObject, rawFrom, pluginExecutionContext.OrganizationId.ToString(), requestId, tracingService);
                 status = "Sent";
             }
             catch (Exception ex)
@@ -186,51 +183,28 @@ namespace XgateSmsChannel.Plugins
             return baseUrl.TrimEnd('/');
         }
 
-        // xgate 接口 ExternalId 最长 64 字符，这里把 Guid 压缩为 url-safe base64 再拼上发件人号码
-        private static string BuildExternalId(Guid msgGuid, string rawFrom)
-        {
-            var safeFromNumber = Uri.EscapeDataString(rawFrom);
-            var msgB64 = Convert.ToBase64String(msgGuid.ToByteArray()).Replace("+", "-").Replace("/", "_").TrimEnd('=');
-            return $"{msgB64}.{safeFromNumber}";
-        }
-
-        private string AcquireToken(string baseUrl, string appId, string appSecret)
-        {
-            var tokenRequestBody = JsonUtils.Serialize(new TokenRequest { AppId = appId, AppSecret = appSecret });
-            var tokenHttpResponse = httpClient.PostAsync(
-                $"{baseUrl}/token",
-                new StringContent(tokenRequestBody, Encoding.UTF8, "application/json")).GetAwaiter().GetResult();
-
-            var tokenResponseBody = tokenHttpResponse.Content.ReadAsStringAsync().GetAwaiter().GetResult();
-            if (!tokenHttpResponse.IsSuccessStatusCode)
-            {
-                throw new XgateGatewayException($"登录网关失败 (HTTP {tokenHttpResponse.StatusCode}): {tokenResponseBody}");
-            }
-
-            return JsonUtils.Deserialize<TokenResponse>(tokenResponseBody).AccessToken;
-        }
-
-        private string SendSms(string baseUrl, string accessToken, Payload payloadObject, string superExternalId, ITracingService tracingService)
+        private string SendSms(string baseUrl, string appId, string appSecret, Payload payloadObject, string from, string organizationId, string requestId, ITracingService tracingService)
         {
             var smsRequestBody = JsonUtils.Serialize(new SmsRequest
             {
-                MessageBody = ResolveMessageBody(payloadObject),
-                ToList = new List<SmsRecipient>
-                {
-                    new SmsRecipient { To = payloadObject.To, ExternalId = superExternalId }
-                }
+                OrganizationId = organizationId,
+                RequestId = requestId,
+                From = from,
+                To = payloadObject.To,
+                Message = ResolveMessageBody(payloadObject)
             });
 
             var smsHttpRequest = new HttpRequestMessage(HttpMethod.Post, $"{baseUrl}/send")
             {
                 Content = new StringContent(smsRequestBody, Encoding.UTF8, "application/json")
             };
-            smsHttpRequest.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
+
+            var credentials = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{appId}:{appSecret}"));
+            smsHttpRequest.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", credentials);
 
             var smsHttpResponse = httpClient.SendAsync(smsHttpRequest).GetAwaiter().GetResult();
             var smsResponseBody = smsHttpResponse.Content.ReadAsStringAsync().GetAwaiter().GetResult();
 
-            // 兜底：发送接口 HTTP 异常（500/404 等）
             if (!smsHttpResponse.IsSuccessStatusCode)
             {
                 throw new XgateGatewayException($"请求发送接口异常 (HTTP {smsHttpResponse.StatusCode}): {smsResponseBody}");
@@ -238,7 +212,6 @@ namespace XgateSmsChannel.Plugins
 
             var smsResponse = JsonUtils.Deserialize<SmsResponse>(smsResponseBody);
 
-            // 兜底：HTTP 200 但业务失败（欠费、空号、内容违规等）
             if (smsResponse.CountOfStatus != null && smsResponse.CountOfStatus.Success == 1
                 && smsResponse.ReceiveInfo != null && smsResponse.ReceiveInfo.Count > 0)
             {

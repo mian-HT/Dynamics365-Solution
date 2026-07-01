@@ -1,15 +1,23 @@
 namespace XgateSmsChannel.Plugins.XgateContracts
 {
-    using System.Collections.Generic;
     using System.Runtime.Serialization;
 
     [DataContract]
     public class SmsRequest
     {
-        [DataMember(Name = "MessageBody")]
-        public string MessageBody { get; set; }
+        [DataMember(Name = "organizationId")]
+        public string OrganizationId { get; set; }
 
-        [DataMember(Name = "ToList")]
-        public List<SmsRecipient> ToList { get; set; }
+        [DataMember(Name = "requestId")]
+        public string RequestId { get; set; }
+
+        [DataMember(Name = "from")]
+        public string From { get; set; }
+
+        [DataMember(Name = "to")]
+        public string To { get; set; }
+
+        [DataMember(Name = "message")]
+        public string Message { get; set; }
     }
 }
