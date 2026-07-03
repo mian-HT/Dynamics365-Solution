@@ -7,15 +7,12 @@ function xgateCredentialHelper(executionContext) {
         var hasAccountId = !!accountId;
         window._xgateHasAccountId = hasAccountId;
 
-        if (!hasAccountId) {
-            _xgateShowApiSection(controlElement);
-            _xgateSetHeaderElement(controlElement);
-            _xgateHideHeaderSvg(controlElement);
-            _xgateInsertContainer(controlElement);
-        } else {
-            _xgateHideApiSection(controlElement);
-            _xgateRemoveContainer();
-        }
+        // Regardless of whether an account ID exists, we want to show the API section 
+        // and the custom container, but we might want to update the header text.
+        _xgateShowApiSection(controlElement);
+        _xgateSetHeaderElement(controlElement, hasAccountId);
+        _xgateHideHeaderSvg(controlElement);
+        _xgateInsertContainer(controlElement);
 
         _xgateWatchContainer();
         _xgateRegisterCleanup();
@@ -32,12 +29,15 @@ function _xgateSafeSetVisible(formContext, fieldName, visible) {
     }
 }
 
-function _xgateSetHeaderElement(controlElement) {
+function _xgateSetHeaderElement(controlElement, hasAccountId) {
     if (!controlElement) return;
     var headerElement = controlElement.querySelector("h4");
     if (!headerElement) return;
 
-    headerElement.textContent = "Connect to Xgate to create API Credentials";
+    // Change text based on whether credentials exist
+    headerElement.textContent = hasAccountId 
+        ? "Manage Xgate API Credentials" 
+        : "Connect to Xgate to create API Credentials";
     headerElement.style.whiteSpace = "nowrap";
     headerElement.style.fontSize = "14px";
     headerElement.style.margin = "0";
@@ -151,17 +151,34 @@ function _xgateInsertContainer(controlElement) {
     var connectExistingBtn = document.getElementById("xgateConnectExistingBtn");
 
     if (startTrialBtn && connectExistingBtn) {
-        // 1. 获取当前 D365 环境的 URL (例如：https://org12345.crm.dynamics.com)
-        var orgUrl = "";
-        if (typeof Xrm !== "undefined" && Xrm.Utility && Xrm.Utility.getGlobalContext) {
-            orgUrl = Xrm.Utility.getGlobalContext().getClientUrl();
-        }
-        startTrialBtn.onclick = function () {
-            window.open("https://smsc.xgate.com.hk?orgUrl=" + encodeURIComponent(orgUrl), "_blank");
+        var openAuthWindow = function () {
+            var orgUrl = "";
+            var orgId = "";
+            if (typeof Xrm !== "undefined" && Xrm.Utility && Xrm.Utility.getGlobalContext) {
+                var context = Xrm.Utility.getGlobalContext();
+                orgUrl = context.getClientUrl();
+                // Get the Organization ID to support multi-environment routing
+                orgId = context.organizationSettings.organizationId; 
+            }
+
+            // Construct the URL with both orgUrl and orgId
+            var targetUrl = "https://smsc.xgate.com.hk/d365-auth?orgUrl=" + encodeURIComponent(orgUrl) + "&orgId=" + encodeURIComponent(orgId);
+            
+            // Use a popup window for a better integration experience
+            var width = 600;
+            var height = 700;
+            var left = (window.screen.width - width) / 2;
+            var top = (window.screen.height - height) / 2;
+            
+            window.open(
+                targetUrl, 
+                "XgateAuth", 
+                "width=" + width + ",height=" + height + ",left=" + left + ",top=" + top + ",status=yes,scrollbars=yes"
+            );
         };
-        connectExistingBtn.onclick = function () {
-            window.open("https://smsc.xgate.com.hk?orgUrl=" + encodeURIComponent(orgUrl), "_blank");
-        };
+
+        startTrialBtn.onclick = openAuthWindow;
+        connectExistingBtn.onclick = openAuthWindow;
     }
 }
 
@@ -186,25 +203,19 @@ function _xgateApplyUiState() {
     var hasAccountId = !!window._xgateHasAccountId;
 
     if (controlElement) {
-        if (hasAccountId) {
-            if (controlElement.style.display !== "none") {
-                _xgateHideApiSection(controlElement);
-            }
-            if (document.getElementById("xgate-trial-container")) {
-                _xgateRemoveContainer();
-            }
-        } else {
-            if (controlElement.style.display === "none") {
-                _xgateShowApiSection(controlElement);
-            }
-            _xgateSetHeaderElement(controlElement);
-            _xgateHideHeaderSvg(controlElement);
-            if (!document.getElementById("xgate-trial-container")) {
-                _xgateInsertContainer(controlElement);
-            }
+        // We no longer hide the API section or remove the container based on hasAccountId
+        if (controlElement.style.display === "none") {
+            _xgateShowApiSection(controlElement);
+        }
+        
+        // Update the header text dynamically
+        _xgateSetHeaderElement(controlElement, hasAccountId);
+        _xgateHideHeaderSvg(controlElement);
+        
+        if (!document.getElementById("xgate-trial-container")) {
+            _xgateInsertContainer(controlElement);
         }
     }
-
 }
 
 function _xgateDisconnectObserver() {

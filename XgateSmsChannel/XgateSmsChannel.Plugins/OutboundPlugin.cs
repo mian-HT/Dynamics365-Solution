@@ -16,7 +16,7 @@ namespace XgateSmsChannel.Plugins
         [System.Diagnostics.CodeAnalysis.SuppressMessage(
             "Major Code Smell", "S1075:URIs should not be hardcoded",
             Justification = "网关默认基地址，仅在账号未配置 ApiBaseUrl 时作为兜底使用")]
-        private const string DefaultBaseUrl = "https://sms-api.xgate.com/sms/2.0";
+        private const string DefaultBaseUrl = "https://connector-api-uat.xgatecorp.com/crm/report/api/sms";
         private const string DefaultFrom = "10690000";
         private const string AccountEntityName = "xgate_xgatesmschannelinstanceaccount";
 
@@ -174,13 +174,7 @@ namespace XgateSmsChannel.Plugins
 
         private static string ResolveBaseUrl(Entity accountEntity)
         {
-            var baseUrl = accountEntity.GetAttributeValue<string>("xgate_apibaseurl");
-            if (string.IsNullOrWhiteSpace(baseUrl))
-            {
-                baseUrl = DefaultBaseUrl;
-            }
-
-            return baseUrl.TrimEnd('/');
+            return DefaultBaseUrl;
         }
 
         private string SendSms(string baseUrl, string appId, string appSecret, Payload payloadObject, string from, string organizationId, string requestId, ITracingService tracingService)
