@@ -188,7 +188,7 @@ namespace XgateSmsChannel.Plugins
                 Message = ResolveMessageBody(payloadObject)
             });
 
-            var smsHttpRequest = new HttpRequestMessage(HttpMethod.Post, $"{baseUrl}/send")
+            var smsHttpRequest = new HttpRequestMessage(HttpMethod.Post, $"{baseUrl}/send?organizationId={organizationId}")
             {
                 Content = new StringContent(smsRequestBody, Encoding.UTF8, "application/json")
             };
