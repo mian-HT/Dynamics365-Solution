@@ -1,11 +1,9 @@
 import { IInputs, IOutputs } from "./generated/ManifestTypes";
 import * as React from "react";
-// 【删除】不再需要 import * as ReactDOM from "react-dom";
 import { HelloWorld, IHelloWorldProps } from "./HelloWorld";
 
-// 【修改】实现接口改为 ReactControl
 export class WhatsAppTemplateEditor implements ComponentFramework.ReactControl<IInputs, IOutputs> {
-    
+
     private notifyOutputChanged: () => void;
     private currentJsonPayload: string | null;
 
@@ -13,8 +11,8 @@ export class WhatsAppTemplateEditor implements ComponentFramework.ReactControl<I
      * 1. 控件初始化
      */
     public init(
-        context: ComponentFramework.Context<IInputs>, 
-        notifyOutputChanged: () => void, 
+        context: ComponentFramework.Context<IInputs>,
+        notifyOutputChanged: () => void,
         state: ComponentFramework.Dictionary
     ): void {
         this.notifyOutputChanged = notifyOutputChanged;
@@ -26,13 +24,11 @@ export class WhatsAppTemplateEditor implements ComponentFramework.ReactControl<I
      * 2. 渲染视图：当数据变化时触发
      */
     public updateView(context: ComponentFramework.Context<IInputs>): React.ReactElement {
-        // 准备传给 React 组件的属性
         const props: IHelloWorldProps = {
             name: context.parameters.sampleProperty.raw ?? "",
-            onDataChanged: this.handleReactDataChange 
+            onDataChanged: this.handleReactDataChange
         };
 
-        // 【关键变化】直接返回 React 元素，D365 引擎会自动帮我们把它挂载到页面上！
         return React.createElement(HelloWorld, props);
     }
 

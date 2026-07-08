@@ -38,7 +38,7 @@
       </msdyn_channeldefinitionid>
       <msdyn_description>Template ID</msdyn_description>
       <msdyn_displayname>Template ID</msdyn_displayname>
-      <msdyn_isrequired>1</msdyn_isrequired>
+      <msdyn_isrequired>0</msdyn_isrequired>
       <msdyn_maxlength>100</msdyn_maxlength>
       <msdyn_name>xgate_templateid</msdyn_name> 
       <msdyn_type>192350000</msdyn_type>

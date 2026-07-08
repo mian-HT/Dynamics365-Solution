@@ -5,10 +5,9 @@ namespace XgateWhatsAppChannel.Plugins
     using System;
     using System.IO;
     using System.Net;
-    using System.Runtime.Serialization;
     using System.Text;
 
-    public class GetTemplatePlugin : IPlugin
+    public class GetSendersPlugin : IPlugin
     {
         public void Execute(IServiceProvider serviceProvider)
         {
@@ -20,28 +19,22 @@ namespace XgateWhatsAppChannel.Plugins
 
             try
             {
-                // 1. 从 payload JSON 中解析出 templateId
-                string payload = (string)context.InputParameters["payload"];
+                // 1. payload 目前无需参数，仅打印以便排查
+                string payload = context.InputParameters.Contains("payload") ? (string)context.InputParameters["payload"] : null;
                 tracingService.Trace($"Input payload: {payload}");
-                var payloadObj = JsonUtils.Deserialize<GetTemplateRequest>(payload);
-                string templateId = payloadObj.templateId;
-                tracingService.Trace($"Start fetching template details for ID: {templateId}");
+                tracingService.Trace("Start fetching sender list");
 
                 // 2. 直接从 WhatsApp 渠道实例扩展表获取共用的鉴权 Token
                 string token = this.GetAuthToken(organizationService, tracingService);
-                
-                // 3. 构建请求你们真实接口的 URL (请根据你们实际的 GET/POST 接口调整)
-                string apiUrl = $"https://xcrm360-api-uat.xgatecorp.com/whatsapp/openapi/template/detail?templateId={templateId}";
+
+                // 3. 调用 Xgate 拉取 sender 列表接口
+                string apiUrl = "https://xcrm360-api-uat.xgatecorp.com/whatsapp/openapi/sender/list";
                 var request = WebRequest.CreateHttp(apiUrl);
-                request.Method = "GET"; 
+                request.Method = "GET";
                 request.Headers.Add(HttpRequestHeader.Authorization, $"Bearer {token}");
 
-                // 打印请求详情，便于排查（token 只显示头尾，避免泄漏完整凭证）
-                string maskedToken = token.Length > 12 ? $"{token.Substring(0, 6)}...{token.Substring(token.Length - 6)}" : "***";
-                tracingService.Trace($"Xgate API Request => Method: {request.Method}, Url: {apiUrl}, templateId: {templateId}, Authorization: Bearer {maskedToken}");
-
                 // 4. 发起请求并读取返回结果
-                string responseBody = "";
+                string responseBody;
                 using (var response = (HttpWebResponse)request.GetResponse())
                 using (var streamReader = new StreamReader(response.GetResponseStream(), Encoding.UTF8))
                 {
@@ -55,7 +48,6 @@ namespace XgateWhatsAppChannel.Plugins
             }
             catch (WebException webEx)
             {
-                // 捕获 HTTP 请求异常
                 string errorDetail = webEx.Message;
                 if (webEx.Response != null)
                 {
@@ -65,7 +57,6 @@ namespace XgateWhatsAppChannel.Plugins
                     }
                 }
                 tracingService.Trace($"Web Error: {errorDetail}");
-                // 返回一个友好的错误 JSON 格式给前端
                 context.OutputParameters["response"] = $"{{\"code\": -1, \"message\": \"{errorDetail.Replace("\"", "\\\"")}\"}}";
             }
             catch (Exception ex)
@@ -73,13 +64,6 @@ namespace XgateWhatsAppChannel.Plugins
                 tracingService.Trace($"General Error: {ex.Message}");
                 context.OutputParameters["response"] = $"{{\"code\": -1, \"message\": \"{ex.Message.Replace("\"", "\\\"")}\"}}";
             }
-        }
-
-        [DataContract]
-        private class GetTemplateRequest
-        {
-            [DataMember]
-            public string templateId { get; set; }
         }
 
         private string GetAuthToken(IOrganizationService organizationService, ITracingService tracingService)

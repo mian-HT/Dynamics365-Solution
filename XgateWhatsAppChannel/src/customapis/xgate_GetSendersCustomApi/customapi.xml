@@ -1,0 +1,18 @@
+<customapi uniquename="xgate_GetSendersCustomApi">
+  <allowedcustomprocessingsteptype>0</allowedcustomprocessingsteptype>
+  <bindingtype>0</bindingtype>
+  <description default="GetSenders custom api">
+    <label description="GetSenders custom api" languagecode="1033" />
+  </description>
+  <displayname default="GetSendersCustomApi">
+    <label description="GetSendersCustomApi" languagecode="1033" />
+  </displayname>
+  <iscustomizable>0</iscustomizable>
+  <isfunction>0</isfunction>
+  <isprivate>0</isprivate>
+  <name>GetSendersCustomApi</name>
+  <plugintypeid>
+    <plugintypeid>a3d221de-4e1d-4cd6-b5d4-110a78477127</plugintypeid>
+  </plugintypeid>
+  <workflowsdkstepenabled>0</workflowsdkstepenabled>
+</customapi>

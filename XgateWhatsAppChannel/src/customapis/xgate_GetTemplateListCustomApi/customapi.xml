@@ -1,0 +1,18 @@
+<customapi uniquename="xgate_GetTemplateListCustomApi">
+  <allowedcustomprocessingsteptype>0</allowedcustomprocessingsteptype>
+  <bindingtype>0</bindingtype>
+  <description default="GetTemplateList custom api">
+    <label description="GetTemplateList custom api" languagecode="1033" />
+  </description>
+  <displayname default="GetTemplateListCustomApi">
+    <label description="GetTemplateListCustomApi" languagecode="1033" />
+  </displayname>
+  <iscustomizable>0</iscustomizable>
+  <isfunction>0</isfunction>
+  <isprivate>0</isprivate>
+  <name>GetTemplateListCustomApi</name>
+  <plugintypeid>
+    <plugintypeid>448d7ddb-b083-4e31-8bad-777a9b4f251e</plugintypeid>
+  </plugintypeid>
+  <workflowsdkstepenabled>0</workflowsdkstepenabled>
+</customapi>

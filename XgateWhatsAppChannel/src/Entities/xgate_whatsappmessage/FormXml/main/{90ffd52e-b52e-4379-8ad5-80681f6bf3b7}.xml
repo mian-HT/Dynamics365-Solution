@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <forms xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <systemform>
     <formid>{90ffd52e-b52e-4379-8ad5-80681f6bf3b7}</formid>
@@ -33,38 +33,29 @@
                       </cell>
                     </row>
                     <row>
-                      <cell id="{ea227e5b-74b9-4d5c-96b8-d1e17e09f0c7}">
-                        <labels>
-                          <label description="所有者" languagecode="1041" />
-                        </labels>
-                        <control id="ownerid" classid="{270BD3DB-D9AF-4782-9025-509E298DEC0A}" datafieldname="ownerid" />
-                      </cell>
-                    </row>
-                    <row>
-                      <cell id="{e3e442d3-8439-41cf-8de3-e7ff76eb3207}" locklevel="0" colspan="1" rowspan="1">
-                        <labels>
-                          <label description="Template ID" languagecode="1041" />
-                          <label description="Template ID" languagecode="1033" />
-                        </labels>
-                        <control id="xgate_templateid" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" datafieldname="xgate_templateid" disabled="false" />
-                      </cell>
-                    </row>
-                    <row>
-                      <cell id="{2e0ce92a-7dcc-4442-ad3d-ab9574c415ab}" locklevel="0" colspan="1" rowspan="1">
-                        <labels>
-                          <label description="Header Variables" languagecode="1041" />
-                          <label description="Header Variables" languagecode="1033" />
-                        </labels>
-                        <control id="xgate_headervariables" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" datafieldname="xgate_headervariables" disabled="false" />
-                      </cell>
-                    </row>
-                    <row>
                       <cell id="{ca87ff25-0ac7-4704-b0e8-f5f9ae5534e6}" locklevel="0" colspan="1" rowspan="1">
                         <labels>
                           <label description="Body Variables" languagecode="1041" />
                           <label description="Body Variables" languagecode="1033" />
                         </labels>
                         <control id="xgate_bodyvariables" classid="{F9A8A302-114E-466A-B582-6771B2AE0D92}" datafieldname="xgate_bodyvariables" disabled="false" uniqueid="{4d0ef6c6-dcbd-4f58-9b7c-53a80c659126}" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{a1b2c3d4-0001-4a10-9b0e-000000000001}" locklevel="0" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="Body Variables (Raw 调试)" languagecode="1041" />
+                          <label description="Body Variables (Raw 调试)" languagecode="1033" />
+                        </labels>
+                        <control id="xgate_bodyvariables_raw" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" datafieldname="xgate_bodyvariables" disabled="false" uniqueid="{a1b2c3d4-0002-4a10-9b0e-000000000002}" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{dc3b7ed4-9a3d-14e1-ac32-b851ea4e11c3}" showlabel="true" locklevel="0" visible="false">
+                        <labels>
+                          <label description="Placeholders" languagecode="1033" />
+                        </labels>
+                        <control id="xgate_placeholders" classid="{E0DECE4B-6FC8-4a8f-A065-082708572369}" datafieldname="xgate_placeholders" disabled="false" uniqueid="{b02dc4a0-7711-0a2a-0ce4-d0c384a17712}" />
                       </cell>
                     </row>
                   </rows>
