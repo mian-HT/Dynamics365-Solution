@@ -98,9 +98,10 @@ namespace XgateWhatsAppChannel.Plugins
             request.ContentType = "application/json";
             request.Headers.Add(HttpRequestHeader.Authorization, $"Bearer {token}");
 
-            payloadObject.Message.TryGetValue("xgate_templateid", out string partTemplateId);
-            payloadObject.Message.TryGetValue("xgate_headervariables", out string rawHeader);
-            payloadObject.Message.TryGetValue("xgate_bodyvariables", out string rawBody);
+            // message part 的 key = msdyn_name（去掉发布者前缀后的纯名字），与 Customizations.xml 保持一致
+            payloadObject.Message.TryGetValue("templateid", out string partTemplateId);
+            payloadObject.Message.TryGetValue("headervariables", out string rawHeader);
+            payloadObject.Message.TryGetValue("bodyvariables", out string rawBody);
 
             // --- 解析 body：PCF 输出的复合 JSON { senderId, templateId, variables }，并兼容旧格式 ---
             ResolveBody(rawBody, out string senderIdFromBody, out string templateIdFromBody, out string varsJson);

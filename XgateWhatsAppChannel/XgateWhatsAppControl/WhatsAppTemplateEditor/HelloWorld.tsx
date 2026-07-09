@@ -469,8 +469,6 @@ export class HelloWorld extends React.Component<IHelloWorldProps, IHelloWorldSta
 
     return (
       <div style={styles.root}>
-        <h3 style={styles.title}>💬 WhatsApp 动态模板配置</h3>
-
         {/* 顶部：发件号 + 模板选择 */}
         <div style={styles.selectRow}>
           <div style={styles.field}>
@@ -530,25 +528,6 @@ export class HelloWorld extends React.Component<IHelloWorldProps, IHelloWorldSta
           <label style={styles.previewLabel}>预览 (Preview)</label>
           {this.renderPreview()}
         </div>
-        {this.renderDebugPayload()}
-      </div>
-    );
-  }
-
-  // 实时显示传给后端并写入 xgate_bodyvariables 的复合 JSON（含字符数，用于排查超长/为空）
-  private renderDebugPayload(): React.ReactNode {
-    const payload = this.buildPayloadString();
-    const len = payload.length;
-    const overLimit = len > 4000;
-    return (
-      <div style={styles.debugBox}>
-        <div style={styles.debugHeader}>
-          <span>实时组装的 JSON（写入 xgate_bodyvariables）</span>
-          <span style={{ color: overLimit ? '#F53F3F' : '#85c46c' }}>
-            {len} 字符{overLimit ? '（超过 4000，会保存失败！）' : ' / 4000'}
-          </span>
-        </div>
-        <pre style={styles.debugPre}>{payload}</pre>
       </div>
     );
   }
@@ -703,7 +682,6 @@ export class HelloWorld extends React.Component<IHelloWorldProps, IHelloWorldSta
 // ============ 样式（参考 ManualConfigForm 的布局与配色）============
 const styles: Record<string, React.CSSProperties> = {
   root: { padding: '16px', fontFamily: 'Segoe UI, sans-serif', color: '#1d2129' },
-  title: { color: '#25D366', borderBottom: '2px solid #25D366', paddingBottom: '10px', marginTop: 0 },
   selectRow: { display: 'flex', gap: '16px', flexWrap: 'wrap', marginBottom: '16px' },
   field: { display: 'flex', flexDirection: 'column', minWidth: '260px' },
   label: { fontWeight: 600, marginBottom: '6px' },
@@ -732,9 +710,5 @@ const styles: Record<string, React.CSSProperties> = {
   bubbleBody: { fontSize: '14px', lineHeight: '20px', whiteSpace: 'pre-wrap', color: '#111' },
   bubbleFooter: { fontSize: '12px', color: '#86909c', marginTop: '6px', whiteSpace: 'pre-wrap' },
   buttonList: { marginTop: '6px', maxWidth: '280px' },
-  previewButton: { background: '#FFFFFF', color: '#00A5F4', textAlign: 'center', padding: '8px', borderRadius: '6px', marginTop: '4px', fontSize: '14px', boxShadow: '0 1px 1px rgba(0,0,0,0.12)' },
-  // 调试面板
-  debugBox: { flex: '1 1 100%', width: '100%', marginTop: '8px', background: '#2d2d2d', borderRadius: '6px', overflow: 'hidden' },
-  debugHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 12px', color: '#ddd', fontSize: '12px', borderBottom: '1px solid #444' },
-  debugPre: { margin: 0, padding: '12px', color: '#85c46c', fontFamily: 'monospace', fontSize: '12px', whiteSpace: 'pre-wrap', wordBreak: 'break-all' }
+  previewButton: { background: '#FFFFFF', color: '#00A5F4', textAlign: 'center', padding: '8px', borderRadius: '6px', marginTop: '4px', fontSize: '14px', boxShadow: '0 1px 1px rgba(0,0,0,0.12)' }
 };

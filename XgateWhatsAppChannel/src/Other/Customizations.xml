@@ -40,7 +40,7 @@
       <msdyn_displayname>Template ID</msdyn_displayname>
       <msdyn_isrequired>0</msdyn_isrequired>
       <msdyn_maxlength>100</msdyn_maxlength>
-      <msdyn_name>xgate_templateid</msdyn_name> 
+      <msdyn_name>templateid</msdyn_name>
       <msdyn_type>192350000</msdyn_type>
     </msdyn_channelmessagepart>
 
@@ -52,7 +52,7 @@
       <msdyn_displayname>Header Variables</msdyn_displayname>
       <msdyn_isrequired>0</msdyn_isrequired>
       <msdyn_maxlength>2000</msdyn_maxlength>
-      <msdyn_name>xgate_headervariables</msdyn_name>
+      <msdyn_name>headervariables</msdyn_name>
       <msdyn_type>192350000</msdyn_type>
     </msdyn_channelmessagepart>
 
@@ -64,7 +64,7 @@
       <msdyn_displayname>Body Variables</msdyn_displayname>
       <msdyn_isrequired>0</msdyn_isrequired>
       <msdyn_maxlength>4000</msdyn_maxlength>
-      <msdyn_name>xgate_bodyvariables</msdyn_name>
+      <msdyn_name>bodyvariables</msdyn_name>
       <msdyn_type>192350000</msdyn_type>
     </msdyn_channelmessagepart>
   </msdyn_channelmessageparts>

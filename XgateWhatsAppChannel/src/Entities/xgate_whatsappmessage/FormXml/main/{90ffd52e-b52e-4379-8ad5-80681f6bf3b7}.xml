@@ -42,15 +42,6 @@
                       </cell>
                     </row>
                     <row>
-                      <cell id="{a1b2c3d4-0001-4a10-9b0e-000000000001}" locklevel="0" colspan="1" rowspan="1">
-                        <labels>
-                          <label description="Body Variables (Raw 调试)" languagecode="1041" />
-                          <label description="Body Variables (Raw 调试)" languagecode="1033" />
-                        </labels>
-                        <control id="xgate_bodyvariables_raw" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" datafieldname="xgate_bodyvariables" disabled="false" uniqueid="{a1b2c3d4-0002-4a10-9b0e-000000000002}" />
-                      </cell>
-                    </row>
-                    <row>
                       <cell id="{dc3b7ed4-9a3d-14e1-ac32-b851ea4e11c3}" showlabel="true" locklevel="0" visible="false">
                         <labels>
                           <label description="Placeholders" languagecode="1033" />

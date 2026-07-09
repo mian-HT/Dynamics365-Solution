@@ -5,7 +5,7 @@
     <version>1.0.0</version>
     <authors>XgateWhatsAppChannel.Plugins</authors>
     <description>Package Description</description>
-    <repository type="git" commit="a38519649fc63f4e244eddc9bde28befc423debc" />
+    <repository type="git" commit="f4250b54ec76c2c3cb9e8f6dca759e1ca030c3ad" />
     <dependencies>
       <group targetFramework=".NETFramework4.7.1">
         <dependency id="Microsoft.CrmSdk.CoreAssemblies" version="9.0.2.46" exclude="Build,Analyzers" />
