@@ -24,15 +24,6 @@
                   </labels>
                   <rows>
                     <row>
-                      <cell id="{db7afcb6-8fe7-413e-9615-dade90340c6d}">
-                        <labels>
-                          <label description="Name" languagecode="1041" />
-                          <label description="Name" languagecode="1033" />
-                        </labels>
-                        <control id="xgate_name" classid="{4273EDBD-AC1D-40d3-9FB2-095C621B552D}" datafieldname="xgate_name" />
-                      </cell>
-                    </row>
-                    <row>
                       <cell id="{ca87ff25-0ac7-4704-b0e8-f5f9ae5534e6}" locklevel="0" colspan="1" rowspan="1">
                         <labels>
                           <label description="Body Variables" languagecode="1041" />

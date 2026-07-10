@@ -72,6 +72,15 @@ interface IButtonInfo {
 const MEDIA_HEADER_FORMATS = new Set(['image', 'video', 'document']);
 const SHORTLINK_DEFAULT = '0'; // 短链默认参数
 
+// 保存后重新打开时，从绑定字段回传的复合 JSON（结构与 buildPayloadString 输出一致），用于回填界面
+interface IRestorePayload {
+  senderId?: string;
+  templateId?: string;
+  header?: { format?: string; text?: string[]; [key: string]: unknown };
+  variables?: Record<string, string>;
+  buttons?: string[];
+}
+
 interface IHelloWorldState {
   senders: ISender[];
   selectedSenderId: string;
@@ -99,6 +108,11 @@ interface IHelloWorldState {
 const EMPTY_HEADER: IHeaderInfo = { kind: '', mediaFormat: '', example: '', defaultUrl: '' };
 
 export class HelloWorld extends React.Component<IHelloWorldProps, IHelloWorldState> {
+  // 待回填的数据（保存后重新打开时从绑定字段解析而来），在 sender/template/detail 链路里逐级消费
+  private restore: IRestorePayload | null = null;
+  // 是否已触发过回填（绑定值可能在挂载后才由 CIJ 注入，只回填一次，避免覆盖用户编辑）
+  private hasRestored = false;
+
   constructor(props: IHelloWorldProps) {
     super(props);
     this.state = {
@@ -124,6 +138,70 @@ export class HelloWorld extends React.Component<IHelloWorldProps, IHelloWorldSta
 
   public componentDidMount(): void {
     this.fetchSenders();
+    // 保存后重新打开：绑定值此刻可能已就绪；若尚未就绪，会稍后在 componentDidUpdate 里补触发
+    this.maybeRestore(this.props.name);
+  }
+
+  public componentDidUpdate(prevProps: IHelloWorldProps): void {
+    if (prevProps.name !== this.props.name) {
+      this.maybeRestore(this.props.name);
+    }
+  }
+
+  // 只在首次拿到非空绑定值时触发一次回填，避免覆盖用户后续的编辑
+  private maybeRestore(raw?: string): void {
+    if (this.hasRestored) return;
+    const parsed = this.parseRestore(raw);
+    if (!parsed) return;
+    this.hasRestored = true;
+    this.restore = parsed;
+    // 若 sender 列表已就绪则立即回填；否则由 fetchSenders 完成后的回调消费 this.restore
+    if (this.state.senders.length > 0) {
+      this.tryRestoreSender();
+    }
+  }
+
+  // 把绑定字段回传的字符串解析成回填结构；非法/为空/新建场景返回 null
+  private parseRestore(raw?: string): IRestorePayload | null {
+    const trimmed = (raw ?? '').trim();
+    if (!trimmed.startsWith('{')) return null;
+    try {
+      const obj = JSON.parse(trimmed) as IRestorePayload;
+      if (obj && (obj.senderId || obj.templateId)) return obj;
+      return null;
+    } catch {
+      return null;
+    }
+  }
+
+  // sender 列表就绪后，若有待回填的 senderId 则自动选中并继续拉模板
+  private tryRestoreSender(): void {
+    const r = this.restore;
+    if (!r?.senderId) return;
+    if (!this.state.senders.some(s => s.id === r.senderId)) {
+      this.restore = null;
+      return;
+    }
+    this.setState({ selectedSenderId: r.senderId });
+    this.fetchTemplates(r.senderId);
+  }
+
+  // 模板列表就绪后，若有待回填的 templateId 则自动选中并继续拉详情
+  private tryRestoreTemplate(): void {
+    const r = this.restore;
+    if (!r?.templateId) return;
+    if (!this.state.templates.some(t => t.id === r.templateId)) {
+      this.restore = null;
+      return;
+    }
+    this.setState({ selectedTemplateId: r.templateId });
+    this.fetchTemplateDetails(r.templateId);
+  }
+
+  private extractRestoreMediaUrl(r: IRestorePayload | null, format: string): string | undefined {
+    if (!r?.header) return undefined;
+    const media = (r.header as Record<string, unknown>)[format] as { url?: string } | undefined;
+    return media?.url;
   }
 
   // ============ Web API 调用封装 ============
@@ -189,7 +267,7 @@ export class HelloWorld extends React.Component<IHelloWorldProps, IHelloWorldSta
             });
           }
         }
-        this.setState({ senders, isLoadingSenders: false });
+        this.setState({ senders, isLoadingSenders: false }, () => this.tryRestoreSender());
         return null;
       })
       .catch((error: Error) => {
@@ -218,7 +296,7 @@ export class HelloWorld extends React.Component<IHelloWorldProps, IHelloWorldSta
             });
           }
         }
-        this.setState({ templates, isLoadingTemplates: false });
+        this.setState({ templates, isLoadingTemplates: false }, () => this.tryRestoreTemplate());
         return null;
       })
       .catch((error: Error) => {
@@ -256,6 +334,18 @@ export class HelloWorld extends React.Component<IHelloWorldProps, IHelloWorldSta
     const bodyVars = this.buildBodyVariables(detail);
     const { infos, count, defaults } = this.buildButtonMapping(detail);
 
+    // 回填：若为"保存后重新打开"（this.restore 有值），用保存过的值覆盖各输入，否则按新建流程重置
+    const r = this.restore;
+    const restoredHeaderText = headerInfo.kind === 'text' ? (r?.header?.text?.[0] ?? '') : '';
+    const restoredMediaUrl = headerInfo.kind === 'media'
+      ? (this.extractRestoreMediaUrl(r, headerInfo.mediaFormat) ?? headerInfo.defaultUrl)
+      : '';
+    const restoredBodyInputs: Record<string, string> = r?.variables ? { ...r.variables } : {};
+    const restoredButtonInputs: Record<number, string> = {};
+    if (Array.isArray(r?.buttons)) {
+      r.buttons.forEach((val, i) => { restoredButtonInputs[i] = val; });
+    }
+
     this.setState({
       isLoadingVariables: false,
       detail,
@@ -264,12 +354,14 @@ export class HelloWorld extends React.Component<IHelloWorldProps, IHelloWorldSta
       buttonInfos: infos,
       buttonCount: count,
       buttonDefaults: defaults,
-      // 重置输入；media header 预填模板默认媒体
-      headerText: '',
-      headerMediaUrl: headerInfo.kind === 'media' ? headerInfo.defaultUrl : '',
-      bodyInputs: {},
-      buttonInputs: {}
+      headerText: restoredHeaderText,
+      headerMediaUrl: restoredMediaUrl,
+      bodyInputs: restoredBodyInputs,
+      buttonInputs: restoredButtonInputs
     }, () => this.buildAndEmit());
+
+    // 回填只消费一次
+    this.restore = null;
   }
 
   private buildHeaderInfo(detail: ITemplateDetail): IHeaderInfo {
@@ -414,6 +506,7 @@ export class HelloWorld extends React.Component<IHelloWorldProps, IHelloWorldSta
   // ============ 事件处理 ============
 
   private handleSenderChange = (senderId: string): void => {
+    this.restore = null; // 用户手动改选，放弃任何待回填
     this.setState({
       selectedSenderId: senderId,
       selectedTemplateId: '',
@@ -433,6 +526,7 @@ export class HelloWorld extends React.Component<IHelloWorldProps, IHelloWorldSta
   };
 
   private handleTemplateChange = (templateId: string): void => {
+    this.restore = null; // 用户手动改选，放弃任何待回填
     this.setState({
       selectedTemplateId: templateId,
       detail: null,
