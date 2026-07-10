@@ -20,14 +20,6 @@
                   </labels>
                   <rows>
                     <row>
-                      <cell id="{581ab5ee-cd5b-0e66-8840-626bd856332d}" showlabel="true" locklevel="0">
-                        <labels>
-                          <label description="Account Id" languagecode="1033" />
-                        </labels>
-                        <control id="xgate_accountid" classid="{4273EDBD-AC1D-40d3-9FB2-095C621B552D}" datafieldname="xgate_accountid" disabled="false" />
-                      </cell>
-                    </row>
-                    <row>
                       <cell id="{9e9e97a5-cc5a-dc74-3773-29366518bc4a}" showlabel="true" locklevel="0">
                         <labels>
                           <label description="Auth Token" languagecode="1033" />
@@ -35,6 +27,14 @@
                         <control id="xgate_authtoken" classid="{4273EDBD-AC1D-40d3-9FB2-095C621B552D}" datafieldname="xgate_authtoken" disabled="false" />
                       </cell>
                     </row>
+                  </rows>
+                </section>
+                <section name="xgate_account_section" id="1dfd7869-7f23-4943-b9b1-224d13b0d038" IsUserDefined="0" locklevel="0" showlabel="true" showbar="false" layout="varwidth" celllabelalignment="Left" celllabelposition="Left" columns="1" labelwidth="115">
+                  <labels>
+                    <label description="To create AccountId and AuthToken" languagecode="1033" />
+                  </labels>
+                  <rows>
+                    <row />
                   </rows>
                 </section>
               </sections>
@@ -72,6 +72,16 @@
           </NavBarArea>
         </NavBarAreas>
       </Navigation>
+      <formLibraries>
+        <Library name="xgate_whatsappCredentialHelper.js" libraryUniqueId="{9f3a5af7-487b-447b-9a09-a7d0e9f1a2be}" />
+      </formLibraries>
+      <events>
+        <event name="onload" application="false" active="false">
+          <Handlers>
+            <Handler functionName="xgateWhatsAppCredentialHelper" libraryName="xgate_whatsappCredentialHelper.js" handlerUniqueId="{4fc5e834-202d-448f-8d41-d373650a68d0}" enabled="true" parameters="" passExecutionContext="true" />
+          </Handlers>
+        </event>
+      </events>
     </form>
     <IsCustomizable>0</IsCustomizable>
     <CanBeDeleted>0</CanBeDeleted>
