@@ -13,8 +13,9 @@
     "refreshTypes": "pcf-scripts refreshTypes"
   },
   "dependencies": {
-    "react": "16.14.0",
     "@fluentui/react-components": "9.68.0",
+    "cos-js-sdk-v5": "^1.10.1",
+    "react": "16.14.0",
     "react-dom": "16.14.0"
   },
   "devDependencies": {

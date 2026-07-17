@@ -28,8 +28,9 @@ namespace XgateWhatsAppChannel.Plugins
             var payloadObject = JsonUtils.Deserialize<Payload>(payload);
             var credentials = this.GetCredentials(organizationService, payloadObject.ChannelDefinitionId, payloadObject.From);
 
-            // 调用内部 API
-            var responseString = SendXgateRequest(credentials.Token, payloadObject, tracingService);
+            // 调用内部 API（organizationId 用服务端可信的上下文，作为查询参数传给新端点）
+            string organizationId = pluginExecutionContext.OrganizationId.ToString();
+            var responseString = SendXgateRequest(credentials.Token, organizationId, payloadObject, tracingService);
             tracingService.Trace("Xgate API Response: " + responseString);
 
             // 解析内部 API 返回的结果
@@ -91,9 +92,10 @@ namespace XgateWhatsAppChannel.Plugins
             };
         }
 
-        private static string SendXgateRequest(string token, Payload payloadObject, ITracingService tracingService)
+        private static string SendXgateRequest(string token, string organizationId, Payload payloadObject, ITracingService tracingService)
         {
-            var request = WebRequest.CreateHttp("https://xcrm360-api-uat.xgatecorp.com/whatsapp/openapi/message/send");
+            string apiUrl = $"https://connector-api-uat.xgatecorp.com/crm/report/api/whatsapp/send?organizationId={Uri.EscapeDataString(organizationId ?? string.Empty)}";
+            var request = WebRequest.CreateHttp(apiUrl);
             request.Method = "POST";
             request.ContentType = "application/json";
             request.Headers.Add(HttpRequestHeader.Authorization, $"Bearer {token}");
@@ -120,6 +122,8 @@ namespace XgateWhatsAppChannel.Plugins
             string compositeBody = (rawBody ?? "").Trim();
             string headerFromBody = ExtractRawJsonValue(compositeBody, "header");
             string headerJson = !string.IsNullOrWhiteSpace(headerFromBody) ? headerFromBody : BuildHeaderJson(rawHeader);
+            // PCF 为规避 CIJ 短链化，媒体地址是以 COS 组件（bucket/region/key）形式下发的，这里在服务端拼回真实 URL
+            headerJson = RebuildCosMediaHeader(headerJson);
 
             // 如果 header 有值，加上外层的 key 和逗号
             string headerPart = string.IsNullOrEmpty(headerJson) ? "" : $"\"header\": {headerJson},";
@@ -129,19 +133,14 @@ namespace XgateWhatsAppChannel.Plugins
             string buttonsPart = string.IsNullOrEmpty(buttonsJson) ? "" : $",\"buttons\": {buttonsJson}";
 
             // 使用字符串插值构建最终的 Payload，彻底绕开 D365 沙盒禁止匿名类型序列化的限制
+            // 按新接口的扁平结构组装：header / variables / buttons 直接用现成的原始 JSON 值
             string postData = $@"{{
+                ""requestId"": ""{payloadObject.RequestId}"",
                 ""senderId"": {long.Parse(senderId)},
                 ""receiverPhoneNumber"": ""{payloadObject.To}"",
-                ""message"": {{
-                    ""type"": ""whatsapp_template"",
-                    ""templateId"": {templateId},
-                    ""templateParams"": {{
-                        {headerPart}
-                        ""body"": {{
-                            ""variables"": {varsJson}
-                        }}{buttonsPart}
-                    }}
-                }}
+                ""templateId"": {templateId},
+                {headerPart}
+                ""variables"": {varsJson}{buttonsPart}
             }}";
 
             tracingService.Trace("Xgate API Request Body: " + postData);
@@ -279,6 +278,175 @@ namespace XgateWhatsAppChannel.Plugins
 
                 return null;
             }
+        }
+
+        // 把 header 里以 COS 组件（bucket/region/key）承载的媒体地址在服务端拼回真实 URL。
+        // PCF 侧为规避 CIJ 对文本渠道链接的短链化，不再下发完整 URL；这里负责还原。
+        // 若没有完整的 COS 组件（旧数据 / 兜底 url 形式 / 文本 header），原样返回不改动。
+        private static string RebuildCosMediaHeader(string headerJson)
+        {
+            if (string.IsNullOrWhiteSpace(headerJson)) return headerJson;
+
+            string format = ExtractStringValue(headerJson, "format");
+            if (format != "image" && format != "video" && format != "document") return headerJson;
+
+            string media = ExtractRawJsonValue(headerJson, format);
+            if (string.IsNullOrEmpty(media)) return headerJson;
+
+            string bucket = ExtractStringValue(media, "bucket");
+            string region = ExtractStringValue(media, "region");
+            string key = ExtractStringValue(media, "key");
+
+            if (string.IsNullOrEmpty(bucket) || string.IsNullOrEmpty(region) || string.IsNullOrEmpty(key))
+            {
+                return headerJson;
+            }
+
+            string url = $"https://{bucket}.cos.{region}.myqcloud.com/{key}";
+
+            // 保留媒体对象里的其它字段
+            string name = ExtractStringValue(media, "name");
+            string mimeType = ExtractStringValue(media, "mimeType");
+            string mime = ExtractStringValue(media, "mime");
+            string size = ExtractScalarValue(media, "size");
+
+            var mediaSb = new StringBuilder();
+            mediaSb.Append("{\"url\":\"").Append(EscapeJson(url)).Append("\"");
+            if (name != null) mediaSb.Append(",\"name\":\"").Append(EscapeJson(name)).Append("\"");
+            if (size != null) mediaSb.Append(",\"size\":").Append(size);
+            if (mimeType != null) mediaSb.Append(",\"mimeType\":\"").Append(EscapeJson(mimeType)).Append("\"");
+            if (mime != null) mediaSb.Append(",\"mime\":\"").Append(EscapeJson(mime)).Append("\"");
+            mediaSb.Append("}");
+
+            return "{\"format\":\"" + format + "\",\"" + format + "\":" + mediaSb + "}";
+        }
+
+        // 定位 key 对应值的起始下标（第一个非空白字符）；校验它是真正的 key（前一个非空白字符是 { 或 ,）。找不到返回 -1
+        private static int FindValueStart(string json, string key)
+        {
+            if (string.IsNullOrEmpty(json)) return -1;
+
+            string token = "\"" + key + "\"";
+            int searchFrom = 0;
+
+            while (true)
+            {
+                int keyIdx = json.IndexOf(token, searchFrom, StringComparison.Ordinal);
+                if (keyIdx < 0) return -1;
+
+                int p = keyIdx - 1;
+                while (p >= 0 && char.IsWhiteSpace(json[p])) p--;
+                if (p < 0 || (json[p] != '{' && json[p] != ','))
+                {
+                    searchFrom = keyIdx + token.Length;
+                    continue;
+                }
+
+                int i = keyIdx + token.Length;
+                while (i < json.Length && char.IsWhiteSpace(json[i])) i++;
+                if (i >= json.Length || json[i] != ':')
+                {
+                    searchFrom = keyIdx + token.Length;
+                    continue;
+                }
+                i++;
+                while (i < json.Length && char.IsWhiteSpace(json[i])) i++;
+                if (i >= json.Length) return -1;
+
+                return i;
+            }
+        }
+
+        // 按 key 抠出字符串值（返回反转义后的原始字符串）；找不到或不是字符串返回 null
+        private static string ExtractStringValue(string json, string key)
+        {
+            int idx = FindValueStart(json, key);
+            if (idx < 0 || json[idx] != '"') return null;
+
+            var sb = new StringBuilder();
+            bool esc = false;
+            for (int i = idx + 1; i < json.Length; i++)
+            {
+                char ch = json[i];
+                if (esc)
+                {
+                    switch (ch)
+                    {
+                        case 'n': sb.Append('\n'); break;
+                        case 't': sb.Append('\t'); break;
+                        case 'r': sb.Append('\r'); break;
+                        case 'b': sb.Append('\b'); break;
+                        case 'f': sb.Append('\f'); break;
+                        case '/': sb.Append('/'); break;
+                        case '\\': sb.Append('\\'); break;
+                        case '"': sb.Append('"'); break;
+                        case 'u':
+                            if (i + 4 < json.Length)
+                            {
+                                int code;
+                                if (int.TryParse(json.Substring(i + 1, 4), System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture, out code))
+                                {
+                                    sb.Append((char)code);
+                                    i += 4;
+                                }
+                            }
+                            break;
+                        default: sb.Append(ch); break;
+                    }
+                    esc = false;
+                }
+                else if (ch == '\\') esc = true;
+                else if (ch == '"') return sb.ToString();
+                else sb.Append(ch);
+            }
+
+            return null;
+        }
+
+        // 按 key 抠出标量原始文本（数字 / true / false / null），保持原样；找不到或不是标量返回 null
+        private static string ExtractScalarValue(string json, string key)
+        {
+            int idx = FindValueStart(json, key);
+            if (idx < 0) return null;
+
+            char c = json[idx];
+            if (c == '"' || c == '{' || c == '[') return null;
+
+            int end = idx;
+            while (end < json.Length && json[end] != ',' && json[end] != '}' && json[end] != ']' && !char.IsWhiteSpace(json[end]))
+            {
+                end++;
+            }
+
+            string raw = json.Substring(idx, end - idx);
+            return string.IsNullOrEmpty(raw) ? null : raw;
+        }
+
+        // JSON 字符串值转义
+        private static string EscapeJson(string s)
+        {
+            if (string.IsNullOrEmpty(s)) return s ?? "";
+
+            var sb = new StringBuilder(s.Length + 8);
+            foreach (char ch in s)
+            {
+                switch (ch)
+                {
+                    case '"': sb.Append("\\\""); break;
+                    case '\\': sb.Append("\\\\"); break;
+                    case '\n': sb.Append("\\n"); break;
+                    case '\r': sb.Append("\\r"); break;
+                    case '\t': sb.Append("\\t"); break;
+                    case '\b': sb.Append("\\b"); break;
+                    case '\f': sb.Append("\\f"); break;
+                    default:
+                        if (ch < 0x20) sb.Append("\\u").Append(((int)ch).ToString("x4"));
+                        else sb.Append(ch);
+                        break;
+                }
+            }
+
+            return sb.ToString();
         }
 
         private static string SerializeVariablesDict(IDictionary<string, string> dict)

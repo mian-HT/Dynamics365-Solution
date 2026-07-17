@@ -1,4 +1,5 @@
 import * as React from 'react';
+import * as COS from 'cos-js-sdk-v5';
 
 export interface IHelloWorldProps {
   name?: string;
@@ -72,6 +73,42 @@ interface IButtonInfo {
 const MEDIA_HEADER_FORMATS = new Set(['image', 'video', 'document']);
 const SHORTLINK_DEFAULT = '0'; // 短链默认参数
 
+// 媒体上传对照表（与 QuickSend 的 uploadMap 保持一致：accept / size(MB) / 上传类型）
+const MEDIA_UPLOAD_MAP: Record<string, { accept: string; size: number; type: string }> = {
+  image: { accept: '.png,.jpg,.jpeg', size: 5, type: 'image' },
+  video: { accept: '.mp4,.3gp,.3gpp', size: 16, type: 'video' },
+  document: { accept: '.pdf', size: 100, type: 'document' }
+};
+
+// COS 临时密钥结构（对齐 /whatsapp/cos/credential 返回的扁平结构）。
+// bucket / region / allowPrefix 均由接口返回（按 organizationId 做资源隔离），前端不写死。
+interface ICosTmpKey {
+  bucket: string;                 // 存储桶，如 dynamics365-1258635022
+  region: string;                 // 地域，如 ap-hongkong
+  allowPrefix?: string;           // 允许写入的前缀，如 whatsapp/{orgId}/*
+  tmpSecretId: string;
+  tmpSecretKey: string;
+  sessionToken: string;           // sessionToken（临时密钥）
+  startTime?: string | number;    // 服务端签发时间戳（秒），可选
+  expiredTime: string | number;   // 过期时间戳（秒）
+}
+
+// 上传成功后组装的媒体数据，随复合 JSON 一起写入绑定字段。
+// 注意：这里【故意不放完整 url】，改用 COS 组件（bucket/region/key）承载地址，
+// 由 OutboundPlugin 在服务端拼回真实 URL。原因是 CIJ 对文本类渠道会无条件把消息里的
+// http(s) 链接短链化（换成 usa.tx.ms 跟踪短链），导致 WhatsApp 媒体地址失效。
+// 拆成不含域名的组件后，CIJ 扫不到 URL，就不会被短链化。
+interface IUploadMediaData {
+  bucket?: string;    // COS 存储桶
+  region?: string;    // COS 地域
+  key?: string;       // COS 对象 Key（不含域名，形如 whatsapp/.../x.jpg）
+  url?: string;       // 兜底：无法拆成 COS 组件的媒体（如模板自带的非 COS 媒体）
+  name?: string;      // 文件名
+  size?: number;      // 文件大小（字节）
+  mimeType?: string;  // 由文件地址推断的 MIME 类型
+  mime?: string;      // 浏览器原始 File.type
+}
+
 // 保存后重新打开时，从绑定字段回传的复合 JSON（结构与 buildPayloadString 输出一致），用于回填界面
 interface IRestorePayload {
   senderId?: string;
@@ -100,7 +137,11 @@ interface IHelloWorldState {
 
   // 用户填写的表单值
   headerText: string;                  // text header 输入
-  headerMediaUrl: string;              // media header 的 URL（默认取模板媒体）
+  headerMedia: IUploadMediaData | null; // media header 上传后的完整媒体数据（默认取模板媒体）
+  headerMediaPreviewUrl: string;       // 预览用地址（优先 filePreSignedUrl，回退 url）
+  isUploadingMedia: boolean;           // 媒体上传中
+  uploadProgress: number;              // 上传进度（0-100）
+  uploadError: string;                 // 媒体上传错误提示
   bodyInputs: Record<string, string>;  // body 变量值（key=变量名）
   buttonInputs: Record<number, string>; // 按钮变量值（key=paramsIndex）
 }
@@ -130,11 +171,18 @@ export class HelloWorld extends React.Component<IHelloWorldProps, IHelloWorldSta
       buttonDefaults: {},
       isLoadingVariables: false,
       headerText: '',
-      headerMediaUrl: '',
+      headerMedia: null,
+      headerMediaPreviewUrl: '',
+      isUploadingMedia: false,
+      uploadProgress: 0,
+      uploadError: '',
       bodyInputs: {},
       buttonInputs: {}
     };
   }
+
+  // 缓存的 COS 临时密钥（有效期内复用，过期前 60s 重新拉取）
+  private cosSecret: ICosTmpKey | null = null;
 
   public componentDidMount(): void {
     this.fetchSenders();
@@ -198,10 +246,32 @@ export class HelloWorld extends React.Component<IHelloWorldProps, IHelloWorldSta
     this.fetchTemplateDetails(r.templateId);
   }
 
-  private extractRestoreMediaUrl(r: IRestorePayload | null, format: string): string | undefined {
+  // 把媒体对象还原成可访问的完整 URL：优先用 COS 组件拼，取不到再回退兜底 url（用于预览/展示）
+  private resolveMediaUrl(m: IUploadMediaData | null | undefined): string {
+    if (!m) return '';
+    if (m.bucket && m.region && m.key) {
+      return `https://${m.bucket}.cos.${m.region}.myqcloud.com/${m.key}`;
+    }
+    return m.url ?? '';
+  }
+
+  // 尝试把一个 COS 完整 URL 拆成 { bucket, region, key }；非 COS 地址返回 null
+  private splitCosUrl(url: string): { bucket: string; region: string; key: string } | null {
+    const m = /^https:\/\/([^./]+)\.cos\.([^./]+)\.myqcloud\.com\/(.+)$/.exec(url ?? '');
+    return m ? { bucket: m[1], region: m[2], key: m[3] } : null;
+  }
+
+  // 由一个完整 URL 构造媒体对象：COS 地址拆成组件，非 COS 地址落到兜底 url
+  private buildMediaFromUrl(url: string): IUploadMediaData {
+    const cos = this.splitCosUrl(url);
+    return cos ? { ...cos } : { url };
+  }
+
+  private extractRestoreMedia(r: IRestorePayload | null, format: string): IUploadMediaData | undefined {
     if (!r?.header) return undefined;
-    const media = (r.header as Record<string, unknown>)[format] as { url?: string } | undefined;
-    return media?.url;
+    const media = (r.header as Record<string, unknown>)[format] as IUploadMediaData | undefined;
+    if (media && this.resolveMediaUrl(media)) return media;
+    return undefined;
   }
 
   // ============ Web API 调用封装 ============
@@ -337,9 +407,13 @@ export class HelloWorld extends React.Component<IHelloWorldProps, IHelloWorldSta
     // 回填：若为"保存后重新打开"（this.restore 有值），用保存过的值覆盖各输入，否则按新建流程重置
     const r = this.restore;
     const restoredHeaderText = headerInfo.kind === 'text' ? (r?.header?.text?.[0] ?? '') : '';
-    const restoredMediaUrl = headerInfo.kind === 'media'
-      ? (this.extractRestoreMediaUrl(r, headerInfo.mediaFormat) ?? headerInfo.defaultUrl)
-      : '';
+    // media header：优先回填保存过的完整媒体数据，否则回退到模板自带的默认媒体
+    let restoredMedia: IUploadMediaData | null = null;
+    if (headerInfo.kind === 'media') {
+      restoredMedia = this.extractRestoreMedia(r, headerInfo.mediaFormat)
+        ?? (headerInfo.defaultUrl ? this.buildMediaFromUrl(headerInfo.defaultUrl) : null);
+    }
+    const restoredMediaPreviewUrl = this.resolveMediaUrl(restoredMedia);
     const restoredBodyInputs: Record<string, string> = r?.variables ? { ...r.variables } : {};
     const restoredButtonInputs: Record<number, string> = {};
     if (Array.isArray(r?.buttons)) {
@@ -355,7 +429,11 @@ export class HelloWorld extends React.Component<IHelloWorldProps, IHelloWorldSta
       buttonCount: count,
       buttonDefaults: defaults,
       headerText: restoredHeaderText,
-      headerMediaUrl: restoredMediaUrl,
+      headerMedia: restoredMedia,
+      headerMediaPreviewUrl: restoredMediaPreviewUrl,
+      isUploadingMedia: false,
+      uploadProgress: 0,
+      uploadError: '',
       bodyInputs: restoredBodyInputs,
       buttonInputs: restoredButtonInputs
     }, () => this.buildAndEmit());
@@ -465,7 +543,7 @@ export class HelloWorld extends React.Component<IHelloWorldProps, IHelloWorldSta
 
   // 组装最终交给后端的复合 JSON（与写入 xgate_bodyvariables 的内容完全一致）
   private buildPayloadString(): string {
-    const { selectedSenderId, selectedTemplateId, headerInfo, bodyVars, buttonCount, buttonDefaults, headerText, headerMediaUrl, bodyInputs, buttonInputs } = this.state;
+    const { selectedSenderId, selectedTemplateId, headerInfo, bodyVars, buttonCount, buttonDefaults, headerText, headerMedia, bodyInputs, buttonInputs } = this.state;
 
     const payload: Record<string, unknown> = {
       senderId: selectedSenderId,
@@ -475,8 +553,10 @@ export class HelloWorld extends React.Component<IHelloWorldProps, IHelloWorldSta
     // header
     if (headerInfo.kind === 'text' && headerText) {
       payload.header = { format: 'text', text: [headerText] };
-    } else if (headerInfo.kind === 'media' && headerMediaUrl) {
-      payload.header = { format: headerInfo.mediaFormat, [headerInfo.mediaFormat]: { url: headerMediaUrl } };
+    } else if (headerInfo.kind === 'media' && this.resolveMediaUrl(headerMedia)) {
+      // header.[format] = { bucket, region, key, name, size, mimeType, mime }（COS 组件形式，
+      // 不含完整 URL，避免被 CIJ 短链化；OutboundPlugin 会在服务端拼回真实 URL）
+      payload.header = { format: headerInfo.mediaFormat, [headerInfo.mediaFormat]: { ...headerMedia } };
     }
 
     // body：命名变量 -> 值
@@ -518,7 +598,11 @@ export class HelloWorld extends React.Component<IHelloWorldProps, IHelloWorldSta
       buttonCount: 0,
       buttonDefaults: {},
       headerText: '',
-      headerMediaUrl: '',
+      headerMedia: null,
+      headerMediaPreviewUrl: '',
+      isUploadingMedia: false,
+      uploadProgress: 0,
+      uploadError: '',
       bodyInputs: {},
       buttonInputs: {}
     }, () => this.buildAndEmit());
@@ -536,7 +620,11 @@ export class HelloWorld extends React.Component<IHelloWorldProps, IHelloWorldSta
       buttonCount: 0,
       buttonDefaults: {},
       headerText: '',
-      headerMediaUrl: '',
+      headerMedia: null,
+      headerMediaPreviewUrl: '',
+      isUploadingMedia: false,
+      uploadProgress: 0,
+      uploadError: '',
       bodyInputs: {},
       buttonInputs: {}
     }, () => this.buildAndEmit());
@@ -546,9 +634,132 @@ export class HelloWorld extends React.Component<IHelloWorldProps, IHelloWorldSta
   private handleHeaderTextChange = (value: string): void => {
     this.setState({ headerText: value }, () => this.buildAndEmit());
   };
-  private handleHeaderMediaChange = (value: string): void => {
-    this.setState({ headerMediaUrl: value }, () => this.buildAndEmit());
+
+  // 选择文件后：本地校验 -> 拿 COS 临时密钥 -> 前端直传 COS -> 组装媒体数据（对齐 QuickSend）
+  private handleMediaFileSelected = (file: File | null): void => {
+    if (!file) return;
+    const { headerInfo } = this.state;
+    const cfg = MEDIA_UPLOAD_MAP[headerInfo.mediaFormat];
+    if (!cfg) return;
+
+    // 大小校验
+    if (file.size > cfg.size * 1024 * 1024) {
+      this.setState({ uploadError: `文件超过大小限制（最大 ${cfg.size}MB）` });
+      return;
+    }
+    // 扩展名校验
+    const ext = (file.name.split('.').pop() ?? '').toLowerCase();
+    const accepts = cfg.accept.split(',').map(s => s.trim().toLowerCase());
+    if (!accepts.includes('.' + ext)) {
+      this.setState({ uploadError: `不支持的文件格式（仅支持 ${cfg.accept}）` });
+      return;
+    }
+
+    const type = cfg.type;
+    // 文件名：{时间戳}_{随机}.{ext}；完整对象 Key 与地址在拿到密钥后按返回的 Bucket/Region/Prefix 组装
+    const filename = `${Math.floor(Date.now() / 1000)}_${Math.round(Math.random() * 999999)}.${ext}`;
+
+    this.setState({ isUploadingMedia: true, uploadProgress: 0, uploadError: '' });
+
+    let fileUrl = '';
+    let cosBucket = '';
+    let cosRegion = '';
+    let cosKey = '';
+    this.getCosCredentials()
+      .then((secret) => {
+        // Key：{allowPrefix去掉尾部 /*}/{type}/{filename}，最终地址按返回的 bucket/region 拼
+        const base = (secret.allowPrefix ?? '').replace(/\*+$/, '').replace(/^\/+|\/+$/g, '');
+        const objectKey = [base, type, filename].filter((p) => p).join('/');
+        cosBucket = secret.bucket;
+        cosRegion = secret.region;
+        cosKey = objectKey;
+        // fileUrl 仅用于本地预览；写入绑定字段的是拆开的 bucket/region/key，避免被 CIJ 短链化
+        fileUrl = `https://${secret.bucket}.cos.${secret.region}.myqcloud.com/${objectKey}`;
+
+        const cos = new COS({
+          getAuthorization: (_options, callback) => {
+            callback({
+              TmpSecretId: secret.tmpSecretId,
+              TmpSecretKey: secret.tmpSecretKey,
+              SecurityToken: secret.sessionToken,
+              StartTime: Number(secret.startTime) || Math.floor(Date.now() / 1000),
+              ExpiredTime: Number(secret.expiredTime)
+            });
+          }
+        });
+
+        const params: COS.PutObjectParams = {
+          Bucket: secret.bucket,
+          Region: secret.region,
+          Key: objectKey,
+          StorageClass: 'STANDARD',
+          Body: file,
+          onProgress: (progressData) => {
+            const percent = progressData?.percent ? Math.round(progressData.percent * 100) : 0;
+            this.setState({ uploadProgress: percent });
+          }
+        };
+
+        return cos.putObject(params);
+      })
+      .then(() => {
+        // 写入绑定字段的是拆开的 COS 组件（不含完整 URL），由 OutboundPlugin 服务端拼回真实地址
+        const media: IUploadMediaData = {
+          bucket: cosBucket,
+          region: cosRegion,
+          key: cosKey,
+          name: file.name,
+          size: file.size,
+          mimeType: this.guessMimeType(fileUrl) || file.type,
+          mime: file.type
+        };
+        this.setState({
+          headerMedia: media,
+          headerMediaPreviewUrl: fileUrl,
+          isUploadingMedia: false,
+          uploadProgress: 100,
+          uploadError: ''
+        }, () => this.buildAndEmit());
+        return null;
+      })
+      .catch((error: Error) => {
+        console.error('COS 上传失败:', error);
+        this.setState({ isUploadingMedia: false, uploadError: error.message || '上传失败，请重试' });
+      });
   };
+
+  // 获取（并缓存）COS 临时密钥；过期前 60s 复用缓存，否则经 Custom API 重新拉取
+  private getCosCredentials(): Promise<ICosTmpKey> {
+    const now = Math.floor(Date.now() / 1000);
+    if (this.cosSecret && Number(this.cosSecret.expiredTime) - 60 > now) {
+      return Promise.resolve(this.cosSecret);
+    }
+    // Custom API 插件把凭证接口的响应体原样透传，因此 parsed 即扁平的凭证对象
+    return this.callCustomApi('xgate_GetCosTmpKeyCustomApi', {}).then((parsed) => {
+      const data = parsed as unknown as ICosTmpKey;
+      if (!data?.bucket || !data?.region || !data?.expiredTime || !data?.tmpSecretId || !data?.tmpSecretKey || !data?.sessionToken) {
+        const msg = typeof parsed.message === 'string' ? parsed.message : '获取 COS 临时密钥失败（响应缺少必要字段）';
+        throw new Error(msg);
+      }
+      this.cosSecret = data;
+      return data;
+    });
+  }
+
+  private handleRemoveMedia = (): void => {
+    this.setState({ headerMedia: null, headerMediaPreviewUrl: '', uploadProgress: 0, uploadError: '' }, () => this.buildAndEmit());
+  };
+
+  // 由文件地址扩展名推断 MIME（对齐 QuickSend 的 mime.getType(fileUrl)）
+  private guessMimeType(url: string): string {
+    const clean = url.split('?')[0];
+    const ext = (clean.split('.').pop() ?? '').toLowerCase();
+    const map: Record<string, string> = {
+      png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', webp: 'image/webp', gif: 'image/gif',
+      mp4: 'video/mp4', '3gp': 'video/3gpp', '3gpp': 'video/3gpp', pdf: 'application/pdf'
+    };
+    return map[ext] || '';
+  }
   private handleBodyChange = (name: string, value: string): void => {
     this.setState(prev => ({ bodyInputs: { ...prev.bodyInputs, [name]: value } }), () => this.buildAndEmit());
   };
@@ -627,7 +838,7 @@ export class HelloWorld extends React.Component<IHelloWorldProps, IHelloWorldSta
   }
 
   private renderHeaderField(): React.ReactNode {
-    const { headerInfo, headerText, headerMediaUrl } = this.state;
+    const { headerInfo, headerText } = this.state;
     if (headerInfo.kind === 'text') {
       return (
         <div style={styles.formItem}>
@@ -643,22 +854,7 @@ export class HelloWorld extends React.Component<IHelloWorldProps, IHelloWorldSta
       );
     }
     if (headerInfo.kind === 'media') {
-      return (
-        <div style={styles.formItem}>
-          <label style={styles.itemLabel}>页头媒体 (Header · {headerInfo.mediaFormat})</label>
-          {headerInfo.mediaFormat === 'image' && headerMediaUrl && (
-            <img src={headerMediaUrl} alt="header" style={styles.mediaThumb} />
-          )}
-          <input
-            type="text"
-            value={headerMediaUrl}
-            onChange={(e) => this.handleHeaderMediaChange(e.target.value)}
-            placeholder="媒体文件 URL"
-            style={styles.input}
-          />
-          <div style={styles.subHint}>默认取模板自带媒体，可替换为其它 {headerInfo.mediaFormat} 的 URL。</div>
-        </div>
-      );
+      return this.renderMediaUploader();
     }
     if (headerInfo.kind === 'other') {
       return (
@@ -669,6 +865,52 @@ export class HelloWorld extends React.Component<IHelloWorldProps, IHelloWorldSta
       );
     }
     return null;
+  }
+
+  // 媒体上传区（对齐 QuickSend：上传文件 -> COS，替换/删除，展示文件名与预览）
+  private renderMediaUploader(): React.ReactNode {
+    const { headerInfo, headerMedia, headerMediaPreviewUrl, isUploadingMedia, uploadProgress, uploadError } = this.state;
+    const cfg = MEDIA_UPLOAD_MAP[headerInfo.mediaFormat] ?? { accept: '', size: 0, type: '' };
+    return (
+      <div style={styles.formItem}>
+        <label style={styles.itemLabel}>页头媒体 (Header · {headerInfo.mediaFormat})</label>
+
+        {headerInfo.mediaFormat === 'image' && headerMediaPreviewUrl && (
+          <img src={headerMediaPreviewUrl} alt="header" style={styles.mediaThumb} />
+        )}
+
+        {this.resolveMediaUrl(headerMedia) && (
+          <div style={styles.fileRow}>
+            <span style={styles.fileName}>{headerMedia?.name ?? this.resolveMediaUrl(headerMedia)}</span>
+            <button type="button" style={styles.removeBtn} onClick={this.handleRemoveMedia} disabled={isUploadingMedia}>删除</button>
+          </div>
+        )}
+
+        <label style={{ ...styles.uploadBtn, ...(isUploadingMedia ? styles.uploadBtnDisabled : {}) }}>
+          {isUploadingMedia ? `上传中... ${uploadProgress}%` : (this.resolveMediaUrl(headerMedia) ? '替换文件' : '上传文件')}
+          <input
+            type="file"
+            accept={cfg.accept}
+            disabled={isUploadingMedia}
+            style={{ display: 'none' }}
+            onChange={(e) => {
+              const file = e.target.files?.[0] ?? null;
+              this.handleMediaFileSelected(file);
+              e.target.value = ''; // 允许重复选择同一文件
+            }}
+          />
+        </label>
+
+        {isUploadingMedia && (
+          <div style={styles.progressBar}>
+            <div style={{ ...styles.progressInner, width: `${uploadProgress}%` }} />
+          </div>
+        )}
+
+        {uploadError && <div style={styles.uploadError}>{uploadError}</div>}
+        <div style={styles.subHint}>默认取模板自带媒体，可上传替换（前端直传腾讯云 COS）。{cfg.accept}，最大 {cfg.size}MB。</div>
+      </div>
+    );
   }
 
   private renderBodyFields(): React.ReactNode {
@@ -717,7 +959,7 @@ export class HelloWorld extends React.Component<IHelloWorldProps, IHelloWorldSta
 
   // WhatsApp 气泡预览
   private renderPreview(): React.ReactNode {
-    const { detail, headerInfo, headerMediaUrl } = this.state;
+    const { detail, headerInfo, headerMediaPreviewUrl } = this.state;
     if (!detail) return null;
 
     const buttons = detail.buttons?.buttons ?? [];
@@ -727,8 +969,8 @@ export class HelloWorld extends React.Component<IHelloWorldProps, IHelloWorldSta
       <div style={styles.chatArea}>
         <div style={styles.bubble}>
           {/* header 媒体预览 */}
-          {headerInfo.kind === 'media' && headerInfo.mediaFormat === 'image' && headerMediaUrl && (
-            <img src={headerMediaUrl} alt="header" style={styles.bubbleImage} />
+          {headerInfo.kind === 'media' && headerInfo.mediaFormat === 'image' && headerMediaPreviewUrl && (
+            <img src={headerMediaPreviewUrl} alt="header" style={styles.bubbleImage} />
           )}
           {headerInfo.kind === 'media' && headerInfo.mediaFormat !== 'image' && (
             <div style={styles.bubbleMediaBox}>📎 {headerInfo.mediaFormat.toUpperCase()}</div>
@@ -795,6 +1037,15 @@ const styles: Record<string, React.CSSProperties> = {
   varTag: { flex: '0 0 auto', color: '#165DFF', background: '#E8F3FF', padding: '3px 8px', borderRadius: '3px', fontSize: '13px', whiteSpace: 'nowrap' },
   mediaThumb: { width: '100%', maxHeight: '160px', objectFit: 'cover', borderRadius: '6px', marginBottom: '8px' },
   unsupported: { color: '#F53F3F', background: '#FFECE8', padding: '8px', borderRadius: '4px' },
+  // 媒体上传
+  uploadBtn: { display: 'inline-block', padding: '8px 16px', background: '#165DFF', color: '#fff', borderRadius: '4px', cursor: 'pointer', fontSize: '13px', textAlign: 'center' },
+  uploadBtnDisabled: { background: '#94BFFF', cursor: 'not-allowed' },
+  fileRow: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', padding: '6px 8px', background: '#F2F3F5', borderRadius: '4px', marginBottom: '8px' },
+  fileName: { fontSize: '13px', color: '#1d2129', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
+  removeBtn: { flex: '0 0 auto', border: 'none', background: 'transparent', color: '#F53F3F', cursor: 'pointer', fontSize: '13px' },
+  progressBar: { height: '6px', background: '#E5E6EB', borderRadius: '3px', marginTop: '8px', overflow: 'hidden' },
+  progressInner: { height: '100%', background: '#165DFF', borderRadius: '3px', transition: 'width 0.2s' },
+  uploadError: { color: '#F53F3F', fontSize: '12px', marginTop: '6px' },
   // WhatsApp 预览
   chatArea: { background: '#EFEAE2', padding: '16px', borderRadius: '8px', minHeight: '160px' },
   bubble: { background: '#FFFFFF', borderRadius: '8px', padding: '8px', boxShadow: '0 1px 1px rgba(0,0,0,0.12)', maxWidth: '280px' },

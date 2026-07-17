@@ -20,5 +20,8 @@
     <PluginType AssemblyQualifiedName="XgateWhatsAppChannel.Plugins.GetTemplateListPlugin, XgateWhatsAppChannel.Plugins, Version=1.0.0.0, Culture=neutral, PublicKeyToken=ce2803c0831125f1" PluginTypeId="448d7ddb-b083-4e31-8bad-777a9b4f251e" Name="XgateWhatsAppChannel.Plugins.GetTemplateListPlugin">
       <FriendlyName>448d7ddb-b083-4e31-8bad-777a9b4f251e1.0.0.0</FriendlyName>
     </PluginType>
+    <PluginType AssemblyQualifiedName="XgateWhatsAppChannel.Plugins.GetCosTmpKeyPlugin, XgateWhatsAppChannel.Plugins, Version=1.0.0.0, Culture=neutral, PublicKeyToken=ce2803c0831125f1" PluginTypeId="d4b7e6c1-8a52-4f39-b1c7-2e9a5d6f0c83" Name="XgateWhatsAppChannel.Plugins.GetCosTmpKeyPlugin">
+      <FriendlyName>d4b7e6c1-8a52-4f39-b1c7-2e9a5d6f0c831.0.0.0</FriendlyName>
+    </PluginType>
   </PluginTypes>
 </PluginAssembly>

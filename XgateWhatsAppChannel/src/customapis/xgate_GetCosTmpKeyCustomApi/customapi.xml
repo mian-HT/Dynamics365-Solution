@@ -1,0 +1,18 @@
+<customapi uniquename="xgate_GetCosTmpKeyCustomApi">
+  <allowedcustomprocessingsteptype>0</allowedcustomprocessingsteptype>
+  <bindingtype>0</bindingtype>
+  <description default="GetCosTmpKey custom api">
+    <label description="GetCosTmpKey custom api" languagecode="1033" />
+  </description>
+  <displayname default="GetCosTmpKeyCustomApi">
+    <label description="GetCosTmpKeyCustomApi" languagecode="1033" />
+  </displayname>
+  <iscustomizable>0</iscustomizable>
+  <isfunction>0</isfunction>
+  <isprivate>0</isprivate>
+  <name>GetCosTmpKeyCustomApi</name>
+  <plugintypeid>
+    <plugintypeid>d4b7e6c1-8a52-4f39-b1c7-2e9a5d6f0c83</plugintypeid>
+  </plugintypeid>
+  <workflowsdkstepenabled>0</workflowsdkstepenabled>
+</customapi>
