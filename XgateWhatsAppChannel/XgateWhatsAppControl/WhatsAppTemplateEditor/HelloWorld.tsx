@@ -851,7 +851,7 @@ export class HelloWorld extends React.Component<IHelloWorldProps, IHelloWorldSta
           if (token) onInsert(token);
         }}
       >
-        <option value="">Insert field…</option>
+        <option value="">Personalization</option>
         {PERSONALIZATION_FIELDS.map((f) => (
           <option key={f.token} value={f.token}>{f.label}</option>
         ))}
