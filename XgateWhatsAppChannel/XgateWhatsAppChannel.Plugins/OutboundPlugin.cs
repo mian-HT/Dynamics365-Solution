@@ -4,10 +4,12 @@ namespace XgateWhatsAppChannel.Plugins
     using Microsoft.Xrm.Sdk.Query;
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.IO;
     using System.Net;
     using System.Runtime.Serialization;
     using System.Text;
+    using System.Text.RegularExpressions;
 
     public class OutboundPlugin : IPlugin
     {
@@ -26,6 +28,11 @@ namespace XgateWhatsAppChannel.Plugins
 
             // 解析 D365 传进来的原始 Payload
             var payloadObject = JsonUtils.Deserialize<Payload>(payload);
+
+            // 个性化替换：把 message part 里 [[字段]] 形式的 token 换成收件人真实值（路线二）。
+            // Test Send / 无收件人上下文 / 字段为空 时保留 token 原文（按约定）。
+            PersonalizeMessageParts(organizationService, payloadObject, tracingService);
+
             var credentials = this.GetCredentials(organizationService, payloadObject.ChannelDefinitionId, payloadObject.From);
 
             // 调用内部 API（organizationId 用服务端可信的上下文，作为查询参数传给新端点）
@@ -90,6 +97,136 @@ namespace XgateWhatsAppChannel.Plugins
                 AccountId = xgateAccountId,
                 Token = xgateAuthtoken,
             };
+        }
+
+        // ===================== 个性化（路线二：插件自解析 [[字段]] token） =====================
+
+        // token 语法：[[逻辑名]]，如 [[fullname]] [[mobilephone]]；特殊语义键 [[accountname]]。
+        private static readonly Regex TokenRegex = new Regex(@"\[\[\s*([A-Za-z0-9_\.]+)\s*\]\]", RegexOptions.Compiled);
+
+        // 扫描所有 message part，把其中的 [[字段]] token 换成收件人真实值。
+        // 约定：无收件人上下文（Test Send / UserId 为空）或字段值为空/查不到 → 保留 token 原文。
+        private static void PersonalizeMessageParts(IOrganizationService service, Payload payloadObject, ITracingService tracing)
+        {
+            if (payloadObject?.Message == null || payloadObject.Message.Count == 0) return;
+
+            // 先看是否存在任何 token，没有就直接返回，避免无谓查询
+            bool hasToken = false;
+            foreach (var kv in payloadObject.Message)
+            {
+                if (!string.IsNullOrEmpty(kv.Value) && TokenRegex.IsMatch(kv.Value)) { hasToken = true; break; }
+            }
+            if (!hasToken) return;
+
+            var ctx = payloadObject.MarketingAppContext;
+            if (ctx == null || ctx.IsTestSend || string.IsNullOrWhiteSpace(ctx.UserId) || !Guid.TryParse(ctx.UserId, out Guid recipientId))
+            {
+                tracing.Trace("Personalization skipped (no recipient context / test send). Tokens kept as-is.");
+                return; // 保留 token 原文
+            }
+
+            string entityType = string.IsNullOrWhiteSpace(ctx.UserEntityType) ? "contact" : ctx.UserEntityType.Trim();
+
+            // 收集所有 token 需要的列
+            var columns = CollectColumns(payloadObject.Message, entityType);
+            if (columns.Count == 0) return;
+
+            Entity recipient;
+            try
+            {
+                recipient = service.Retrieve(entityType, recipientId, new ColumnSet(columns.ToArray()));
+            }
+            catch (Exception ex)
+            {
+                tracing.Trace("Personalization retrieve failed: {0}. Tokens kept as-is.", ex.Message);
+                return; // 查询失败也保留 token 原文
+            }
+
+            // 逐个 message part 做替换
+            var keys = new List<string>(payloadObject.Message.Keys);
+            foreach (var key in keys)
+            {
+                string value = payloadObject.Message[key];
+                if (string.IsNullOrEmpty(value) || !TokenRegex.IsMatch(value)) continue;
+                payloadObject.Message[key] = TokenRegex.Replace(value, m =>
+                {
+                    string field = m.Groups[1].Value.Trim();
+                    string resolved = ResolveFieldValue(recipient, entityType, field);
+                    // 空值 / 查不到 → 保留 token 原文；否则 JSON 转义后回填
+                    return string.IsNullOrEmpty(resolved) ? m.Value : EscapeJson(resolved);
+                });
+            }
+        }
+
+        // 汇总所有 token 对应需要 Retrieve 的列（去重）
+        private static List<string> CollectColumns(IDictionary<string, string> message, string entityType)
+        {
+            var set = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var kv in message)
+            {
+                if (string.IsNullOrEmpty(kv.Value)) continue;
+                foreach (Match m in TokenRegex.Matches(kv.Value))
+                {
+                    string field = m.Groups[1].Value.Trim();
+                    if (field.IndexOf('.') >= 0) continue; // 本期不支持自定义关系路径 token
+
+                    if (field.Equals("accountname", StringComparison.OrdinalIgnoreCase))
+                    {
+                        // contact：走 parentcustomerid 的 Name；lead：走直属 companyname
+                        if (entityType.Equals("lead", StringComparison.OrdinalIgnoreCase)) set.Add("companyname");
+                        else set.Add("parentcustomerid");
+                    }
+                    else
+                    {
+                        set.Add(field.ToLowerInvariant());
+                    }
+                }
+            }
+            return new List<string>(set);
+        }
+
+        // 把一个 token 字段解析成字符串值；空 / 不存在返回 null（调用方据此保留 token 原文）
+        private static string ResolveFieldValue(Entity entity, string entityType, string field)
+        {
+            if (entity == null) return null;
+
+            if (field.Equals("accountname", StringComparison.OrdinalIgnoreCase))
+            {
+                if (entityType.Equals("lead", StringComparison.OrdinalIgnoreCase))
+                {
+                    return FormatAttribute(entity, "companyname");
+                }
+                // contact：用 parentcustomerid（EntityReference）自带的 Name，省一次查询
+                var er = entity.GetAttributeValue<EntityReference>("parentcustomerid");
+                return er == null ? null : (string.IsNullOrEmpty(er.Name) ? null : er.Name);
+            }
+
+            return FormatAttribute(entity, field.ToLowerInvariant());
+        }
+
+        // 按属性实际类型格式化为字符串
+        private static string FormatAttribute(Entity entity, string attr)
+        {
+            if (entity == null || !entity.Contains(attr) || entity[attr] == null) return null;
+
+            object o = entity[attr];
+            switch (o)
+            {
+                case string s:
+                    return string.IsNullOrEmpty(s) ? null : s;
+                case EntityReference er:
+                    return string.IsNullOrEmpty(er.Name) ? null : er.Name;
+                case OptionSetValue osv:
+                    return entity.FormattedValues.Contains(attr) ? entity.FormattedValues[attr] : osv.Value.ToString(CultureInfo.InvariantCulture);
+                case Money money:
+                    return money.Value.ToString(CultureInfo.InvariantCulture);
+                case bool b:
+                    return entity.FormattedValues.Contains(attr) ? entity.FormattedValues[attr] : (b ? "true" : "false");
+                case DateTime dt:
+                    return entity.FormattedValues.Contains(attr) ? entity.FormattedValues[attr] : dt.ToString("o", CultureInfo.InvariantCulture);
+                default:
+                    return entity.FormattedValues.Contains(attr) ? entity.FormattedValues[attr] : Convert.ToString(o, CultureInfo.InvariantCulture);
+            }
         }
 
         private static string SendXgateRequest(string token, string organizationId, Payload payloadObject, ITracingService tracingService)

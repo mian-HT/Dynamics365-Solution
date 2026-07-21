@@ -133,7 +133,7 @@ function _xgateWaInsertContainer(controlElement) {
             }
 
             // 拼接目标 URL，携带环境信息
-            var targetUrl = "https://smsc.xgate.com.hk/d365-auth?orgUrl=" + encodeURIComponent(orgUrl) + "&orgId=" + encodeURIComponent(orgId);
+            var targetUrl = "https://dms4-uat.xgatecorp.com/dms4/whatsapp/login?orgUrl=" + encodeURIComponent(orgUrl) + "&orgId=" + encodeURIComponent(orgId);
 
             // 简单的在新标签页中打开链接
             window.open(targetUrl, "_blank");

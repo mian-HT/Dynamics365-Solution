@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("XgateWhatsAppChannel.Plugins")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2fdc71dbeacdbfb69a75d758c1a1fb04b36d117d")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+96604c2cbc6983ca99e7bc3a95e788b9a05f1669")]
 [assembly: System.Reflection.AssemblyProductAttribute("XgateWhatsAppChannel.Plugins")]
 [assembly: System.Reflection.AssemblyTitleAttribute("XgateWhatsAppChannel.Plugins")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

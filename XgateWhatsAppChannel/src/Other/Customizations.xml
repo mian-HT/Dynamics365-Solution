@@ -62,7 +62,7 @@
         <msdyn_channeldefinitionid>702c7021-cf32-4fcd-be63-b3373f27906b</msdyn_channeldefinitionid>
       </msdyn_channeldefinitionid>
       <msdyn_description>Body Variables (Key:Value)</msdyn_description>
-      <msdyn_displayname>Body Variables</msdyn_displayname>
+      <msdyn_displayname>Template Config</msdyn_displayname>
       <msdyn_isrequired>0</msdyn_isrequired>
       <msdyn_maxlength>4000</msdyn_maxlength>
       <msdyn_name>bodyvariables</msdyn_name>

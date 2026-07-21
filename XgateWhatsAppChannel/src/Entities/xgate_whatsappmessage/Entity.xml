@@ -723,7 +723,7 @@
           <MaxLength>4000</MaxLength>
           <Length>8000</Length>
           <displaynames>
-            <displayname description="Body Variables" languagecode="1041" />
+            <displayname description="Template Config" languagecode="1041" />
           </displaynames>
           <Descriptions>
             <Description description="" languagecode="1041" />

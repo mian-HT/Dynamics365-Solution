@@ -26,8 +26,8 @@
                     <row>
                       <cell id="{ca87ff25-0ac7-4704-b0e8-f5f9ae5534e6}" locklevel="0" colspan="1" rowspan="1">
                         <labels>
-                          <label description="Body Variables" languagecode="1041" />
-                          <label description="Body Variables" languagecode="1033" />
+                          <label description="Template Config" languagecode="1041" />
+                          <label description="Template Config" languagecode="1033" />
                         </labels>
                         <control id="xgate_bodyvariables" classid="{F9A8A302-114E-466A-B582-6771B2AE0D92}" datafieldname="xgate_bodyvariables" disabled="false" uniqueid="{4d0ef6c6-dcbd-4f58-9b7c-53a80c659126}" />
                       </cell>

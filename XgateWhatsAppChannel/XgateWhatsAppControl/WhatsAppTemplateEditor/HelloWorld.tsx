@@ -23,6 +23,7 @@ interface ITemplateListItem {
 // ---- 模板详情原始结构（与 Xgate template/detail 返回对齐）----
 interface ITemplateHeader {
   type?: string;
+  text?: string;   // text 页头的原始文本（可能是纯静态，也可能含 {{n}} 变量）
   format?: string; // text | image | video | document | ...
   media?: { url?: string } | null;
   example?: { header_handle?: string[]; header_text?: string[]; variables?: string[] } | null;
@@ -53,12 +54,13 @@ interface ITemplateDetail {
 }
 
 // ---- 表单映射（对齐 ManualConfigForm 的 headerMapping / bodyMapping / buttonMapping）----
-type HeaderFormatKind = '' | 'text' | 'media' | 'other';
+type HeaderFormatKind = '' | 'text' | 'statictext' | 'media' | 'other';
 interface IHeaderInfo {
   kind: HeaderFormatKind;
   mediaFormat: string;   // image | video | document（kind=media 时有效）
   example: string;       // text header 的变量名示例
   defaultUrl: string;    // 模板自带的默认媒体 URL
+  staticText: string;    // 纯静态文本页头（kind=statictext 时用于预览展示）
 }
 interface IBodyVariable {
   name: string;     // 变量名（命名变量用名字，否则回退成序号 "1"/"2"）
@@ -146,7 +148,22 @@ interface IHelloWorldState {
   buttonInputs: Record<number, string>; // 按钮变量值（key=paramsIndex）
 }
 
-const EMPTY_HEADER: IHeaderInfo = { kind: '', mediaFormat: '', example: '', defaultUrl: '' };
+const EMPTY_HEADER: IHeaderInfo = { kind: '', mediaFormat: '', example: '', defaultUrl: '', staticText: '' };
+
+// 个性化字段清单（路线二）。用户从下拉插入 token，值原样写入复合 JSON；
+// 由 OutboundPlugin 在发送时按收件人（contact/lead）真实值替换。
+// token 语法 [[逻辑名]]，不含 {{}}，天然绕过 CIJ 动态文本校验。
+// 特殊语义键 accountname：contact→所属客户名，lead→公司名（companyname），由插件分流。
+const PERSONALIZATION_FIELDS: { label: string; token: string }[] = [
+  { label: 'Full name', token: '[[fullname]]' },
+  { label: 'First name', token: '[[firstname]]' },
+  { label: 'Last name', token: '[[lastname]]' },
+  { label: 'Email', token: '[[emailaddress1]]' },
+  { label: 'City', token: '[[address1_city]]' },
+  { label: 'Country/Region', token: '[[address1_country]]' },
+  { label: 'Salutation', token: '[[salutation]]' },
+  { label: 'Account name', token: '[[accountname]]' }
+];
 
 export class HelloWorld extends React.Component<IHelloWorldProps, IHelloWorldState> {
   // 待回填的数据（保存后重新打开时从绑定字段解析而来），在 sender/template/detail 链路里逐级消费
@@ -183,6 +200,11 @@ export class HelloWorld extends React.Component<IHelloWorldProps, IHelloWorldSta
 
   // 缓存的 COS 临时密钥（有效期内复用，过期前 60s 重新拉取）
   private cosSecret: ICosTmpKey | null = null;
+
+  // 各输入框的 DOM 引用，用于把个性化 token 插入到光标处
+  private bodyInputRefs: Record<string, HTMLInputElement | null> = {};
+  private headerInputRef: HTMLInputElement | null = null;
+  private buttonInputRefs: Record<number, HTMLInputElement | null> = {};
 
   public componentDidMount(): void {
     this.fetchSenders();
@@ -303,7 +325,7 @@ export class HelloWorld extends React.Component<IHelloWorldProps, IHelloWorldSta
   private callCustomApi(operationName: string, payloadObj: Record<string, unknown>): Promise<Record<string, unknown>> {
     const api = this.getXrmWebApi();
     if (!api) {
-      return Promise.reject(new Error('Xrm.WebApi 不可用（请在 D365 环境中运行）'));
+      return Promise.reject(new Error('Xrm.WebApi is unavailable (please run inside a D365 environment)'));
     }
     const request = this.buildRequest(operationName, JSON.stringify(payloadObj));
     return api.execute(request)
@@ -341,7 +363,7 @@ export class HelloWorld extends React.Component<IHelloWorldProps, IHelloWorldSta
         return null;
       })
       .catch((error: Error) => {
-        console.error('拉取 sender 列表失败:', error);
+        console.error('Failed to fetch sender list:', error);
         this.setState({ isLoadingSenders: false });
       });
   };
@@ -370,7 +392,7 @@ export class HelloWorld extends React.Component<IHelloWorldProps, IHelloWorldSta
         return null;
       })
       .catch((error: Error) => {
-        console.error('拉取模板列表失败:', error);
+        console.error('Failed to fetch template list:', error);
         this.setState({ isLoadingTemplates: false });
       });
   };
@@ -384,15 +406,15 @@ export class HelloWorld extends React.Component<IHelloWorldProps, IHelloWorldSta
         if (parsedData.code === 0 || !parsedData.error) {
           this.applyTemplateDetail(parsedData.data as ITemplateDetail);
         } else {
-          const errorMessage = typeof parsedData.message === 'string' ? parsedData.message : '未知错误';
-          alert(`后端接口报错: ${errorMessage}`);
+          const errorMessage = typeof parsedData.message === 'string' ? parsedData.message : 'Unknown error';
+          alert(`Backend API error: ${errorMessage}`);
           this.setState({ isLoadingVariables: false });
         }
         return null;
       })
       .catch((error: Error) => {
-        console.error('拉取模板详情失败:', error);
-        alert('拉取模板详情失败，请检查网络或插件报错日志。');
+        console.error('Failed to fetch template details:', error);
+        alert('Failed to fetch template details. Please check the network or plugin error logs.');
         this.setState({ isLoadingVariables: false });
       });
   };
@@ -448,40 +470,39 @@ export class HelloWorld extends React.Component<IHelloWorldProps, IHelloWorldSta
     if (!header || !format) return EMPTY_HEADER;
 
     if (format === 'text') {
+      // 对齐 ManualConfigForm.headerMapping：只有当 example.header_text 恰好有 1 个变量时，
+      // text 页头才需要用户输入；否则（如 hello_world 的纯静态页头）不渲染输入框，仅在预览里展示。
       const example = header.example ?? undefined;
       const headerText = example?.header_text;
       const variables = example?.variables;
-      const exampleName = headerText && headerText.length === 1 ? (variables?.[0] ?? '1') : '';
-      return { kind: 'text', mediaFormat: '', example: exampleName, defaultUrl: '' };
+      if (headerText && headerText.length === 1) {
+        const exampleName = variables?.[0] ?? '1';
+        return { kind: 'text', mediaFormat: '', example: exampleName, defaultUrl: '', staticText: header.text ?? '' };
+      }
+      return { kind: 'statictext', mediaFormat: '', example: '', defaultUrl: '', staticText: header.text ?? '' };
     }
 
     if (MEDIA_HEADER_FORMATS.has(format)) {
       const defaultUrl = header.example?.header_handle?.[0] ?? header.media?.url ?? '';
-      return { kind: 'media', mediaFormat: format, example: '', defaultUrl };
+      return { kind: 'media', mediaFormat: format, example: '', defaultUrl, staticText: '' };
     }
 
-    return { kind: 'other', mediaFormat: '', example: '', defaultUrl: '' };
+    return { kind: 'other', mediaFormat: '', example: '', defaultUrl: '', staticText: '' };
   }
 
-  // 变量个数由 body.example.body_text[0] 决定；变量名优先用 variables，否则回退序号
+  // 对齐 ManualConfigForm.bodyMapping：变量个数完全由 body.example.body_text[0] 决定；
+  // 变量名仅当 variables 数量与其一致时采用 variables，否则回退序号；无 body_text[0] 则不渲染正文字段。
   private buildBodyVariables(detail: ITemplateDetail): IBodyVariable[] {
     const example = detail?.body?.example ?? undefined;
     const bodyText = this.toStringArray(this.firstRow(example?.body_text));
+    if (bodyText.length === 0) return [];
+
     const namedVars = this.toStringArray(example?.variables);
-    const fallbackNames = this.toStringArray(detail?.variables?.body?.variables);
-
-    if (bodyText.length > 0) {
-      const names = namedVars.length === bodyText.length
-        ? namedVars
-        : (fallbackNames.length === bodyText.length ? fallbackNames : []);
-      return bodyText.map((val, k) => ({
-        name: names.length === bodyText.length ? names[k] : String(k + 1),
-        example: val
-      }));
-    }
-
-    const names = namedVars.length > 0 ? namedVars : fallbackNames;
-    return names.map((n) => ({ name: n, example: '' }));
+    const useNames = namedVars.length === bodyText.length;
+    return bodyText.map((val, k) => ({
+      name: useNames ? namedVars[k] : String(k + 1),
+      example: val
+    }));
   }
 
   // 对齐 ManualConfigForm 的 buttonMapping + useHandleButtonsParams
@@ -644,14 +665,14 @@ export class HelloWorld extends React.Component<IHelloWorldProps, IHelloWorldSta
 
     // 大小校验
     if (file.size > cfg.size * 1024 * 1024) {
-      this.setState({ uploadError: `文件超过大小限制（最大 ${cfg.size}MB）` });
+      this.setState({ uploadError: `File exceeds the size limit (max ${cfg.size}MB)` });
       return;
     }
     // 扩展名校验
     const ext = (file.name.split('.').pop() ?? '').toLowerCase();
     const accepts = cfg.accept.split(',').map(s => s.trim().toLowerCase());
     if (!accepts.includes('.' + ext)) {
-      this.setState({ uploadError: `不支持的文件格式（仅支持 ${cfg.accept}）` });
+      this.setState({ uploadError: `Unsupported file format (only ${cfg.accept} allowed)` });
       return;
     }
 
@@ -723,8 +744,8 @@ export class HelloWorld extends React.Component<IHelloWorldProps, IHelloWorldSta
         return null;
       })
       .catch((error: Error) => {
-        console.error('COS 上传失败:', error);
-        this.setState({ isUploadingMedia: false, uploadError: error.message || '上传失败，请重试' });
+        console.error('COS upload failed:', error);
+        this.setState({ isUploadingMedia: false, uploadError: error.message || 'Upload failed, please try again' });
       });
   };
 
@@ -738,7 +759,7 @@ export class HelloWorld extends React.Component<IHelloWorldProps, IHelloWorldSta
     return this.callCustomApi('xgate_GetCosTmpKeyCustomApi', {}).then((parsed) => {
       const data = parsed as unknown as ICosTmpKey;
       if (!data?.bucket || !data?.region || !data?.expiredTime || !data?.tmpSecretId || !data?.tmpSecretKey || !data?.sessionToken) {
-        const msg = typeof parsed.message === 'string' ? parsed.message : '获取 COS 临时密钥失败（响应缺少必要字段）';
+        const msg = typeof parsed.message === 'string' ? parsed.message : 'Failed to get COS temporary credentials (response is missing required fields)';
         throw new Error(msg);
       }
       this.cosSecret = data;
@@ -767,6 +788,77 @@ export class HelloWorld extends React.Component<IHelloWorldProps, IHelloWorldSta
     this.setState(prev => ({ buttonInputs: { ...prev.buttonInputs, [paramsIndex]: value } }), () => this.buildAndEmit());
   };
 
+  // ============ 个性化字段插入 ============
+
+  // 把 token 插入到输入框当前光标处（拿不到光标位置则追加到末尾），并把光标移动到插入内容之后
+  private insertAtCaret(el: HTMLInputElement | null, current: string, token: string): { next: string; caret: number } {
+    if (el && typeof el.selectionStart === 'number') {
+      const start = el.selectionStart;
+      const end = typeof el.selectionEnd === 'number' ? el.selectionEnd : start;
+      const next = current.slice(0, start) + token + current.slice(end);
+      return { next, caret: start + token.length };
+    }
+    return { next: current + token, caret: (current + token).length };
+  }
+
+  private restoreCaret(el: HTMLInputElement | null, caret: number): void {
+    if (!el) return;
+    try {
+      el.focus();
+      el.setSelectionRange(caret, caret);
+    } catch {
+      /* 某些环境不支持 setSelectionRange，忽略即可 */
+    }
+  }
+
+  private insertBodyToken = (name: string, token: string): void => {
+    const el = this.bodyInputRefs[name];
+    const { next, caret } = this.insertAtCaret(el, this.state.bodyInputs[name] || '', token);
+    this.setState(prev => ({ bodyInputs: { ...prev.bodyInputs, [name]: next } }), () => {
+      this.buildAndEmit();
+      this.restoreCaret(this.bodyInputRefs[name], caret);
+    });
+  };
+
+  private insertHeaderToken = (token: string): void => {
+    const el = this.headerInputRef;
+    const { next, caret } = this.insertAtCaret(el, this.state.headerText, token);
+    this.setState({ headerText: next }, () => {
+      this.buildAndEmit();
+      this.restoreCaret(this.headerInputRef, caret);
+    });
+  };
+
+  private insertButtonToken = (paramsIndex: number, token: string): void => {
+    const el = this.buttonInputRefs[paramsIndex];
+    const { next, caret } = this.insertAtCaret(el, this.state.buttonInputs[paramsIndex] || '', token);
+    this.setState(prev => ({ buttonInputs: { ...prev.buttonInputs, [paramsIndex]: next } }), () => {
+      this.buildAndEmit();
+      this.restoreCaret(this.buttonInputRefs[paramsIndex], caret);
+    });
+  };
+
+  // 个性化字段下拉：选中即插入对应 token，随后重置回占位项
+  private renderFieldPicker(onInsert: (token: string) => void): React.ReactNode {
+    return (
+      <select
+        value=""
+        title="Insert personalization field (replaced with the recipient's real value at send time)"
+        style={styles.fieldPicker}
+        onChange={(e) => {
+          const token = e.target.value;
+          e.target.value = '';
+          if (token) onInsert(token);
+        }}
+      >
+        <option value="">Insert field…</option>
+        {PERSONALIZATION_FIELDS.map((f) => (
+          <option key={f.token} value={f.token}>{f.label}</option>
+        ))}
+      </select>
+    );
+  }
+
   // ============ 渲染 ============
 
   public render(): React.ReactNode {
@@ -777,14 +869,14 @@ export class HelloWorld extends React.Component<IHelloWorldProps, IHelloWorldSta
         {/* 顶部：发件号 + 模板选择 */}
         <div style={styles.selectRow}>
           <div style={styles.field}>
-            <label style={styles.label}>发件号 (Sender)</label>
+            <label style={styles.label}>Sender</label>
             <select
               value={selectedSenderId}
               onChange={(e) => this.handleSenderChange(e.target.value)}
               disabled={isLoadingSenders}
               style={styles.select}
             >
-              <option value="">{isLoadingSenders ? '发件号加载中...' : '请选择发件号'}</option>
+              <option value="">{isLoadingSenders ? 'Loading senders...' : 'Select a sender'}</option>
               {senders.map((s) => (
                 <option key={s.id} value={s.id}>
                   {s.displayName ? `${s.displayName} (${s.senderNumber})` : s.senderNumber}
@@ -793,7 +885,7 @@ export class HelloWorld extends React.Component<IHelloWorldProps, IHelloWorldSta
             </select>
           </div>
           <div style={styles.field}>
-            <label style={styles.label}>模板 (Template)</label>
+            <label style={styles.label}>Template</label>
             <select
               value={selectedTemplateId}
               onChange={(e) => this.handleTemplateChange(e.target.value)}
@@ -801,7 +893,7 @@ export class HelloWorld extends React.Component<IHelloWorldProps, IHelloWorldSta
               style={styles.select}
             >
               <option value="">
-                {!selectedSenderId ? '请先选择发件号' : (isLoadingTemplates ? '模板加载中...' : '请选择模板')}
+                {!selectedSenderId ? 'Select a sender first' : (isLoadingTemplates ? 'Loading templates...' : 'Select a template')}
               </option>
               {templates.map((t) => (
                 <option key={t.id} value={t.id}>{t.name}（{t.id}{t.language ? ` · ${t.language}` : ''}）</option>
@@ -819,7 +911,7 @@ export class HelloWorld extends React.Component<IHelloWorldProps, IHelloWorldSta
   private renderMain(): React.ReactNode {
     const { selectedTemplateId, isLoadingVariables, detail } = this.state;
     if (!selectedTemplateId) return null;
-    if (isLoadingVariables) return <div style={styles.hint}>模板详情加载中...</div>;
+    if (isLoadingVariables) return <div style={styles.hint}>Loading template details...</div>;
     if (!detail) return null;
 
     return (
@@ -830,7 +922,7 @@ export class HelloWorld extends React.Component<IHelloWorldProps, IHelloWorldSta
           {this.renderButtonFields()}
         </div>
         <div style={styles.previewContainer}>
-          <label style={styles.previewLabel}>预览 (Preview)</label>
+          <label style={styles.previewLabel}>Preview</label>
           {this.renderPreview()}
         </div>
       </div>
@@ -842,16 +934,24 @@ export class HelloWorld extends React.Component<IHelloWorldProps, IHelloWorldSta
     if (headerInfo.kind === 'text') {
       return (
         <div style={styles.formItem}>
-          <label style={styles.itemLabel}>页头自定义字段 (Header)</label>
-          <input
-            type="text"
-            value={headerText}
-            onChange={(e) => this.handleHeaderTextChange(e.target.value)}
-            placeholder={`{{${headerInfo.example || '1'}}}`}
-            style={styles.input}
-          />
+          <label style={styles.itemLabel}>Header variable</label>
+          <div style={styles.varRow}>
+            <input
+              ref={(el) => { this.headerInputRef = el; }}
+              type="text"
+              value={headerText}
+              onChange={(e) => this.handleHeaderTextChange(e.target.value)}
+              placeholder={`{{${headerInfo.example || '1'}}}`}
+              style={styles.input}
+            />
+            {this.renderFieldPicker((token) => this.insertHeaderToken(token))}
+          </div>
         </div>
       );
+    }
+    // 纯静态文本页头：内容固定、无变量，无需用户输入，只在右侧预览里展示
+    if (headerInfo.kind === 'statictext') {
+      return null;
     }
     if (headerInfo.kind === 'media') {
       return this.renderMediaUploader();
@@ -859,8 +959,8 @@ export class HelloWorld extends React.Component<IHelloWorldProps, IHelloWorldSta
     if (headerInfo.kind === 'other') {
       return (
         <div style={styles.formItem}>
-          <label style={styles.itemLabel}>页头 (Header)</label>
-          <div style={styles.unsupported}>⚠ 暂不支持的页头类型</div>
+          <label style={styles.itemLabel}>Header</label>
+          <div style={styles.unsupported}>⚠ Unsupported header type</div>
         </div>
       );
     }
@@ -873,7 +973,7 @@ export class HelloWorld extends React.Component<IHelloWorldProps, IHelloWorldSta
     const cfg = MEDIA_UPLOAD_MAP[headerInfo.mediaFormat] ?? { accept: '', size: 0, type: '' };
     return (
       <div style={styles.formItem}>
-        <label style={styles.itemLabel}>页头媒体 (Header · {headerInfo.mediaFormat})</label>
+        <label style={styles.itemLabel}>Header media ({headerInfo.mediaFormat})</label>
 
         {headerInfo.mediaFormat === 'image' && headerMediaPreviewUrl && (
           <img src={headerMediaPreviewUrl} alt="header" style={styles.mediaThumb} />
@@ -882,12 +982,12 @@ export class HelloWorld extends React.Component<IHelloWorldProps, IHelloWorldSta
         {this.resolveMediaUrl(headerMedia) && (
           <div style={styles.fileRow}>
             <span style={styles.fileName}>{headerMedia?.name ?? this.resolveMediaUrl(headerMedia)}</span>
-            <button type="button" style={styles.removeBtn} onClick={this.handleRemoveMedia} disabled={isUploadingMedia}>删除</button>
+            <button type="button" style={styles.removeBtn} onClick={this.handleRemoveMedia} disabled={isUploadingMedia}>Remove</button>
           </div>
         )}
 
         <label style={{ ...styles.uploadBtn, ...(isUploadingMedia ? styles.uploadBtnDisabled : {}) }}>
-          {isUploadingMedia ? `上传中... ${uploadProgress}%` : (this.resolveMediaUrl(headerMedia) ? '替换文件' : '上传文件')}
+          {isUploadingMedia ? `Uploading... ${uploadProgress}%` : (this.resolveMediaUrl(headerMedia) ? 'Replace file' : 'Upload file')}
           <input
             type="file"
             accept={cfg.accept}
@@ -908,7 +1008,7 @@ export class HelloWorld extends React.Component<IHelloWorldProps, IHelloWorldSta
         )}
 
         {uploadError && <div style={styles.uploadError}>{uploadError}</div>}
-        <div style={styles.subHint}>默认取模板自带媒体，可上传替换（前端直传腾讯云 COS）。{cfg.accept}，最大 {cfg.size}MB。</div>
+        <div style={styles.subHint}>Uses the built-in template media by default; you can upload a replacement (direct upload to Tencent Cloud COS). {cfg.accept}, max {cfg.size}MB.</div>
       </div>
     );
   }
@@ -918,17 +1018,19 @@ export class HelloWorld extends React.Component<IHelloWorldProps, IHelloWorldSta
     if (bodyVars.length === 0) return null;
     return (
       <div style={styles.formItem}>
-        <label style={styles.itemLabel}>正文自定义字段 (Body)</label>
+        <label style={styles.itemLabel}>Body variables</label>
         {bodyVars.map((v) => (
           <div key={v.name} style={styles.varRow}>
             <span style={styles.varTag}>{`{{${v.name}}}`}</span>
             <input
+              ref={(el) => { this.bodyInputRefs[v.name] = el; }}
               type="text"
               value={bodyInputs[v.name] || ''}
               onChange={(e) => this.handleBodyChange(v.name, e.target.value)}
-              placeholder={v.example ? `例：${v.example}` : `请输入 ${v.name}`}
+              placeholder={`Enter ${v.name}`}
               style={styles.input}
             />
+            {this.renderFieldPicker((token) => this.insertBodyToken(v.name, token))}
           </div>
         ))}
       </div>
@@ -940,17 +1042,19 @@ export class HelloWorld extends React.Component<IHelloWorldProps, IHelloWorldSta
     if (buttonInfos.length === 0) return null;
     return (
       <div style={styles.formItem}>
-        <label style={styles.itemLabel}>按钮自定义字段 (Buttons)</label>
+        <label style={styles.itemLabel}>Button variables</label>
         {buttonInfos.map((b) => (
           <div key={b.paramsIndex} style={styles.varRow}>
             <span style={styles.varTag}>{`{{${b.variableName}}}`}</span>
             <input
+              ref={(el) => { this.buttonInputRefs[b.paramsIndex] = el; }}
               type="text"
               value={buttonInputs[b.paramsIndex] || ''}
               onChange={(e) => this.handleButtonChange(b.paramsIndex, e.target.value)}
-              placeholder={`请输入 ${b.variableName}`}
+              placeholder={`Enter ${b.variableName}`}
               style={styles.input}
             />
+            {this.renderFieldPicker((token) => this.insertButtonToken(b.paramsIndex, token))}
           </div>
         ))}
       </div>
@@ -975,8 +1079,8 @@ export class HelloWorld extends React.Component<IHelloWorldProps, IHelloWorldSta
           {headerInfo.kind === 'media' && headerInfo.mediaFormat !== 'image' && (
             <div style={styles.bubbleMediaBox}>📎 {headerInfo.mediaFormat.toUpperCase()}</div>
           )}
-          {/* header 文本预览 */}
-          {headerInfo.kind === 'text' && (
+          {/* header 文本预览（含带变量的 text 与纯静态 statictext） */}
+          {(headerInfo.kind === 'text' || headerInfo.kind === 'statictext') && (
             <div style={styles.bubbleHeaderText}>{this.previewHeaderText()}</div>
           )}
           {/* body */}
@@ -998,6 +1102,8 @@ export class HelloWorld extends React.Component<IHelloWorldProps, IHelloWorldSta
 
   private previewHeaderText(): string {
     const { headerText, headerInfo } = this.state;
+    // 纯静态页头：直接展示模板自带的固定文本
+    if (headerInfo.kind === 'statictext') return headerInfo.staticText;
     if (headerText) return headerText;
     return headerInfo.example ? `{{${headerInfo.example}}}` : '';
   }
@@ -1005,10 +1111,12 @@ export class HelloWorld extends React.Component<IHelloWorldProps, IHelloWorldSta
   private previewBodyText(): string {
     const { detail, bodyVars, bodyInputs } = this.state;
     let text = detail?.body?.text ?? '';
-    // 把 {{1}}/{{2}} 顺序替换成用户输入（无输入则回退成示例/占位）
+    // 对齐 ContentTemplate.template2HTML：example 仅用于数变量个数，不作为预览显示内容。
+    // 未输入的变量在预览里显示占位 {{name}}，只有用户真正填了值才替换成实际内容。
     for (let i = 0; i < bodyVars.length; i++) {
       const v = bodyVars[i];
-      const value = bodyInputs[v.name] || v.example || `{{${v.name}}}`;
+      const input = bodyInputs[v.name];
+      const value = input && input.length > 0 ? input : `{{${v.name}}}`;
       text = text.split(`{{${i + 1}}}`).join(value);
     }
     return text;
@@ -1035,6 +1143,7 @@ const styles: Record<string, React.CSSProperties> = {
   input: { padding: '8px', width: '100%', boxSizing: 'border-box', borderRadius: '4px', border: '1px solid #ccc' },
   varRow: { display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' },
   varTag: { flex: '0 0 auto', color: '#165DFF', background: '#E8F3FF', padding: '3px 8px', borderRadius: '3px', fontSize: '13px', whiteSpace: 'nowrap' },
+  fieldPicker: { flex: '0 0 auto', padding: '6px', borderRadius: '4px', border: '1px solid #ccc', background: '#fff', color: '#4e5969', fontSize: '13px', cursor: 'pointer', maxWidth: '110px' },
   mediaThumb: { width: '100%', maxHeight: '160px', objectFit: 'cover', borderRadius: '6px', marginBottom: '8px' },
   unsupported: { color: '#F53F3F', background: '#FFECE8', padding: '8px', borderRadius: '4px' },
   // 媒体上传
