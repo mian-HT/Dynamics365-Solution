@@ -245,7 +245,7 @@ namespace XgateWhatsAppChannel.Plugins
             // --- 解析 body：PCF 输出的复合 JSON { senderId, templateId, variables }，并兼容旧格式 ---
             ResolveBody(rawBody, out string senderIdFromBody, out string templateIdFromBody, out string varsJson);
             // senderId / templateId 优先取 PCF 里的值，取不到再回退到 message part
-            string senderId = !string.IsNullOrWhiteSpace(senderIdFromBody) ? senderIdFromBody : payloadObject.From;
+            string senderId = senderIdFromBody;
             string templateIdStr = !string.IsNullOrWhiteSpace(templateIdFromBody) ? templateIdFromBody : partTemplateId;
 
             int templateId = 0;
@@ -274,6 +274,7 @@ namespace XgateWhatsAppChannel.Plugins
             string postData = $@"{{
                 ""requestId"": ""{payloadObject.RequestId}"",
                 ""senderId"": {long.Parse(senderId)},
+                ""from"": ""{payloadObject.From}"",
                 ""receiverPhoneNumber"": ""{payloadObject.To}"",
                 ""templateId"": {templateId},
                 {headerPart}

@@ -146,6 +146,8 @@ interface IHelloWorldState {
   uploadError: string;                 // 媒体上传错误提示
   bodyInputs: Record<string, string>;  // body 变量值（key=变量名）
   buttonInputs: Record<number, string>; // 按钮变量值（key=paramsIndex）
+
+  openPickerId: string | null;         // 当前展开的个性化字段选择器 id（null 表示全部收起）
 }
 
 const EMPTY_HEADER: IHeaderInfo = { kind: '', mediaFormat: '', example: '', defaultUrl: '', staticText: '' };
@@ -194,7 +196,8 @@ export class HelloWorld extends React.Component<IHelloWorldProps, IHelloWorldSta
       uploadProgress: 0,
       uploadError: '',
       bodyInputs: {},
-      buttonInputs: {}
+      buttonInputs: {},
+      openPickerId: null
     };
   }
 
@@ -210,6 +213,8 @@ export class HelloWorld extends React.Component<IHelloWorldProps, IHelloWorldSta
     this.fetchSenders();
     // 保存后重新打开：绑定值此刻可能已就绪；若尚未就绪，会稍后在 componentDidUpdate 里补触发
     this.maybeRestore(this.props.name);
+    // 点击个性化选择器以外的区域时收起菜单
+    document.addEventListener('mousedown', this.handleDocumentMouseDown);
   }
 
   public componentDidUpdate(prevProps: IHelloWorldProps): void {
@@ -217,6 +222,22 @@ export class HelloWorld extends React.Component<IHelloWorldProps, IHelloWorldSta
       this.maybeRestore(this.props.name);
     }
   }
+
+  public componentWillUnmount(): void {
+    document.removeEventListener('mousedown', this.handleDocumentMouseDown);
+  }
+
+  // 点击选择器（含图标按钮与弹出菜单）以外区域时收起
+  private handleDocumentMouseDown = (e: MouseEvent): void => {
+    if (this.state.openPickerId === null) return;
+    const target = e.target as HTMLElement | null;
+    if (target?.closest('[data-personalization-picker]')) return;
+    this.setState({ openPickerId: null });
+  };
+
+  private togglePicker = (pickerId: string): void => {
+    this.setState(prev => ({ openPickerId: prev.openPickerId === pickerId ? null : pickerId }));
+  };
 
   // 只在首次拿到非空绑定值时触发一次回填，避免覆盖用户后续的编辑
   private maybeRestore(raw?: string): void {
@@ -838,24 +859,52 @@ export class HelloWorld extends React.Component<IHelloWorldProps, IHelloWorldSta
     });
   };
 
-  // 个性化字段下拉：选中即插入对应 token，随后重置回占位项
-  private renderFieldPicker(onInsert: (token: string) => void): React.ReactNode {
+  // 个性化字段选择器：点击图标按钮弹出字段菜单，选中即插入对应 token 并收起
+  private renderFieldPicker(pickerId: string, onInsert: (token: string) => void): React.ReactNode {
+    const isOpen = this.state.openPickerId === pickerId;
     return (
-      <select
-        value=""
-        title="Insert personalization field (replaced with the recipient's real value at send time)"
-        style={styles.fieldPicker}
-        onChange={(e) => {
-          const token = e.target.value;
-          e.target.value = '';
-          if (token) onInsert(token);
-        }}
-      >
-        <option value="">Personalization</option>
-        {PERSONALIZATION_FIELDS.map((f) => (
-          <option key={f.token} value={f.token}>{f.label}</option>
-        ))}
-      </select>
+      <div data-personalization-picker="1" style={styles.pickerWrap}>
+        <button
+          type="button"
+          aria-haspopup="true"
+          aria-expanded={isOpen}
+          title="Insert personalization field (replaced with the recipient's real value at send time)"
+          style={{ ...styles.pickerBtn, ...(isOpen ? styles.pickerBtnActive : {}) }}
+          onClick={() => this.togglePicker(pickerId)}
+        >
+          {this.renderPersonalizationIcon()}
+        </button>
+        {isOpen && (
+          <div style={styles.pickerMenu} role="menu">
+            {PERSONALIZATION_FIELDS.map((f) => (
+              <button
+                key={f.token}
+                type="button"
+                role="menuitem"
+                style={styles.pickerMenuItem}
+                onClick={() => {
+                  onInsert(f.token);
+                  this.setState({ openPickerId: null });
+                }}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // 个性化图标（人物 + 动态内容箭头），对齐图三样式
+  private renderPersonalizationIcon(): React.ReactNode {
+    return (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M9.5 11.5a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" stroke="currentColor" strokeWidth="1.5" />
+        <path d="M2.5 20.5a7 7 0 0 1 14 0" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <path d="M16.2 3.4c2 -.9 4.3 0 5.1 2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <path d="M21.6 3 21.4 5.9 18.6 5.4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
     );
   }
 
@@ -944,7 +993,7 @@ export class HelloWorld extends React.Component<IHelloWorldProps, IHelloWorldSta
               placeholder={`{{${headerInfo.example || '1'}}}`}
               style={styles.input}
             />
-            {this.renderFieldPicker((token) => this.insertHeaderToken(token))}
+            {this.renderFieldPicker('header', (token) => this.insertHeaderToken(token))}
           </div>
         </div>
       );
@@ -1008,7 +1057,7 @@ export class HelloWorld extends React.Component<IHelloWorldProps, IHelloWorldSta
         )}
 
         {uploadError && <div style={styles.uploadError}>{uploadError}</div>}
-        <div style={styles.subHint}>Uses the built-in template media by default; you can upload a replacement (direct upload to Tencent Cloud COS). {cfg.accept}, max {cfg.size}MB.</div>
+        <div style={styles.subHint}>Uses the built-in template media by default; you can upload a replacement. {cfg.accept}, max {cfg.size}MB.</div>
       </div>
     );
   }
@@ -1030,7 +1079,7 @@ export class HelloWorld extends React.Component<IHelloWorldProps, IHelloWorldSta
               placeholder={`Enter ${v.name}`}
               style={styles.input}
             />
-            {this.renderFieldPicker((token) => this.insertBodyToken(v.name, token))}
+            {this.renderFieldPicker(`body:${v.name}`, (token) => this.insertBodyToken(v.name, token))}
           </div>
         ))}
       </div>
@@ -1054,7 +1103,7 @@ export class HelloWorld extends React.Component<IHelloWorldProps, IHelloWorldSta
               placeholder={`Enter ${b.variableName}`}
               style={styles.input}
             />
-            {this.renderFieldPicker((token) => this.insertButtonToken(b.paramsIndex, token))}
+            {this.renderFieldPicker(`button:${b.paramsIndex}`, (token) => this.insertButtonToken(b.paramsIndex, token))}
           </div>
         ))}
       </div>
@@ -1143,7 +1192,12 @@ const styles: Record<string, React.CSSProperties> = {
   input: { padding: '8px', width: '100%', boxSizing: 'border-box', borderRadius: '4px', border: '1px solid #ccc' },
   varRow: { display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' },
   varTag: { flex: '0 0 auto', color: '#165DFF', background: '#E8F3FF', padding: '3px 8px', borderRadius: '3px', fontSize: '13px', whiteSpace: 'nowrap' },
-  fieldPicker: { flex: '0 0 auto', padding: '6px', borderRadius: '4px', border: '1px solid #ccc', background: '#fff', color: '#4e5969', fontSize: '13px', cursor: 'pointer', maxWidth: '110px' },
+  // 个性化字段选择器：图标按钮 + 弹出菜单
+  pickerWrap: { flex: '0 0 auto', position: 'relative', display: 'inline-flex' },
+  pickerBtn: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '28px', height: '28px', padding: 0, border: '1px solid transparent', borderRadius: '4px', background: 'transparent', color: '#4e5969', cursor: 'pointer' },
+  pickerBtnActive: { background: '#E8F3FF', borderColor: '#94BFFF', color: '#165DFF' },
+  pickerMenu: { position: 'absolute', top: 'calc(100% + 4px)', right: 0, zIndex: 20, minWidth: '160px', background: '#fff', border: '1px solid #E5E6EB', borderRadius: '6px', boxShadow: '0 4px 12px rgba(0,0,0,0.12)', padding: '4px', display: 'flex', flexDirection: 'column' },
+  pickerMenuItem: { textAlign: 'left', padding: '8px 10px', border: 'none', background: 'transparent', color: '#1d2129', fontSize: '13px', borderRadius: '4px', cursor: 'pointer', whiteSpace: 'nowrap' },
   mediaThumb: { width: '100%', maxHeight: '160px', objectFit: 'cover', borderRadius: '6px', marginBottom: '8px' },
   unsupported: { color: '#F53F3F', background: '#FFECE8', padding: '8px', borderRadius: '4px' },
   // 媒体上传
