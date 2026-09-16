@@ -131,7 +131,9 @@ function _xgateInsertContainer(controlElement) {
             }
             
             // 拼接目标 URL，携带环境信息
-            var targetUrl = "https://dms4-uat.xgatecorp.com/dms4/smsc/login?orgUrl=" + encodeURIComponent(orgUrl) + "&orgId=" + encodeURIComponent(orgId);
+            var clientId = "29b7967d-409b-437c-b5c3-36ce0cdbc186";
+            var redirectUri = "https://connector-api-uat.xgatecorp.com/crm/report/api/consent/callback";
+            var targetUrl = "https://console-uat.xgate.com/embed/d365?parentOrigin=" + encodeURIComponent(orgUrl) + "&orgId=" + encodeURIComponent(orgId) + "&client_id=" + encodeURIComponent(clientId) + "&redirect_uri=" + encodeURIComponent(redirectUri);
             
             // 简单的在新标签页中打开链接
             window.open(targetUrl, "_blank");
