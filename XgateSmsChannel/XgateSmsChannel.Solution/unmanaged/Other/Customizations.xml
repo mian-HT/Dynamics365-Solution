@@ -33,6 +33,23 @@
       <statecode>0</statecode>
       <statuscode>1</statuscode>
     </msdyn_channeldefinition>
+    <msdyn_channeldefinition msdyn_channeldefinitionid="2b549ccd-39b3-489e-8a97-d47ac3fd4d1c">
+      <iscustomizable>1</iscustomizable>
+      <msdyn_channeldefinitionexternalentity>xgate_xgatemmschannelinstance</msdyn_channeldefinitionexternalentity>
+      <msdyn_channeldefinitionexternalformid>3f8e422e-90a7-4f42-ae10-42844c850a45</msdyn_channeldefinitionexternalformid>
+      <msdyn_channeltype>Custom</msdyn_channeltype>
+      <msdyn_description>Xgate MMS channel (provider endpoint pending).</msdyn_description>
+      <msdyn_displayname>Xgate MMS channel</msdyn_displayname>
+      <msdyn_hasdeliveryreceipt>0</msdyn_hasdeliveryreceipt>
+      <msdyn_hasinbound>0</msdyn_hasinbound>
+      <msdyn_outboundendpointurltemplate>/xgate_OutboundMmsCustomApi</msdyn_outboundendpointurltemplate>
+      <msdyn_specialconsentrequired>0</msdyn_specialconsentrequired>
+      <msdyn_supportsaccount>0</msdyn_supportsaccount>
+      <msdyn_supportsattachment>0</msdyn_supportsattachment>
+      <msdyn_supportsbinary>0</msdyn_supportsbinary>
+      <statecode>0</statecode>
+      <statuscode>1</statuscode>
+    </msdyn_channeldefinition>
   </msdyn_channeldefinitions>
   <msdyn_channelmessageparts>
     <msdyn_channelmessagepart msdyn_channelmessagepartid="de4e1a4b-086a-4090-b995-8c11c427c090">
@@ -45,6 +62,20 @@
       <msdyn_isrequired>1</msdyn_isrequired>
       <msdyn_maxlength>1000</msdyn_maxlength>
       <msdyn_name>text</msdyn_name>
+      <msdyn_type>192350000</msdyn_type>
+      <statecode>0</statecode>
+      <statuscode>1</statuscode>
+    </msdyn_channelmessagepart>
+    <msdyn_channelmessagepart msdyn_channelmessagepartid="93e9366a-1a03-4f69-97e9-b52ab4c4417c">
+      <iscustomizable>1</iscustomizable>
+      <msdyn_channeldefinitionid>
+        <msdyn_channeldefinitionid>2b549ccd-39b3-489e-8a97-d47ac3fd4d1c</msdyn_channeldefinitionid>
+      </msdyn_channeldefinitionid>
+      <msdyn_description>MMS content JSON (PCF placeholder).</msdyn_description>
+      <msdyn_displayname>MMS content</msdyn_displayname>
+      <msdyn_isrequired>1</msdyn_isrequired>
+      <msdyn_maxlength>4000</msdyn_maxlength>
+      <msdyn_name>content</msdyn_name>
       <msdyn_type>192350000</msdyn_type>
       <statecode>0</statecode>
       <statuscode>1</statuscode>

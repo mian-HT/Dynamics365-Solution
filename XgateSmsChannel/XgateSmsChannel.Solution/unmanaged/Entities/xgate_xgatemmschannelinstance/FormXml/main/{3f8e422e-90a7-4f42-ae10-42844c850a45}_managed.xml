@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<forms xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <systemform>
+    <formid>{3f8e422e-90a7-4f42-ae10-42844c850a45}</formid>
+    <IntroducedVersion>1.0.0.0</IntroducedVersion>
+    <FormPresentation>1</FormPresentation>
+    <FormActivationState>1</FormActivationState>
+    <form headerdensity="HighWithControls">
+      <tabs>
+        <tab verticallayout="true" id="{ed45df4e-c61c-455b-86ac-4ec7a94edac2}" IsUserDefined="1">
+          <labels>
+            <label description="General" languagecode="1033" />
+          </labels>
+          <columns>
+            <column width="100%">
+              <sections>
+                <section showlabel="false" showbar="false" IsUserDefined="0" id="{e9ed1c09-3ae3-46cb-b432-f1ecd0e6920a}">
+                  <labels>
+                    <label description="" languagecode="1033" />
+                  </labels>
+                  <rows>
+                    <row>
+                      <cell id="{000a7ee0-511a-302e-7bd9-2a995273bd8b}" showlabel="true" locklevel="0">
+                        <labels>
+                          <label description="AccountId" languagecode="1033" />
+                        </labels>
+                        <control id="xgate_accountid" classid="{4273EDBD-AC1D-40d3-9FB2-095C621B552D}" datafieldname="xgate_accountid" disabled="false" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{22dce693-1522-0aba-de49-b0a6561b3b12}" showlabel="true" locklevel="0">
+                        <labels>
+                          <label description="Account secret" languagecode="1033" />
+                        </labels>
+                        <control id="xgate_accountsecret" classid="{4273EDBD-AC1D-40d3-9FB2-095C621B552D}" datafieldname="xgate_accountsecret" disabled="false" />
+                      </cell>
+                    </row>
+                  </rows>
+                </section>
+                <section name="xgate_account_section" id="b327f080-bbea-4fee-808b-1cd5b073c374" IsUserDefined="0" locklevel="0" showlabel="true" showbar="false" layout="varwidth" celllabelalignment="Left" celllabelposition="Left" columns="1" labelwidth="115">
+                  <labels>
+                    <label description="To create AccountId and AccountSecret" languagecode="1033" />
+                  </labels>
+                  <rows>
+                    <row />
+                  </rows>
+                </section>
+              </sections>
+            </column>
+          </columns>
+        </tab>
+      </tabs>
+      <Navigation>
+        <NavBar />
+        <NavBarAreas>
+          <NavBarArea Id="Info">
+            <Titles>
+              <Title LCID="1033" Text="Common" />
+            </Titles>
+          </NavBarArea>
+          <NavBarArea Id="Sales">
+            <Titles>
+              <Title LCID="1033" Text="Sales" />
+            </Titles>
+          </NavBarArea>
+          <NavBarArea Id="Service">
+            <Titles>
+              <Title LCID="1033" Text="Service" />
+            </Titles>
+          </NavBarArea>
+          <NavBarArea Id="Marketing">
+            <Titles>
+              <Title LCID="1033" Text="Marketing" />
+            </Titles>
+          </NavBarArea>
+          <NavBarArea Id="ProcessCenter">
+            <Titles>
+              <Title LCID="1033" Text="Process Sessions" />
+            </Titles>
+          </NavBarArea>
+        </NavBarAreas>
+      </Navigation>
+      <header id="{83507da8-cbcb-4f0b-8d94-b863124f8d38}" celllabelposition="Top" columns="111" labelwidth="115" celllabelalignment="Left">
+        <rows>
+          <row>
+            <cell id="{8342c00e-788e-4c67-ae6a-ae100af67f36}" showlabel="false">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+            <cell id="{0e418809-afea-48e7-aa22-13aa199438bc}" showlabel="false">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+            <cell id="{95621307-dc89-452c-bbb1-698e41e7d06b}" showlabel="false">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+          </row>
+        </rows>
+      </header>
+      <footer id="{0ba7727f-50c7-40df-81f2-91ae288e2665}" celllabelposition="Top" columns="111" labelwidth="115" celllabelalignment="Left">
+        <rows>
+          <row>
+            <cell id="{ea65402c-983c-4ace-97e5-df6e0219760d}" showlabel="false">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+            <cell id="{0c568381-8165-4d94-80c1-34233c5438e9}" showlabel="false">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+            <cell id="{f1f28bcd-ad4e-41b0-921d-a6fb9f26b371}" showlabel="false">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+          </row>
+        </rows>
+      </footer>
+      <DisplayConditions Order="0" FallbackForm="true">
+        <Everyone />
+      </DisplayConditions>
+      <formLibraries>
+        <Library name="xgate_credentialHelper.js" libraryUniqueId="{0e99e092-5508-48d7-9e3d-ec21d63dd20b}" />
+      </formLibraries>
+      <events>
+        <event name="onload" application="false" active="false">
+          <Handlers>
+            <Handler functionName="xgateCredentialHelper" libraryName="xgate_credentialHelper.js" handlerUniqueId="{25663b7c-6649-4cbd-83d1-b8bf92156b98}" enabled="true" parameters="" passExecutionContext="true" />
+          </Handlers>
+        </event>
+        <event name="onchange" application="false" active="false" attribute="xgate_accountid">
+          <Handlers>
+            <Handler functionName="xgateCredentialHelper" libraryName="xgate_credentialHelper.js" handlerUniqueId="{6eab4f90-1fc2-418a-b36c-9bd6d7de0969}" enabled="true" parameters="" passExecutionContext="true" />
+          </Handlers>
+        </event>
+      </events>
+    </form>
+    <IsCustomizable>0</IsCustomizable>
+    <CanBeDeleted>0</CanBeDeleted>
+    <LocalizedNames>
+      <LocalizedName description="Information" languagecode="1033" />
+    </LocalizedNames>
+    <Descriptions>
+      <Description description="A form for this entity." languagecode="1033" />
+    </Descriptions>
+  </systemform>
+</forms>

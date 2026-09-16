@@ -1,0 +1,18 @@
+<customapi uniquename="xgate_OutboundMmsCustomApi">
+  <allowedcustomprocessingsteptype>0</allowedcustomprocessingsteptype>
+  <bindingtype>0</bindingtype>
+  <description default="Outbound MMS custom API placeholder">
+    <label description="Outbound MMS custom API placeholder" languagecode="1033" />
+  </description>
+  <displayname default="OutboundMmsCustomApi">
+    <label description="OutboundMmsCustomApi" languagecode="1033" />
+  </displayname>
+  <iscustomizable>0</iscustomizable>
+  <isfunction>0</isfunction>
+  <isprivate>0</isprivate>
+  <name>OutboundMmsCustomApi</name>
+  <plugintypeid>
+    <plugintypeexportkey>f2a1cabf-8098-4f23-a631-9f3f428f85b8</plugintypeexportkey>
+  </plugintypeid>
+  <workflowsdkstepenabled>0</workflowsdkstepenabled>
+</customapi>
