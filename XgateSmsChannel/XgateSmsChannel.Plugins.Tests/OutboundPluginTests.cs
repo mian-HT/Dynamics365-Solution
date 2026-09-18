@@ -33,7 +33,7 @@ namespace XgateSmsChannel.Plugins.Tests
             ctx.SetPayload(payload);
 
             var handler = BuildHttpHandler(
-                sendStatus: HttpStatusCode.OK, sendBody: "{\"CountOfStatus\":{\"SUCCESS\":1,\"FAILED\":0},\"ReceiveInfo\":[{\"MessageId\":\"MSG-REAL-1\"}]}");
+                sendStatus: HttpStatusCode.OK, sendBody: SendBody("MSG-REAL-1"));
 
             new OutboundPlugin(handler.Object).Execute(ctx.ServiceProvider.Object);
 
@@ -54,7 +54,7 @@ namespace XgateSmsChannel.Plugins.Tests
             ctx.SetPayload(BuildPayloadJson(channelInstanceId: string.Empty, requestId: Guid.NewGuid().ToString()));
 
             var handler = BuildHttpHandler(
-                sendStatus: HttpStatusCode.OK, sendBody: "{\"CountOfStatus\":{\"SUCCESS\":1,\"FAILED\":0},\"ReceiveInfo\":[{\"MessageId\":\"MSG-FB-9\"}]}");
+                sendStatus: HttpStatusCode.OK, sendBody: SendBody("MSG-FB-9"));
 
             new OutboundPlugin(handler.Object).Execute(ctx.ServiceProvider.Object);
 
@@ -134,7 +134,50 @@ namespace XgateSmsChannel.Plugins.Tests
             ctx.SetPayload(BuildPayloadJson(channelInstanceId: Guid.NewGuid().ToString(), requestId: Guid.NewGuid().ToString()));
 
             var handler = BuildHttpHandler(
-                sendStatus: HttpStatusCode.OK, sendBody: "{\"CountOfStatus\":{\"SUCCESS\":0,\"FAILED\":1},\"ReceiveInfo\":[]}");
+                sendStatus: HttpStatusCode.OK, sendBody: "{\"accepted\":false,\"provider\":\"smsc\",\"recipients\":[]}");
+
+            new OutboundPlugin(handler.Object).Execute(ctx.ServiceProvider.Object);
+
+            var response = ctx.GetResponse();
+            Assert.Equal("Failed", response.Status);
+            Assert.Contains("网关拒绝发送", response.StatusDetails["ErrorDetails"].ToString());
+        }
+
+        [Fact]
+        public void Execute_SendAsyncAccepted_SendingStatus_ReturnsSent()
+        {
+            var ctx = new PipelineContext();
+            ctx.OrgService
+                .Setup(s => s.Retrieve("xgate_xgatesmschannelinstanceaccount", It.IsAny<Guid>(), It.IsAny<ColumnSet>()))
+                .Returns(BuildAccount(stateCode: 0));
+
+            ctx.SetPayload(BuildPayloadJson(channelInstanceId: Guid.NewGuid().ToString(), requestId: Guid.NewGuid().ToString()));
+
+            // 网关同步受理：accepted=true + status=Sending，最终结果走 webhook 回调
+            var handler = BuildHttpHandler(
+                sendStatus: HttpStatusCode.OK, sendBody: SendBody("01M2QC1B7PC8D0XWVJ1JBHX03H"));
+
+            new OutboundPlugin(handler.Object).Execute(ctx.ServiceProvider.Object);
+
+            var response = ctx.GetResponse();
+            Assert.Equal("Sent", response.Status);
+            Assert.Equal("01M2QC1B7PC8D0XWVJ1JBHX03H", response.MessageId);
+            Assert.Null(response.StatusDetails);
+        }
+
+        [Fact]
+        public void Execute_SendRecipientFailedStatus_ReturnsFailed()
+        {
+            var ctx = new PipelineContext();
+            ctx.OrgService
+                .Setup(s => s.Retrieve("xgate_xgatesmschannelinstanceaccount", It.IsAny<Guid>(), It.IsAny<ColumnSet>()))
+                .Returns(BuildAccount(stateCode: 0));
+
+            ctx.SetPayload(BuildPayloadJson(channelInstanceId: Guid.NewGuid().ToString(), requestId: Guid.NewGuid().ToString()));
+
+            // 防御性场景：即便 2xx 且带 MessageId，但状态为 NotDelivered 时仍判定失败
+            var handler = BuildHttpHandler(
+                sendStatus: HttpStatusCode.OK, sendBody: SendBody("MSG-REJ", status: "NotDelivered"));
 
             new OutboundPlugin(handler.Object).Execute(ctx.ServiceProvider.Object);
 
@@ -161,7 +204,7 @@ namespace XgateSmsChannel.Plugins.Tests
             ctx.SetPayload(BuildPayloadJson(channelInstanceId: Guid.NewGuid().ToString(), requestId: Guid.NewGuid().ToString()));
 
             var handler = BuildHttpHandler(
-                sendStatus: HttpStatusCode.OK, sendBody: "{\"CountOfStatus\":{\"SUCCESS\":1,\"FAILED\":0},\"ReceiveInfo\":[{\"MessageId\":\"MSG-DEF-1\"}]}");
+                sendStatus: HttpStatusCode.OK, sendBody: SendBody("MSG-DEF-1"));
 
             new OutboundPlugin(handler.Object).Execute(ctx.ServiceProvider.Object);
 
@@ -182,7 +225,7 @@ namespace XgateSmsChannel.Plugins.Tests
             ctx.SetPayload(BuildPayloadJson(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), message));
 
             var handler = BuildHttpHandler(
-                sendStatus: HttpStatusCode.OK, sendBody: "{\"CountOfStatus\":{\"SUCCESS\":1,\"FAILED\":0},\"ReceiveInfo\":[{\"MessageId\":\"MSG-2\"}]}");
+                sendStatus: HttpStatusCode.OK, sendBody: SendBody("MSG-2"));
 
             new OutboundPlugin(handler.Object).Execute(ctx.ServiceProvider.Object);
 
@@ -200,7 +243,7 @@ namespace XgateSmsChannel.Plugins.Tests
             ctx.SetPayload(BuildPayloadJson(Guid.NewGuid().ToString(), requestId: string.Empty));
 
             var handler = BuildHttpHandler(
-                sendStatus: HttpStatusCode.OK, sendBody: "{\"CountOfStatus\":{\"SUCCESS\":1,\"FAILED\":0},\"ReceiveInfo\":[{\"MessageId\":\"MSG-3\"}]}");
+                sendStatus: HttpStatusCode.OK, sendBody: SendBody("MSG-3"));
 
             new OutboundPlugin(handler.Object).Execute(ctx.ServiceProvider.Object);
 
@@ -223,7 +266,7 @@ namespace XgateSmsChannel.Plugins.Tests
             ctx.SetPayload(BuildPayloadJson(Guid.NewGuid().ToString(), Guid.NewGuid().ToString()));
 
             var handler = BuildHttpHandler(
-                sendStatus: HttpStatusCode.OK, sendBody: "{\"CountOfStatus\":{\"SUCCESS\":1,\"FAILED\":0},\"ReceiveInfo\":[{\"MessageId\":\"MSG-FB-X\"}]}");
+                sendStatus: HttpStatusCode.OK, sendBody: SendBody("MSG-FB-X"));
 
             new OutboundPlugin(handler.Object).Execute(ctx.ServiceProvider.Object);
 
@@ -233,7 +276,7 @@ namespace XgateSmsChannel.Plugins.Tests
         }
 
         [Fact]
-        public void Execute_SendRequest_UsesBasicAuth()
+        public void Execute_SendRequest_UsesBearerAuth()
         {
             var ctx = new PipelineContext();
             ctx.OrgService
@@ -252,16 +295,14 @@ namespace XgateSmsChannel.Plugins.Tests
                 .Callback<HttpRequestMessage, CancellationToken>((r, _) => capturedRequest = r)
                 .Returns(() => Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
                 {
-                    Content = new StringContent("{\"CountOfStatus\":{\"SUCCESS\":1,\"FAILED\":0},\"ReceiveInfo\":[{\"MessageId\":\"MSG-BA\"}]}")
+                    Content = new StringContent(SendBody("MSG-BA"))
                 }));
 
             new OutboundPlugin(handler.Object).Execute(ctx.ServiceProvider.Object);
 
             Assert.NotNull(capturedRequest);
-            Assert.Equal("Basic", capturedRequest.Headers.Authorization.Scheme);
-            var decoded = System.Text.Encoding.UTF8.GetString(
-                Convert.FromBase64String(capturedRequest.Headers.Authorization.Parameter));
-            Assert.Equal("test-app-id:test-app-secret", decoded);
+            Assert.Equal("Bearer", capturedRequest.Headers.Authorization.Scheme);
+            Assert.Equal("test-app-secret", capturedRequest.Headers.Authorization.Parameter);
         }
 
         // ----------------- 测试辅助 -----------------
@@ -290,6 +331,15 @@ namespace XgateSmsChannel.Plugins.Tests
             return JsonUtils.Serialize(payload);
         }
 
+        // 按新的发送接口响应结构构造 JSON 报文
+        private static string SendBody(string messageId, string status = "Sending", bool accepted = true, string provider = "smsc", string to = "+85261234567")
+        {
+            return "{\"accepted\":" + (accepted ? "true" : "false")
+                + ",\"provider\":\"" + provider + "\""
+                + ",\"requestId\":\"req-test\""
+                + ",\"recipients\":[{\"to\":\"" + to + "\",\"messageId\":\"" + messageId + "\",\"status\":\"" + status + "\"}]}";
+        }
+
         private static Mock<HttpMessageHandler> BuildHttpHandler(
             HttpStatusCode sendStatus = HttpStatusCode.OK, string sendBody = "{}")
         {
@@ -298,7 +348,7 @@ namespace XgateSmsChannel.Plugins.Tests
             handler.Protected()
                 .Setup<Task<HttpResponseMessage>>(
                     "SendAsync",
-                    ItExpr.Is<HttpRequestMessage>(r => r.RequestUri.AbsoluteUri.EndsWith("/send")),
+                    ItExpr.Is<HttpRequestMessage>(r => r.RequestUri.AbsoluteUri.Contains("/send")),
                     ItExpr.IsAny<CancellationToken>())
                 .Returns(() => Task.FromResult(new HttpResponseMessage(sendStatus)
                 {

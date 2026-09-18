@@ -1,11 +1,13 @@
 function xgateCredentialHelper(executionContext) {
     try {
         var formContext = executionContext.getFormContext();
-        var accountId = formContext.getAttribute("xgate_accountid").getValue();
+        // AccountId 输入框已从表单移除，凭证是否已配置改用 ApiKey 字段(数据名仍为 xgate_accountsecret)判断。
+        // 用空值安全方式读取，避免字段不在表单上时 getAttribute(...) 返回 null 再 .getValue() 抛错，导致按钮不渲染。
+        var apiKey = _xgateGetAttributeValue(formContext, "xgate_accountsecret");
 
         // 核心锚点：寻找页面上的这段说明文字
-        var controlElement = document.querySelector('[aria-label="To create AccountId and AccountSecret"]');
-        var hasAccountId = !!accountId;
+        var controlElement = document.querySelector('[aria-label="To create ApiKey"]');
+        var hasAccountId = !!apiKey;
         window._xgateHasAccountId = hasAccountId;
 
         // 无论是否有 AccountId，都显示 API Section 和下方的跳转按钮容器
@@ -27,6 +29,12 @@ function xgateCredentialHelper(executionContext) {
 function _xgateSafeSetVisible(formContext, fieldName, visible) {
     var control = formContext.getControl(fieldName);
     if (control) control.setVisible(visible);
+}
+
+// 空值安全地读取字段值：字段不在表单上时 getAttribute 返回 null，直接返回 null 而不抛错
+function _xgateGetAttributeValue(formContext, fieldName) {
+    var attribute = formContext.getAttribute(fieldName);
+    return attribute ? attribute.getValue() : null;
 }
 
 // 根据是否填了凭证，动态更改上方文字提示
@@ -70,7 +78,7 @@ function _xgateShowApiSection(controlElement) {
 function _xgateInsertContainer(controlElement) {
     if (document.getElementById("xgate-trial-container")) return;
     if (!controlElement) {
-        console.warn("xgateCredentialHelper: 未找到锚点元素 'To create AccountId and AccountSecret'");
+        console.warn("xgateCredentialHelper: 未找到锚点元素 'To create ApiKey'");
         return;
     }
 
@@ -158,7 +166,7 @@ function _xgateWatchContainer() {
 }
 
 function _xgateApplyUiState() {
-    var controlElement = document.querySelector('[aria-label="To create AccountId and AccountSecret"]');
+    var controlElement = document.querySelector('[aria-label="To create ApiKey"]');
     var hasAccountId = !!window._xgateHasAccountId;
 
     if (controlElement) {

@@ -62,11 +62,10 @@ namespace XgateSmsChannel.Plugins
                 var accountEntity = ResolveAccountEntity(orgService, payloadObject, rawFrom, tracingService);
                 ValidateAccount(accountEntity, rawFrom);
 
-                var appId = accountEntity.GetAttributeValue<string>("xgate_accountid");
                 var appSecret = accountEntity.GetAttributeValue<string>("xgate_accountsecret");
                 var baseUrl = ResolveBaseUrl(accountEntity);
 
-                messageId = SendSms(baseUrl, appId, appSecret, payloadObject, rawFrom, pluginExecutionContext.OrganizationId.ToString(), requestId, tracingService);
+                messageId = SendSms(baseUrl, appSecret, payloadObject, rawFrom, pluginExecutionContext.OrganizationId.ToString(), requestId, tracingService);
                 status = "Sent";
             }
             catch (Exception ex)
@@ -177,7 +176,7 @@ namespace XgateSmsChannel.Plugins
             return DefaultBaseUrl;
         }
 
-        private string SendSms(string baseUrl, string appId, string appSecret, Payload payloadObject, string from, string organizationId, string requestId, ITracingService tracingService)
+        private string SendSms(string baseUrl, string appSecret, Payload payloadObject, string from, string organizationId, string requestId, ITracingService tracingService)
         {
             var smsRequestBody = JsonUtils.Serialize(new SmsRequest
             {
@@ -193,8 +192,7 @@ namespace XgateSmsChannel.Plugins
                 Content = new StringContent(smsRequestBody, Encoding.UTF8, "application/json")
             };
 
-            var credentials = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{appId}:{appSecret}"));
-            smsHttpRequest.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", credentials);
+            smsHttpRequest.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", appSecret);
 
             var smsHttpResponse = httpClient.SendAsync(smsHttpRequest).GetAwaiter().GetResult();
             var smsResponseBody = smsHttpResponse.Content.ReadAsStringAsync().GetAwaiter().GetResult();
@@ -206,15 +204,34 @@ namespace XgateSmsChannel.Plugins
 
             var smsResponse = JsonUtils.Deserialize<SmsResponse>(smsResponseBody);
 
-            if (smsResponse.CountOfStatus != null && smsResponse.CountOfStatus.Success == 1
-                && smsResponse.ReceiveInfo != null && smsResponse.ReceiveInfo.Count > 0)
+            var recipient = smsResponse.Recipients != null && smsResponse.Recipients.Count > 0
+                ? smsResponse.Recipients[0]
+                : null;
+
+            // 新协议：accepted=true 表示渠道已受理本次请求（status 恒为 Sending，最终结果经 webhook 回调另行推送）。
+            // 发送失败时接口直接返回非 2xx（已在上面拦截），这里再做一次防御性状态校验。
+            if (smsResponse.Accepted && recipient != null && !IsFailedStatus(recipient.Status))
             {
-                var messageId = smsResponse.ReceiveInfo[0].MessageId;
-                tracingService.Trace("SMS sent successfully. MessageId: " + messageId);
+                // 渠道未返回 messageId 时回退用 requestId，保证 D365 侧有可对账的标识
+                var messageId = string.IsNullOrEmpty(recipient.MessageId) ? requestId : recipient.MessageId;
+                tracingService.Trace($"SMS accepted by gateway [{smsResponse.Provider}]. Status: {recipient.Status}, MessageId: {messageId}");
                 return messageId;
             }
 
             throw new XgateGatewayException($"网关拒绝发送 (业务异常): {smsResponseBody}");
+        }
+
+        // 判定单条消息状态是否为失败类（明确失败才拒绝，Sending/空 视为已受理）。
+        // 同步返回时 status 恒为 Sending，此处主要作防御性校验。
+        private static bool IsFailedStatus(string status)
+        {
+            if (string.IsNullOrEmpty(status))
+            {
+                return false;
+            }
+
+            return string.Equals(status, "NotDelivered", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(status, "Timeout", StringComparison.OrdinalIgnoreCase);
         }
 
         private static string ResolveMessageBody(Payload payloadObject)

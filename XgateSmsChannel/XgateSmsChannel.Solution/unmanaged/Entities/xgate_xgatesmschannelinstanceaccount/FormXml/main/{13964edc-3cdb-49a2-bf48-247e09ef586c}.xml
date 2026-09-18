@@ -20,17 +20,9 @@
                   </labels>
                   <rows>
                     <row>
-                      <cell id="{000a7ee0-511a-302e-7bd9-2a995273bd8b}" showlabel="true" locklevel="0">
-                        <labels>
-                          <label description="AccountId" languagecode="1033" />
-                        </labels>
-                        <control id="xgate_accountid" classid="{4273EDBD-AC1D-40d3-9FB2-095C621B552D}" datafieldname="xgate_accountid" disabled="false" />
-                      </cell>
-                    </row>
-                    <row>
                       <cell id="{22dce693-1522-0aba-de49-b0a6561b3b12}" showlabel="true" locklevel="0">
                         <labels>
-                          <label description="Account secret" languagecode="1033" />
+                          <label description="ApiKey" languagecode="1033" />
                         </labels>
                         <control id="xgate_accountsecret" classid="{4273EDBD-AC1D-40d3-9FB2-095C621B552D}" datafieldname="xgate_accountsecret" disabled="false" />
                       </cell>
@@ -39,7 +31,7 @@
                 </section>
                 <section name="xgate_account_section" id="b327f080-bbea-4fee-808b-1cd5b073c374" IsUserDefined="0" locklevel="0" showlabel="true" showbar="false" layout="varwidth" celllabelalignment="Left" celllabelposition="Left" columns="1" labelwidth="115">
                   <labels>
-                    <label description="To create AccountId and AccountSecret" languagecode="1033" />
+                    <label description="To create ApiKey" languagecode="1033" />
                   </labels>
                   <rows>
                     <row />
@@ -134,7 +126,7 @@
             <Handler functionName="xgateCredentialHelper" libraryName="xgate_credentialHelper.js" handlerUniqueId="{25663b7c-6649-4cbd-83d1-b8bf92156b98}" enabled="true" parameters="" passExecutionContext="true" />
           </Handlers>
         </event>
-        <event name="onchange" application="false" active="false" attribute="xgate_accountid">
+        <event name="onchange" application="false" active="false" attribute="xgate_accountsecret">
           <Handlers>
             <Handler functionName="xgateCredentialHelper" libraryName="xgate_credentialHelper.js" handlerUniqueId="{6eab4f90-1fc2-418a-b36c-9bd6d7de0969}" enabled="true" parameters="" passExecutionContext="true" />
           </Handlers>

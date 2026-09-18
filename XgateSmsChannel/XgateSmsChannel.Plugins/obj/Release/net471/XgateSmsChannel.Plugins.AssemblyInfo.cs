@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("XgateSmsChannel.Plugins")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b3f7dc1e0430d422e55b8eaf3578f84dbbcc3617")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ceb35aa3a436f7b9db28f71d25a8279344dcb223")]
 [assembly: System.Reflection.AssemblyProductAttribute("XgateSmsChannel.Plugins")]
 [assembly: System.Reflection.AssemblyTitleAttribute("XgateSmsChannel.Plugins")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
